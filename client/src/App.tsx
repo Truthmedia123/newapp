@@ -13,6 +13,11 @@ import BlogPost from "@/pages/BlogPost";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Couples from "@/pages/Couples";
+import RSVPGenerator from "@/pages/RSVPGenerator";
+import RSVPForm from "@/pages/RSVPForm";
+import RSVPConfirmation from "@/pages/RSVPConfirmation";
+import RSVPDashboard from "@/pages/RSVPDashboard";
+import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +33,11 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
         <Route path="/couples/:slug" component={Couples} />
+        <Route path="/rsvp/create" component={RSVPGenerator} />
+        <Route path="/rsvp/:invitationCode" component={RSVPForm} />
+        <Route path="/rsvp/confirmation/:code" component={RSVPConfirmation} />
+        <Route path="/rsvp/manage/:weddingId" component={RSVPDashboard} />
+        <Route path="/admin/dashboard" component={AdminDashboard} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

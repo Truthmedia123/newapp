@@ -4,6 +4,10 @@ import {
   insertReviewSchema, 
   insertBusinessSubmissionSchema, 
   insertContactSchema,
+  insertRsvpInvitationSchema,
+  insertRsvpQuestionSchema,
+  insertRsvpResponseSchema,
+  insertWeddingEventSchema,
   vendors,
   reviews,
   categories,
@@ -11,7 +15,11 @@ import {
   businessSubmissions,
   contacts,
   weddings,
-  rsvps
+  rsvps,
+  rsvpInvitations,
+  rsvpQuestions,
+  rsvpResponses,
+  weddingEvents
 } from "@shared/schema";
 
 import { eq, like, or } from "drizzle-orm";  
@@ -154,23 +162,23 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     }
   });
 
-  // Business Submissions
-  app.post("/api/business-submissions", async (c) => {
-    try {
-      const body = await c.req.json();
-      const submissionData = insertBusinessSubmissionSchema.parse(body);
+  // Business Submissions - DISABLED (Admin-only management)
+  // app.post("/api/business-submissions", async (c) => {
+  //   try {
+  //     const body = await c.req.json();
+  //     const submissionData = insertBusinessSubmissionSchema.parse(body);
       
-      const db = getDb(c.env);
-      const submission = await db.insert(businessSubmissions).values(submissionData).returning().get();
+  //     const db = getDb(c.env);
+  //     const submission = await db.insert(businessSubmissions).values(submissionData).returning().get();
       
-      return c.json(submission, 201);
-    } catch (error) {
-      if (error && typeof error === 'object' && 'errors' in error) {
-        return c.json({ message: "Invalid submission data", errors: (error as any).errors }, 400);
-      }
-      return c.json({ message: "Failed to create business submission" }, 500);
-    }
-  });
+  //     return c.json(submission, 201);
+  //   } catch (error) {
+  //     if (error && typeof error === 'object' && 'errors' in error) {
+  //       return c.json({ message: "Invalid submission data", errors: (error as any).errors }, 400);
+  //     }
+  //     return c.json({ message: "Failed to create business submission" }, 500);
+  //   }
+  // });
 
   // Contact
   app.post("/api/contact", async (c) => {
@@ -251,4 +259,108 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
       return c.json({ error: "Failed to submit RSVP" }, 500);
     }
   });
+
+  // RSVP Generator routes
+  app.post("/api/rsvp/generate", async (c) => {
+    try {
+      const body = await c.req.json();
+      const db = getDb(c.env);
+
+      // Create wedding
+      const wedding = await db.insert(weddings).values(body.wedding).returning().get();
+
+      // Create events
+      for (const event of body.events) {
+        await db.insert(weddingEvents).values({...event, weddingId: wedding.id});
+      }
+
+      // Create questions
+      for (const question of body.questions) {
+        await db.insert(rsvpQuestions).values({...question, weddingId: wedding.id});
+      }
+
+      // Generate invitations for guests
+      const invitations = [];
+      for (const guest of body.guests) {
+        const invitation = await db.insert(rsvpInvitations).values({
+          weddingId: wedding.id,
+          guestName: guest.name,
+          guestEmail: guest.email,
+          invitationCode: generateInvitationCode(),
+          maxGuests: guest.maxGuests || 1,
+          allowPlusOne: guest.allowPlusOne || false,
+          invitedEvents: JSON.stringify(guest.invitedEvents || [])
+        }).returning().get();
+        invitations.push(invitation);
+      }
+
+      return c.json({ wedding, invitations });
+    } catch (error) {
+      return c.json({ error: "Failed to generate RSVP" }, 500);
+    }
+  });
+
+  app.get("/api/rsvp/invitation/:code", async (c) => {
+    try {
+      const code = c.req.param("code");
+      const db = getDb(c.env);
+
+      const invitation = await db.select()
+        .from(rsvpInvitations)
+        .leftJoin(weddings, eq(rsvpInvitations.weddingId, weddings.id))
+        .where(eq(rsvpInvitations.invitationCode, code))
+        .get();
+
+      if (!invitation) {
+        return c.json({ error: "Invitation not found" }, 404);
+      }
+
+      // Get events and questions
+      const events = await db.select().from(weddingEvents)
+        .where(eq(weddingEvents.weddingId, invitation.wedding_id)).all();
+
+      const questions = await db.select().from(rsvpQuestions)
+        .where(eq(rsvpQuestions.weddingId, invitation.wedding_id)).all();
+
+      return c.json({ ...invitation, events, questions });
+    } catch (error) {
+      return c.json({ error: "Failed to fetch invitation" }, 500);
+    }
+  });
+
+  app.post("/api/rsvp/submit", async (c) => {
+    try {
+      const body = await c.req.json();
+      const db = getDb(c.env);
+
+      // Create RSVP record
+      const rsvp = await db.insert(rsvps).values({
+        weddingId: body.weddingId,
+        guestName: body.guests[0]?.name || '',
+        guestEmail: body.guests[0]?.email || '',
+        numberOfGuests: body.guests.length,
+        attendingCeremony: body.attendingCeremony || true,
+        attendingReception: body.attendingReception || true
+      }).returning().get();
+
+      // Save custom question responses
+      for (const [questionId, answer] of Object.entries(body.responses)) {
+        await db.insert(rsvpResponses).values({
+          rsvpId: rsvp.id,
+          questionId: parseInt(questionId),
+          answer: String(answer)
+        });
+      }
+
+      return c.json({ success: true, rsvp });
+    } catch (error) {
+      return c.json({ error: "Failed to submit RSVP" }, 500);
+    }
+  });
+
+  // Helper function for generating invitation codes
+  function generateInvitationCode(): string {
+    return Math.random().toString(36).substring(2, 15) + 
+           Math.random().toString(36).substring(2, 15);
+  }
 }

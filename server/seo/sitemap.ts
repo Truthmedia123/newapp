@@ -31,21 +31,21 @@ ${urlsetOpen}${urls}
 ${urlsetClose}`;
 };
 
-// Static pages
+    // Static pages
 const staticPages: SitemapEntry[] = [
-  {
+    {
     url: 'https://thegoanwedding.com/',
-    changefreq: 'daily',
+      changefreq: 'daily',
     priority: 1.0,
-  },
-  {
+    },
+    {
     url: 'https://thegoanwedding.com/about',
-    changefreq: 'monthly',
+      changefreq: 'monthly',
     priority: 0.8,
-  },
-  {
+    },
+    {
     url: 'https://thegoanwedding.com/contact',
-    changefreq: 'monthly',
+      changefreq: 'monthly',
     priority: 0.7,
   },
   {
@@ -83,7 +83,7 @@ const vendorCategories = [
 
 const categoryPages: SitemapEntry[] = vendorCategories.map(category => ({
   url: `https://thegoanwedding.com/vendors/${category}`,
-  changefreq: 'weekly',
+      changefreq: 'weekly',
   priority: 0.8,
 }));
 
@@ -175,10 +175,10 @@ app.get('/sitemap-vendors.xml', async (c) => {
     const sitemap = generateSitemap(vendorEntries);
 
     return c.text(sitemap, 200, {
-      'Content-Type': 'application/xml',
+          'Content-Type': 'application/xml',
       'Cache-Control': 'public, max-age=3600',
-    });
-  } catch (error) {
+      });
+    } catch (error) {
     console.error('Error generating vendor sitemap:', error);
     return c.text('Error generating vendor sitemap', 500);
   }
@@ -193,8 +193,8 @@ app.get('/sitemap-blog.xml', async (c) => {
     return c.text(blogSitemap, 200, {
       'Content-Type': 'application/xml',
       'Cache-Control': 'public, max-age=3600',
-    });
-  } catch (error) {
+      });
+    } catch (error) {
     console.error('Error generating blog sitemap:', error);
     return c.text('Error generating blog sitemap', 500);
   }

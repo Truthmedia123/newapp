@@ -77,9 +77,9 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
           entries.forEach((entry: any) => {
             if (entry.processingStart && entry.startTime) {
               const fid = entry.processingStart - entry.startTime;
-              setMetrics(prev => ({ ...prev, fid }));
+            setMetrics(prev => ({ ...prev, fid }));
               trackPerformance('fid', fid);
-            }
+          }
           });
         });
         fidObserver.observe({ entryTypes: ['first-input'] });

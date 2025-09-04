@@ -43,14 +43,6 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   locations = [
     'North Goa',
     'South Goa',
-    'Panaji',
-    'Mapusa',
-    'Margao',
-    'Vasco',
-    'Calangute',
-    'Baga',
-    'Anjuna',
-    'Candolim',
   ],
   features = [
     'Outdoor Venue',

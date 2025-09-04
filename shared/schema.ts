@@ -126,6 +126,56 @@ export const rsvps = sqliteTable("rsvps", {
   createdAt: integer("created_at", { mode: "timestamp" }),
 });
 
+export const rsvpInvitations = sqliteTable("rsvp_invitations", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  weddingId: integer("wedding_id").notNull().references(() => weddings.id),
+  guestName: text("guest_name").notNull(),
+  guestEmail: text("guest_email").notNull(),
+  invitationCode: text("invitation_code").notNull().unique(),
+  maxGuests: integer("max_guests").default(1),
+  allowPlusOne: integer("allow_plus_one", { mode: "boolean" }).default(false),
+  invitedEvents: text("invited_events"), // JSON array of event IDs
+  isFamily: integer("is_family", { mode: "boolean" }).default(false),
+  status: text("status").default("sent"), // sent, viewed, responded
+  sentAt: integer("sent_at", { mode: "timestamp" }),
+  viewedAt: integer("viewed_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }),
+});
+
+export const rsvpQuestions = sqliteTable("rsvp_questions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  weddingId: integer("wedding_id").notNull().references(() => weddings.id),
+  question: text("question").notNull(),
+  type: text("type").notNull(), // text, select, multiselect, boolean, number
+  options: text("options"), // JSON array for select types
+  required: integer("required", { mode: "boolean" }).default(false),
+  eventSpecific: text("event_specific"), // null for all events, or event ID
+  order: integer("order").default(0),
+});
+
+export const rsvpResponses = sqliteTable("rsvp_responses", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  rsvpId: integer("rsvp_id").notNull().references(() => rsvps.id),
+  questionId: integer("question_id").notNull().references(() => rsvpQuestions.id),
+  answer: text("answer").notNull(),
+});
+
+export const weddingEvents = sqliteTable("wedding_events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  weddingId: integer("wedding_id").notNull().references(() => weddings.id),
+  name: text("name").notNull(),
+  description: text("description"),
+  date: integer("date", { mode: "timestamp" }).notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time"),
+  venue: text("venue").notNull(),
+  address: text("address").notNull(),
+  dressCode: text("dress_code"),
+  isPrivate: integer("is_private", { mode: "boolean" }).default(false),
+  maxGuests: integer("max_guests"),
+  order: integer("order").default(0),
+});
+
 // Insert schemas
 export const insertVendorSchema = createInsertSchema(vendors).omit({
   id: true,
@@ -170,6 +220,23 @@ export const insertRsvpSchema = createInsertSchema(rsvps).omit({
   createdAt: true,
 });
 
+export const insertRsvpInvitationSchema = createInsertSchema(rsvpInvitations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertRsvpQuestionSchema = createInsertSchema(rsvpQuestions).omit({
+  id: true,
+});
+
+export const insertRsvpResponseSchema = createInsertSchema(rsvpResponses).omit({
+  id: true,
+});
+
+export const insertWeddingEventSchema = createInsertSchema(weddingEvents).omit({
+  id: true,
+});
+
 // Types
 export type Vendor = typeof vendors.$inferSelect;
 export type InsertVendor = z.infer<typeof insertVendorSchema>;
@@ -187,3 +254,11 @@ export type Wedding = typeof weddings.$inferSelect;
 export type InsertWedding = z.infer<typeof insertWeddingSchema>;
 export type Rsvp = typeof rsvps.$inferSelect;
 export type InsertRsvp = z.infer<typeof insertRsvpSchema>;
+export type RsvpInvitation = typeof rsvpInvitations.$inferSelect;
+export type InsertRsvpInvitation = z.infer<typeof insertRsvpInvitationSchema>;
+export type RsvpQuestion = typeof rsvpQuestions.$inferSelect;
+export type InsertRsvpQuestion = z.infer<typeof insertRsvpQuestionSchema>;
+export type RsvpResponse = typeof rsvpResponses.$inferSelect;
+export type InsertRsvpResponse = z.infer<typeof insertRsvpResponseSchema>;
+export type WeddingEvent = typeof weddingEvents.$inferSelect;
+export type InsertWeddingEvent = z.infer<typeof insertWeddingEventSchema>;

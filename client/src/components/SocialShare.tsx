@@ -247,6 +247,7 @@ export const SocialShareButtons: React.FC<SocialShareProps> = (props) => {
         <MessageCircle className="h-4 w-4 mr-2" />
         WhatsApp
       </Button>
+
     </div>
   );
 };

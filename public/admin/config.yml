@@ -2,6 +2,9 @@ backend:
   name: git-gateway
   branch: main
 
+# Admin-only configuration
+publish_mode: editorial_workflow
+
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
@@ -18,7 +21,7 @@ collections:
   - name: "vendors"
     label: "Vendors"
     folder: "content/vendors"
-    create: true
+    create: false  # Admin-only: prevent public creation
     slug: "{{slug}}"
     fields:
       - { label: "Name", name: "name", widget: "string" }

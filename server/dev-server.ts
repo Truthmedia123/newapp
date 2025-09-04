@@ -163,7 +163,7 @@ const server = createServer(app);
     serveStatic(app);
   }
   
-  const port = 3000;
+  const port = 3001;
   const listenOptions: any = {
     port,
     host: "0.0.0.0",
