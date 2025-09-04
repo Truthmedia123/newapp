@@ -1,0 +1,25 @@
+name = "thegoanwedding"
+main = "dist/worker.js"
+compatibility_date = "2025-09-03"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "wedding_platform_db"
+database_id = "eb586981-d322-4e17-a982-6397604e3fc4"
+
+[vars]
+NODE_ENV = "production"
+SITE_URL = "https://your-domain.com"
+
+[build]
+command = "npm run build:production"
+cwd = "."
+watch_dir = "client/src"
+
+[env.dev]
+name = "thegoanwedding-dev"
+d1_databases = []
+
+[env.dev.vars]
+NODE_ENV = "development"
+SITE_URL = "http://localhost:8787"
