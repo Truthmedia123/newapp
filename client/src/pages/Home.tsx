@@ -24,7 +24,7 @@ export default function Home() {
         {/* Background with parallax effect */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/src/assets/hero.jpg"
+            src="/assets/hero.jpg"
             alt="Beautiful Goan beach wedding ceremony"
             className="w-full h-full object-cover scale-110"
           />

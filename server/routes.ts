@@ -1,194 +1,254 @@
-import type { Express } from "express";
-import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertReviewSchema, insertBusinessSubmissionSchema, insertContactSchema } from "@shared/schema";
-import { z } from "zod";
+import type { Hono } from "hono";
+import { getDb, type Env } from "./db";
+import { 
+  insertReviewSchema, 
+  insertBusinessSubmissionSchema, 
+  insertContactSchema,
+  vendors,
+  reviews,
+  categories,
+  blogPosts,
+  businessSubmissions,
+  contacts,
+  weddings,
+  rsvps
+} from "@shared/schema";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+import { eq, like, or } from "drizzle-orm";  
+
+export function registerRoutes(app: Hono<{ Bindings: Env }>) {
   // Vendors
-  app.get("/api/vendors", async (req, res) => {
+  app.get("/api/vendors", async (c) => {
     try {
-      const { category, location, search } = req.query;
-      const vendors = await storage.getVendors({
-        category: category as string,
-        location: location as string,
-        search: search as string,
-      });
-      res.json(vendors);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch vendors" });
-    }
-  });
-
-  app.get("/api/vendors/featured", async (req, res) => {
-    try {
-      const vendors = await storage.getFeaturedVendors();
-      res.json(vendors);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch featured vendors" });
-    }
-  });
-
-  app.get("/api/vendors/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const vendor = await storage.getVendor(id);
-      if (!vendor) {
-        return res.status(404).json({ message: "Vendor not found" });
+      const { category, location, search } = c.req.query();
+      const db = getDb(c.env);
+      
+      let query = db.select().from(vendors);
+      
+      if (category) {
+        query = query.where(eq(vendors.category, category));
       }
-      res.json(vendor);
+      if (location) {
+        query = query.where(eq(vendors.location, location));
+      }
+      if (search) {
+        query = query.where(
+          or(
+            like(vendors.name, `%${search}%`),
+            like(vendors.description, `%${search}%`)
+          )
+        );
+      }
+      
+      const vendorsList = await query.all();
+      return c.json(vendorsList);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch vendor" });
+      return c.json({ message: "Failed to fetch vendors" }, 500);
+    }
+  });
+
+  app.get("/api/vendors/featured", async (c) => {
+    try {
+      const db = getDb(c.env);
+      const featuredVendors = await db.select().from(vendors).where(eq(vendors.featured, true)).all();
+      return c.json(featuredVendors);
+    } catch (error) {
+      return c.json({ message: "Failed to fetch featured vendors" }, 500);
+    }
+  });
+
+  app.get("/api/vendors/:id", async (c) => {
+    try {
+      const id = parseInt(c.req.param("id"));
+      const db = getDb(c.env);
+      const vendor = await db.select().from(vendors).where(eq(vendors.id, id)).get();
+      
+      if (!vendor) {
+        return c.json({ message: "Vendor not found" }, 404);
+      }
+      return c.json(vendor);
+    } catch (error) {
+      return c.json({ message: "Failed to fetch vendor" }, 500);
     }
   });
 
   // Reviews
-  app.get("/api/vendors/:id/reviews", async (req, res) => {
+  app.get("/api/vendors/:id/reviews", async (c) => {
     try {
-      const vendorId = parseInt(req.params.id);
-      const reviews = await storage.getVendorReviews(vendorId);
-      res.json(reviews);
+      const vendorId = parseInt(c.req.param("id"));
+      const db = getDb(c.env);
+      const reviewsList = await db.select().from(reviews).where(eq(reviews.vendorId, vendorId)).all();
+      return c.json(reviewsList);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch reviews" });
+      return c.json({ message: "Failed to fetch reviews" }, 500);
     }
   });
 
-  app.post("/api/vendors/:id/reviews", async (req, res) => {
+  app.post("/api/vendors/:id/reviews", async (c) => {
     try {
-      const vendorId = parseInt(req.params.id);
-      const reviewData = insertReviewSchema.parse({ ...req.body, vendorId });
-      const review = await storage.createReview(reviewData);
-      res.status(201).json(review);
+      const vendorId = parseInt(c.req.param("id"));
+      const body = await c.req.json();
+      const reviewData = insertReviewSchema.parse({ ...body, vendorId });
+      
+      const db = getDb(c.env);
+      const review = await db.insert(reviews).values(reviewData).returning().get();
+      
+      return c.json(review, 201);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid review data", errors: error.errors });
+      if (error && typeof error === 'object' && 'errors' in error) {
+        return c.json({ message: "Invalid review data", errors: (error as any).errors }, 400);
       }
-      res.status(500).json({ message: "Failed to create review" });
+      return c.json({ message: "Failed to create review" }, 500);
     }
   });
 
   // Categories
-  app.get("/api/categories", async (req, res) => {
+  app.get("/api/categories", async (c) => {
     try {
-      const categories = await storage.getCategories();
-      res.json(categories);
+      const db = getDb(c.env);
+      const categoriesList = await db.select().from(categories).all();
+      return c.json(categoriesList);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch categories" });
+      return c.json({ message: "Failed to fetch categories" }, 500);
     }
   });
 
-  app.get("/api/categories/:slug", async (req, res) => {
+  app.get("/api/categories/:slug", async (c) => {
     try {
-      const category = await storage.getCategory(req.params.slug);
+      const slug = c.req.param("slug");
+      const db = getDb(c.env);
+      const category = await db.select().from(categories).where(eq(categories.slug, slug)).get();
+      
       if (!category) {
-        return res.status(404).json({ message: "Category not found" });
+        return c.json({ message: "Category not found" }, 404);
       }
-      res.json(category);
+      return c.json(category);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch category" });
+      return c.json({ message: "Failed to fetch category" }, 500);
     }
   });
 
   // Blog Posts
-  app.get("/api/blog", async (req, res) => {
+  app.get("/api/blog", async (c) => {
     try {
-      const posts = await storage.getBlogPosts(true);
-      res.json(posts);
+      const db = getDb(c.env);
+      const posts = await db.select().from(blogPosts).where(eq(blogPosts.published, true)).all();
+      return c.json(posts);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch blog posts" });
+      return c.json({ message: "Failed to fetch blog posts" }, 500);
     }
   });
 
-  app.get("/api/blog/:slug", async (req, res) => {
+  app.get("/api/blog/:slug", async (c) => {
     try {
-      const post = await storage.getBlogPost(req.params.slug);
+      const slug = c.req.param("slug");
+      const db = getDb(c.env);
+      const post = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug)).get();
+      
       if (!post) {
-        return res.status(404).json({ message: "Blog post not found" });
+        return c.json({ message: "Blog post not found" }, 404);
       }
-      res.json(post);
+      return c.json(post);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch blog post" });
+      return c.json({ message: "Failed to fetch blog post" }, 500);
     }
   });
 
   // Business Submissions
-  app.post("/api/business-submissions", async (req, res) => {
+  app.post("/api/business-submissions", async (c) => {
     try {
-      const submissionData = insertBusinessSubmissionSchema.parse(req.body);
-      const submission = await storage.createBusinessSubmission(submissionData);
-      res.status(201).json(submission);
+      const body = await c.req.json();
+      const submissionData = insertBusinessSubmissionSchema.parse(body);
+      
+      const db = getDb(c.env);
+      const submission = await db.insert(businessSubmissions).values(submissionData).returning().get();
+      
+      return c.json(submission, 201);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid submission data", errors: error.errors });
+      if (error && typeof error === 'object' && 'errors' in error) {
+        return c.json({ message: "Invalid submission data", errors: (error as any).errors }, 400);
       }
-      res.status(500).json({ message: "Failed to create business submission" });
+      return c.json({ message: "Failed to create business submission" }, 500);
     }
   });
 
   // Contact
-  app.post("/api/contact", async (req, res) => {
+  app.post("/api/contact", async (c) => {
     try {
-      const contactData = insertContactSchema.parse(req.body);
-      const contact = await storage.createContact(contactData);
-      res.status(201).json(contact);
+      const body = await c.req.json();
+      const contactData = insertContactSchema.parse(body);
+      
+      const db = getDb(c.env);
+      const contact = await db.insert(contacts).values(contactData).returning().get();
+      
+      return c.json(contact, 201);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid contact data", errors: error.errors });
+      if (error && typeof error === 'object' && 'errors' in error) {
+        return c.json({ message: "Invalid contact data", errors: (error as any).errors }, 400);
       }
-      res.status(500).json({ message: "Failed to send contact message" });
+      return c.json({ message: "Failed to send contact message" }, 500);
     }
   });
 
   // Wedding routes
-  app.get("/api/weddings", async (req, res) => {
+  app.get("/api/weddings", async (c) => {
     try {
-      const weddings = await storage.getWeddings();
-      res.json(weddings);
+      const db = getDb(c.env);
+      const weddingsList = await db.select().from(weddings).all();
+      return c.json(weddingsList);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch weddings" });
+      return c.json({ error: "Failed to fetch weddings" }, 500);
     }
   });
 
-  app.get("/api/weddings/:slug", async (req, res) => {
+  app.get("/api/weddings/:slug", async (c) => {
     try {
-      const wedding = await storage.getWedding(req.params.slug);
+      const slug = c.req.param("slug");
+      const db = getDb(c.env);
+      const wedding = await db.select().from(weddings).where(eq(weddings.slug, slug)).get();
+      
       if (!wedding) {
-        return res.status(404).json({ error: "Wedding not found" });
+        return c.json({ error: "Wedding not found" }, 404);
       }
-      res.json(wedding);
+      return c.json(wedding);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch wedding" });
+      return c.json({ error: "Failed to fetch wedding" }, 500);
     }
   });
 
-  app.post("/api/weddings", async (req, res) => {
+  app.post("/api/weddings", async (c) => {
     try {
-      const wedding = await storage.createWedding(req.body);
-      res.json(wedding);
+      const body = await c.req.json();
+      const db = getDb(c.env);
+      const wedding = await db.insert(weddings).values(body).returning().get();
+      return c.json(wedding);
     } catch (error) {
-      res.status(500).json({ error: "Failed to create wedding" });
+      return c.json({ error: "Failed to create wedding" }, 500);
     }
   });
 
-  app.get("/api/weddings/:id/rsvps", async (req, res) => {
+  app.get("/api/weddings/:id/rsvps", async (c) => {
     try {
-      const rsvps = await storage.getWeddingRsvps(parseInt(req.params.id));
-      res.json(rsvps);
+      const weddingId = parseInt(c.req.param("id"));
+      const db = getDb(c.env);
+      const rsvpsList = await db.select().from(rsvps).where(eq(rsvps.weddingId, weddingId)).all();
+      return c.json(rsvpsList);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch RSVPs" });
+      return c.json({ error: "Failed to fetch RSVPs" }, 500);
     }
   });
 
-  app.post("/api/weddings/:id/rsvps", async (req, res) => {
+  app.post("/api/weddings/:id/rsvps", async (c) => {
     try {
-      const rsvpData = { ...req.body, weddingId: parseInt(req.params.id) };
-      const rsvp = await storage.createRsvp(rsvpData);
-      res.json(rsvp);
+      const weddingId = parseInt(c.req.param("id"));
+      const body = await c.req.json();
+      const rsvpData = { ...body, weddingId };
+      
+      const db = getDb(c.env);
+      const rsvp = await db.insert(rsvps).values(rsvpData).returning().get();
+      return c.json(rsvp);
     } catch (error) {
-      res.status(500).json({ error: "Failed to submit RSVP" });
+      return c.json({ error: "Failed to submit RSVP" }, 500);
     }
   });
-
-  const httpServer = createServer(app);
-  return httpServer;
 }

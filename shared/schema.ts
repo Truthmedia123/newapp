@@ -1,9 +1,9 @@
-import { pgTable, text, serial, integer, boolean, timestamp, decimal, jsonb } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, real, blob } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const vendors = pgTable("vendors", {
-  id: serial("id").primaryKey(),
+export const vendors = sqliteTable("vendors", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   category: text("category").notNull(),
   description: text("description").notNull(),
@@ -18,29 +18,29 @@ export const vendors = pgTable("vendors", {
   facebook: text("facebook"),
   profileImage: text("profile_image"),
   coverImage: text("cover_image"),
-  gallery: text("gallery").array(),
-  services: text("services").array(),
+  gallery: text("gallery"), // SQLite doesn't support arrays, will store as JSON string
+  services: text("services"), // SQLite doesn't support arrays, will store as JSON string
   priceRange: text("price_range"),
-  featured: boolean("featured").default(false),
-  verified: boolean("verified").default(false),
-  rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
+  featured: integer("featured", { mode: "boolean" }).default(false),
+  verified: integer("verified", { mode: "boolean" }).default(false),
+  rating: real("rating").default(0),
   reviewCount: integer("review_count").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }),
 });
 
-export const reviews = pgTable("reviews", {
-  id: serial("id").primaryKey(),
+export const reviews = sqliteTable("reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   vendorId: integer("vendor_id").references(() => vendors.id).notNull(),
   customerName: text("customer_name").notNull(),
   customerEmail: text("customer_email"),
   rating: integer("rating").notNull(),
   comment: text("comment").notNull(),
-  images: text("images").array(),
-  createdAt: timestamp("created_at").defaultNow(),
+  images: text("images"), // SQLite doesn't support arrays, will store as JSON string
+  createdAt: integer("created_at", { mode: "timestamp" }),
 });
 
-export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
+export const categories = sqliteTable("categories", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull().unique(),
   slug: text("slug").notNull().unique(),
   description: text("description"),
@@ -49,21 +49,21 @@ export const categories = pgTable("categories", {
   vendorCount: integer("vendor_count").default(0),
 });
 
-export const blogPosts = pgTable("blog_posts", {
-  id: serial("id").primaryKey(),
+export const blogPosts = sqliteTable("blog_posts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   slug: text("slug").notNull().unique(),
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   featuredImage: text("featured_image"),
   category: text("category").notNull(),
-  tags: text("tags").array(),
-  published: boolean("published").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
+  tags: text("tags"), // SQLite doesn't support arrays, will store as JSON string
+  published: integer("published", { mode: "boolean" }).default(false),
+  createdAt: integer("created_at", { mode: "timestamp" }),
 });
 
-export const businessSubmissions = pgTable("business_submissions", {
-  id: serial("id").primaryKey(),
+export const businessSubmissions = sqliteTable("business_submissions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   category: text("category").notNull(),
   description: text("description").notNull(),
@@ -75,55 +75,55 @@ export const businessSubmissions = pgTable("business_submissions", {
   website: text("website"),
   instagram: text("instagram"),
   facebook: text("facebook"),
-  services: text("services").array(),
+  services: text("services"), // SQLite doesn't support arrays, will store as JSON string
   priceRange: text("price_range"),
   status: text("status").default("pending"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }),
 });
 
-export const contacts = pgTable("contacts", {
-  id: serial("id").primaryKey(),
+export const contacts = sqliteTable("contacts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone"),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }),
 });
 
-export const weddings = pgTable("weddings", {
-  id: serial("id").primaryKey(),
+export const weddings = sqliteTable("weddings", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   brideName: text("bride_name").notNull(),
   groomName: text("groom_name").notNull(),
-  weddingDate: timestamp("wedding_date").notNull(),
+  weddingDate: integer("wedding_date", { mode: "timestamp" }).notNull(),
   venue: text("venue").notNull(),
   venueAddress: text("venue_address").notNull(),
   ceremonyTime: text("ceremony_time").notNull(),
   receptionTime: text("reception_time"),
   coverImage: text("cover_image"),
-  galleryImages: text("gallery_images").array(),
+  galleryImages: text("gallery_images"), // SQLite doesn't support arrays, will store as JSON string
   story: text("story"),
   slug: text("slug").notNull(),
-  rsvpDeadline: timestamp("rsvp_deadline"),
+  rsvpDeadline: integer("rsvp_deadline", { mode: "timestamp" }),
   maxGuests: integer("max_guests").default(100),
-  isPublic: boolean("is_public").default(true),
+  isPublic: integer("is_public", { mode: "boolean" }).default(true),
   contactEmail: text("contact_email").notNull(),
   contactPhone: text("contact_phone"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }),
 });
 
-export const rsvps = pgTable("rsvps", {
-  id: serial("id").primaryKey(),
+export const rsvps = sqliteTable("rsvps", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   weddingId: integer("wedding_id").notNull().references(() => weddings.id),
   guestName: text("guest_name").notNull(),
   guestEmail: text("guest_email").notNull(),
   guestPhone: text("guest_phone"),
-  attendingCeremony: boolean("attending_ceremony").default(true),
-  attendingReception: boolean("attending_reception").default(true),
+  attendingCeremony: integer("attending_ceremony", { mode: "boolean" }).default(true),
+  attendingReception: integer("attending_reception", { mode: "boolean" }).default(true),
   numberOfGuests: integer("number_of_guests").default(1),
   dietaryRestrictions: text("dietary_restrictions"),
   message: text("message"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }),
 });
 
 // Insert schemas
