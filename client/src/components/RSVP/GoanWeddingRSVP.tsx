@@ -190,43 +190,106 @@ export function GoanWeddingRSVP() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      {/* Header with Goan Wedding Theme */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-purple-500/10"></div>
-        <div className="relative z-10 py-12 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Decorative Elements */}
-            <div className="flex justify-center items-center gap-4 mb-6">
-              <Flower className="w-8 h-8 text-pink-400" />
-              <Star className="w-6 h-6 text-yellow-400" />
-              <Crown className="w-8 h-8 text-purple-400" />
-              <Star className="w-6 h-6 text-yellow-400" />
-              <Flower className="w-8 h-8 text-pink-400" />
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              {weddingData.brideName} & {weddingData.groomName}
-            </h1>
-            
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-pink-500" />
-              <p className="text-xl text-gray-600">are getting married!</p>
-              <Sparkles className="w-5 h-5 text-pink-500" />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto text-sm">
-              <div className="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-3">
-                <Calendar className="w-4 h-4 text-emerald-600" />
-                <span className="font-medium">{new Date(weddingData.weddingDate).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-3">
-                <MapPin className="w-4 h-4 text-emerald-600" />
-                <span className="font-medium">{weddingData.venue}</span>
-              </div>
-              <div className="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-3">
-                <Clock className="w-4 h-4 text-emerald-600" />
-                <span className="font-medium">{weddingData.ceremonyTime}</span>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-pink-200/30 rounded-full blur-xl"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-200/30 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-rose-200/20 rounded-full blur-xl"></div>
+        <div className="absolute bottom-40 right-1/3 w-28 h-28 bg-pink-200/25 rounded-full blur-xl"></div>
+      </div>
+
+      {/* Header with Stunning Goan Wedding Theme */}
+      <div className="relative z-10">
+        {/* Top Decorative Border */}
+        <div className="h-2 bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400"></div>
+        
+        <div className="py-16 px-4">
+          <div className="max-w-5xl mx-auto">
+            {/* Main Header Card */}
+            <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-pink-100 overflow-hidden">
+              {/* Header Gradient */}
+              <div className="h-3 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500"></div>
+              
+              <div className="p-8 md:p-12">
+                {/* Decorative Elements */}
+                <div className="flex justify-center items-center gap-6 mb-8">
+                  <div className="flex items-center gap-2">
+                    <Flower className="w-10 h-10 text-pink-400 animate-pulse" />
+                    <Star className="w-6 h-6 text-yellow-400" />
+                  </div>
+                  <div className="h-px bg-gradient-to-r from-transparent via-pink-300 to-transparent flex-1"></div>
+                  <Crown className="w-12 h-12 text-purple-400 animate-bounce" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-purple-300 to-transparent flex-1"></div>
+                  <div className="flex items-center gap-2">
+                    <Star className="w-6 h-6 text-yellow-400" />
+                    <Flower className="w-10 h-10 text-pink-400 animate-pulse" />
+                  </div>
+                </div>
+                
+                {/* Couple Names */}
+                <div className="text-center mb-8">
+                  <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                    {weddingData.brideName} & {weddingData.groomName}
+                  </h1>
+                  
+                  <div className="flex items-center justify-center gap-3 mb-6">
+                    <Sparkles className="w-6 h-6 text-pink-500 animate-pulse" />
+                    <p className="text-2xl text-gray-700 font-medium">are getting married!</p>
+                    <Sparkles className="w-6 h-6 text-pink-500 animate-pulse" />
+                  </div>
+                  
+                  <div className="inline-block bg-gradient-to-r from-pink-100 to-purple-100 rounded-full px-6 py-2">
+                    <p className="text-lg text-gray-600 font-medium">Join us for our Goan Wedding Celebration</p>
+                  </div>
+                </div>
+                
+                {/* Wedding Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-2xl p-6 border border-pink-200 hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center">
+                        <Calendar className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-800">Wedding Date</h3>
+                    </div>
+                    <p className="text-xl font-bold text-pink-600">{new Date(weddingData.weddingDate).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200 hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
+                        <MapPin className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-800">Venue</h3>
+                    </div>
+                    <p className="text-lg font-bold text-purple-600">{weddingData.venue}</p>
+                    <p className="text-sm text-gray-600 mt-1">{weddingData.venueAddress}</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border border-emerald-200 hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center">
+                        <Clock className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-800">Ceremony Time</h3>
+                    </div>
+                    <p className="text-xl font-bold text-emerald-600">{weddingData.ceremonyTime}</p>
+                    <p className="text-sm text-gray-600 mt-1">Reception at {weddingData.receptionTime}</p>
+                  </div>
+                </div>
+                
+                {/* Special Message */}
+                {weddingData.message && (
+                  <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-6 border border-pink-200 text-center">
+                    <p className="text-lg text-gray-700 italic leading-relaxed">"{weddingData.message}"</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -234,124 +297,150 @@ export function GoanWeddingRSVP() {
       </div>
 
       {/* RSVP Form */}
-      <div className="max-w-2xl mx-auto px-4 pb-12">
-        <Card className="shadow-xl border-0">
-          <CardHeader className="bg-gradient-to-r from-pink-500 to-purple-600 text-white text-center">
-            <CardTitle className="text-2xl flex items-center justify-center gap-2">
-              <Heart className="w-6 h-6" />
-              RSVP Response
-              <Heart className="w-6 h-6" />
-            </CardTitle>
-            <p className="text-pink-100">
-              Please respond by {new Date(weddingData.weddingDate).toLocaleDateString()}
-            </p>
-          </CardHeader>
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="max-w-4xl mx-auto px-4 pb-16 relative z-10">
+        <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl border border-pink-100 overflow-hidden">
+          {/* Form Header */}
+          <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 p-8 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-600/20 via-purple-600/20 to-pink-600/20"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <Heart className="w-8 h-8 text-white animate-pulse" />
+                <h2 className="text-3xl md:text-4xl font-bold text-white">RSVP Response</h2>
+                <Heart className="w-8 h-8 text-white animate-pulse" />
+              </div>
+              <p className="text-pink-100 text-lg">
+                Please respond by {new Date(weddingData.weddingDate).toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </p>
+              <div className="mt-4 inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2">
+                <p className="text-white font-medium">We can't wait to celebrate with you! 🎉</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-8 md:p-12">
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Guest Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-pink-500" />
+              <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6 border border-pink-200">
+                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
                   Guest Information
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <Label htmlFor="guestName" className="text-gray-700 font-medium">Full Name *</Label>
+                    <Label htmlFor="guestName" className="text-gray-700 font-semibold text-lg">Full Name *</Label>
                     <Input
                       id="guestName"
                       value={formData.guestName}
                       onChange={(e) => handleInputChange('guestName', e.target.value)}
                       required
-                      className="mt-1"
+                      className="mt-2 h-12 text-lg border-2 border-pink-200 focus:border-pink-500 rounded-xl"
+                      placeholder="Enter your full name"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="guestEmail" className="text-gray-700 font-medium">Email *</Label>
+                    <Label htmlFor="guestEmail" className="text-gray-700 font-semibold text-lg">Email *</Label>
                     <Input
                       id="guestEmail"
                       type="email"
                       value={formData.guestEmail}
                       onChange={(e) => handleInputChange('guestEmail', e.target.value)}
                       required
-                      className="mt-1"
+                      className="mt-2 h-12 text-lg border-2 border-pink-200 focus:border-pink-500 rounded-xl"
+                      placeholder="your.email@example.com"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="guestPhone" className="text-gray-700 font-medium">Phone Number</Label>
+                <div className="mt-6">
+                  <Label htmlFor="guestPhone" className="text-gray-700 font-semibold text-lg">Phone Number</Label>
                   <Input
                     id="guestPhone"
                     value={formData.guestPhone}
                     onChange={(e) => handleInputChange('guestPhone', e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="mt-1"
+                    className="mt-2 h-12 text-lg border-2 border-pink-200 focus:border-pink-500 rounded-xl"
                   />
                 </div>
               </div>
 
               {/* Event Attendance */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-pink-500" />
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
+                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-white" />
+                  </div>
                   Event Attendance
                 </h3>
                 
-                {/* Ceremony */}
-                <div className="border rounded-lg p-4 bg-gradient-to-r from-pink-50 to-purple-50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h4 className="font-semibold text-lg">Wedding Ceremony</h4>
-                      <p className="text-sm text-gray-600">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Ceremony */}
+                  <div className="bg-white rounded-2xl p-6 border-2 border-pink-200 hover:border-pink-400 transition-all duration-300 shadow-lg">
+                    <div className="text-center mb-4">
+                      <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Heart className="w-8 h-8 text-white" />
+                      </div>
+                      <h4 className="font-bold text-xl text-gray-800">Wedding Ceremony</h4>
+                      <p className="text-sm text-gray-600 mt-1">
                         {new Date(weddingData.weddingDate).toLocaleDateString()} at {weddingData.ceremonyTime}
                       </p>
-                      <p className="text-sm text-gray-500">{weddingData.venue}</p>
+                      <p className="text-xs text-gray-500">{weddingData.venue}</p>
                     </div>
-                    <Badge className="bg-pink-100 text-pink-800">Traditional Goan Ceremony</Badge>
+                    
+                    <Badge className="w-full justify-center bg-pink-100 text-pink-800 text-sm py-2 mb-4">Traditional Goan Ceremony</Badge>
+                    
+                    <RadioGroup
+                      value={formData.attendingCeremony ? 'yes' : 'no'}
+                      onValueChange={(value) => handleInputChange('attendingCeremony', value === 'yes')}
+                      className="space-y-3"
+                    >
+                      <div className="flex items-center space-x-3 p-3 rounded-xl bg-green-50 border border-green-200">
+                        <RadioGroupItem value="yes" id="ceremony-yes" className="text-green-600" />
+                        <Label htmlFor="ceremony-yes" className="text-green-700 font-semibold text-lg cursor-pointer">Yes, I'll be there! 🙏</Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-xl bg-red-50 border border-red-200">
+                        <RadioGroupItem value="no" id="ceremony-no" className="text-red-600" />
+                        <Label htmlFor="ceremony-no" className="text-red-700 font-semibold text-lg cursor-pointer">Sorry, I can't make it</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
-                  
-                  <RadioGroup
-                    value={formData.attendingCeremony ? 'yes' : 'no'}
-                    onValueChange={(value) => handleInputChange('attendingCeremony', value === 'yes')}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="ceremony-yes" />
-                      <Label htmlFor="ceremony-yes" className="text-green-700 font-medium">Yes, I'll be there! 🙏</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="no" id="ceremony-no" />
-                      <Label htmlFor="ceremony-no" className="text-red-700">Sorry, I can't make it</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
 
-                {/* Reception */}
-                <div className="border rounded-lg p-4 bg-gradient-to-r from-purple-50 to-pink-50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h4 className="font-semibold text-lg">Wedding Reception</h4>
-                      <p className="text-sm text-gray-600">
+                  {/* Reception */}
+                  <div className="bg-white rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 transition-all duration-300 shadow-lg">
+                    <div className="text-center mb-4">
+                      <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Sparkles className="w-8 h-8 text-white" />
+                      </div>
+                      <h4 className="font-bold text-xl text-gray-800">Wedding Reception</h4>
+                      <p className="text-sm text-gray-600 mt-1">
                         {new Date(weddingData.weddingDate).toLocaleDateString()} at {weddingData.receptionTime}
                       </p>
-                      <p className="text-sm text-gray-500">{weddingData.venue}</p>
+                      <p className="text-xs text-gray-500">{weddingData.venue}</p>
                     </div>
-                    <Badge className="bg-purple-100 text-purple-800">Goan Feast & Celebration</Badge>
+                    
+                    <Badge className="w-full justify-center bg-purple-100 text-purple-800 text-sm py-2 mb-4">Goan Feast & Celebration</Badge>
+                    
+                    <RadioGroup
+                      value={formData.attendingReception ? 'yes' : 'no'}
+                      onValueChange={(value) => handleInputChange('attendingReception', value === 'yes')}
+                      className="space-y-3"
+                    >
+                      <div className="flex items-center space-x-3 p-3 rounded-xl bg-green-50 border border-green-200">
+                        <RadioGroupItem value="yes" id="reception-yes" className="text-green-600" />
+                        <Label htmlFor="reception-yes" className="text-green-700 font-semibold text-lg cursor-pointer">Yes, I'll be there! 🎉</Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-xl bg-red-50 border border-red-200">
+                        <RadioGroupItem value="no" id="reception-no" className="text-red-600" />
+                        <Label htmlFor="reception-no" className="text-red-700 font-semibold text-lg cursor-pointer">Sorry, I can't make it</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
-                  
-                  <RadioGroup
-                    value={formData.attendingReception ? 'yes' : 'no'}
-                    onValueChange={(value) => handleInputChange('attendingReception', value === 'yes')}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="reception-yes" />
-                      <Label htmlFor="reception-yes" className="text-green-700 font-medium">Yes, I'll be there! 🎉</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="no" id="reception-no" />
-                      <Label htmlFor="reception-no" className="text-red-700">Sorry, I can't make it</Label>
-                    </div>
-                  </RadioGroup>
                 </div>
               </div>
 
@@ -475,28 +564,35 @@ export function GoanWeddingRSVP() {
               </div>
 
               {/* Submit Button */}
-              <div className="pt-6">
+              <div className="pt-8">
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-3 text-lg font-semibold"
+                  className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 hover:from-pink-600 hover:via-purple-600 hover:to-pink-600 text-white py-4 text-xl font-bold rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300"
                   disabled={submitting}
                 >
                   {submitting ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Submitting...
+                    <div className="flex items-center gap-3">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                      <span>Submitting your RSVP...</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <Heart className="w-5 h-5" />
-                      Submit RSVP
+                    <div className="flex items-center gap-3">
+                      <Heart className="w-6 h-6 animate-pulse" />
+                      <span>Submit RSVP Response</span>
+                      <Heart className="w-6 h-6 animate-pulse" />
                     </div>
                   )}
                 </Button>
+                
+                <div className="text-center mt-4">
+                  <p className="text-gray-600 text-sm">
+                    💕 Thank you for being part of our special day! 💕
+                  </p>
+                </div>
               </div>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
