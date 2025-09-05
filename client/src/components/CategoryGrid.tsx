@@ -63,7 +63,7 @@ export default function CategoryGrid() {
           <div className="w-16 md:w-24 h-1 bg-gradient-to-r from-red-500 to-teal-500 mx-auto mb-4 md:mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed section-subtitle-mobile px-4 sm:px-0">
             Discover our handpicked collection of Goa's most talented wedding professionals. 
-            Each category features verified vendors who specialize in creating magical moments.
+            Each category features trusted vendors who specialize in creating magical moments.
           </p>
         </div>
         

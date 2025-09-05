@@ -103,8 +103,7 @@ export default function VendorProfile() {
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="absolute bottom-8 left-8 text-white">
           <div className="flex items-center gap-4 mb-4">
-            {vendor.featured && <Badge className="bg-red-500">Featured</Badge>}
-            {vendor.verified && <Badge className="bg-green-500"><i className="fas fa-check mr-1"></i>Verified</Badge>}
+            {vendor.featured && <Badge className="bg-red-500"><i className="fas fa-star mr-1"></i>Featured</Badge>}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-2">{vendor.name}</h1>
           <p className="text-xl capitalize">{vendor.category.replace('-', ' ')}</p>

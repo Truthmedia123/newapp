@@ -190,7 +190,7 @@ export default function AdminDashboard() {
                     Expected CSV format with headers:
                   </p>
                   <code className="text-sm bg-gray-100 p-2 rounded block">
-                    name,category,description,phone,email,whatsapp,location,address,website,instagram,facebook,services,price_range,featured,verified
+                    name,category,description,phone,email,whatsapp,location,address,website,instagram,facebook,services,price_range,featured
                   </code>
                 </div>
 

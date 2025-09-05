@@ -35,11 +35,6 @@ export default function VendorCard({ vendor }: VendorCardProps) {
           
           {/* Badges */}
           <div className="absolute top-4 left-4 right-4 flex justify-between">
-            {vendor.verified && (
-              <Badge className="bg-green-500/90 backdrop-blur-sm text-white border-0 shadow-lg">
-                <i className="fas fa-shield-check mr-1"></i>Verified
-              </Badge>
-            )}
             {vendor.featured && (
               <Badge className="bg-red-500/90 backdrop-blur-sm text-white border-0 shadow-lg">
                 <i className="fas fa-star mr-1"></i>Featured

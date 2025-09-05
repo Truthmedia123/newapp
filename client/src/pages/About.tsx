@@ -125,7 +125,7 @@ export default function About() {
                   <div>
                     <h3 className="text-lg font-semibold text-slate-800 mb-2">Comprehensive Vendor Directory</h3>
                     <p className="text-gray-600">
-                      Access to hundreds of verified wedding vendors across all categories, 
+                      Access to hundreds of carefully curated wedding vendors across all categories, 
                       from photographers to caterers, venues to decorators.
                     </p>
                   </div>
@@ -136,7 +136,7 @@ export default function About() {
                     <i className="fas fa-star text-white text-sm"></i>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-800 mb-2">Verified Reviews & Ratings</h3>
+                    <h3 className="text-lg font-semibold text-slate-800 mb-2">Authentic Reviews & Ratings</h3>
                     <p className="text-gray-600">
                       Honest feedback from real couples to help you make informed decisions 
                       about your wedding vendors.
@@ -190,7 +190,7 @@ export default function About() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 <div>
                   <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
-                  <p className="opacity-90">Verified Vendors</p>
+                  <p className="opacity-90">Trusted Vendors</p>
                 </div>
                 <div>
                   <div className="text-4xl md:text-5xl font-bold mb-2">1000+</div>
