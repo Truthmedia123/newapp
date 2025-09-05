@@ -115,6 +115,7 @@ export const weddings = sqliteTable("weddings", {
 export const rsvps = sqliteTable("rsvps", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   weddingId: integer("wedding_id").notNull().references(() => weddings.id),
+  invitationId: integer("invitation_id").notNull().references(() => rsvpInvitations.id),
   guestName: text("guest_name").notNull(),
   guestEmail: text("guest_email").notNull(),
   guestPhone: text("guest_phone"),

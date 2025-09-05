@@ -14,9 +14,10 @@ import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Couples from "@/pages/Couples";
 import RSVPGenerator from "@/pages/RSVPGenerator";
-import RSVPForm from "@/pages/RSVPForm";
-import RSVPConfirmation from "@/pages/RSVPConfirmation";
-import RSVPDashboard from "@/pages/RSVPDashboard";
+import { RSVPForm } from "@/components/RSVP/RSVPForm";
+import { RSVPConfirmation } from "@/components/RSVP/RSVPConfirmation";
+import { RSVPDashboard } from "@/components/RSVP/RSVPDashboard";
+import { RSVPInvitationSender } from "@/components/RSVP/RSVPInvitationSender";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
@@ -34,6 +35,7 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/couples/:slug" component={Couples} />
         <Route path="/rsvp/create" component={RSVPGenerator} />
+        <Route path="/rsvp/send" component={RSVPInvitationSender} />
         <Route path="/rsvp/:invitationCode" component={RSVPForm} />
         <Route path="/rsvp/confirmation/:code" component={RSVPConfirmation} />
         <Route path="/rsvp/manage/:weddingId" component={RSVPDashboard} />

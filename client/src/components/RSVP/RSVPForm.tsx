@@ -4,30 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Clock, Users, Heart, CheckCircle } from 'lucide-react';
-import { formatWeddingDate, getTimeUntilWedding } from '@/utils/rsvpUtils';
+import { Heart, Calendar, MapPin, Clock, Users, CheckCircle } from 'lucide-react';
 
-interface RSVPFormProps {
-  invitationCode?: string;
-}
-
-interface Invitation {
-  id: number;
-  weddingId: number;
-  guestName: string;
-  guestEmail: string;
-  invitationCode: string;
-  maxGuests: number;
-  allowPlusOne: boolean;
-  invitedEvents: string[];
-  isFamily: boolean;
-  status: string;
+interface InvitationData {
+  invitation: {
+    id: number;
+    guestName: string;
+    guestEmail: string;
+    invitationCode: string;
+    maxGuests: number;
+    allowPlusOne: boolean;
+    status: string;
+  };
   wedding: {
+    id: number;
     brideName: string;
     groomName: string;
     weddingDate: string;
@@ -37,42 +32,44 @@ interface Invitation {
     receptionTime?: string;
   };
   events: Array<{
-    id: string;
+    id: number;
     name: string;
-    description: string;
+    description?: string;
     date: string;
     startTime: string;
-    endTime: string;
+    endTime?: string;
     venue: string;
     address: string;
-    dressCode: string;
   }>;
   questions: Array<{
-    id: string;
+    id: number;
     question: string;
-    type: 'text' | 'select' | 'multiselect' | 'boolean' | 'number';
-    options: string[];
+    type: string;
+    options?: string;
     required: boolean;
-    eventSpecific: string | null;
   }>;
 }
 
-interface Guest {
-  name: string;
-  attending: boolean;
-  dietaryRestrictions?: string;
-}
-
-export function RSVPForm({ invitationCode: propInvitationCode }: RSVPFormProps) {
-  const { invitationCode: paramInvitationCode } = useParams();
-  const invitationCode = propInvitationCode || paramInvitationCode;
-  
-  const [invitation, setInvitation] = useState<Invitation | null>(null);
-  const [responses, setResponses] = useState<Record<string, any>>({});
-  const [guests, setGuests] = useState<Guest[]>([{ name: '', attending: false }]);
+export function RSVPForm() {
+  const { invitationCode } = useParams();
+  const [invitationData, setInvitationData] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    guestName: '',
+    guestEmail: '',
+    guestPhone: '',
+    attendingCeremony: true,
+    attendingReception: true,
+    numberOfGuests: 1,
+    dietaryRestrictions: '',
+    message: '',
+    responses: {} as Record<string, string>
+  });
 
   useEffect(() => {
     if (invitationCode) {
@@ -83,80 +80,81 @@ export function RSVPForm({ invitationCode: propInvitationCode }: RSVPFormProps) 
   const fetchInvitation = async () => {
     try {
       const response = await fetch(`/api/rsvp/invitation/${invitationCode}`);
-      if (response.ok) {
-        const data = await response.json();
-        setInvitation(data);
-        initializeGuests(data);
-      } else {
-        console.error('Failed to fetch invitation');
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('Invitation not found. Please check your invitation link.');
+        } else {
+          setError('Failed to load invitation. Please try again.');
+        }
+        return;
       }
+
+      const data = await response.json();
+      setInvitationData(data);
+      
+      // Pre-fill form with invitation data
+      setFormData(prev => ({
+        ...prev,
+        guestName: data.invitation.guestName,
+        guestEmail: data.invitation.guestEmail,
+        numberOfGuests: data.invitation.maxGuests
+      }));
+      
     } catch (error) {
-      console.error('Failed to fetch invitation:', error);
+      console.error('Error fetching invitation:', error);
+      setError('Failed to load invitation. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const initializeGuests = (invitation: Invitation) => {
-    const initialGuests: Guest[] = [];
-    for (let i = 0; i < invitation.maxGuests; i++) {
-      initialGuests.push({
-        name: i === 0 ? invitation.guestName : '',
-        attending: i === 0
-      });
-    }
-    setGuests(initialGuests);
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const updateGuest = (index: number, field: keyof Guest, value: any) => {
-    const updatedGuests = [...guests];
-    updatedGuests[index] = { ...updatedGuests[index], [field]: value };
-    setGuests(updatedGuests);
+  const handleQuestionResponse = (questionId: number, answer: string) => {
+    setFormData(prev => ({
+      ...prev,
+      responses: {
+        ...prev.responses,
+        [questionId]: answer
+      }
+    }));
   };
 
-  const addGuest = () => {
-    if (invitation && guests.length < invitation.maxGuests) {
-      setGuests([...guests, { name: '', attending: false }]);
-    }
-  };
-
-  const removeGuest = (index: number) => {
-    if (guests.length > 1) {
-      const updatedGuests = guests.filter((_, i) => i !== index);
-      setGuests(updatedGuests);
-    }
-  };
-
-  const submitRSVP = async () => {
-    if (!invitation) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    setSubmitting(true);
-    try {
-      const rsvpData = {
-        invitationCode,
-        weddingId: invitation.weddingId,
-        guests: guests.filter(g => g.name.trim()),
-        responses,
-        eventResponses: {}
-      };
+    if (!invitationData) return;
 
+    setSubmitting(true);
+    
+    try {
       const response = await fetch('/api/rsvp/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(rsvpData)
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          invitationCode,
+          ...formData
+        }),
       });
 
-      if (response.ok) {
-        setSubmitted(true);
-        // Redirect to confirmation page after a delay
-        setTimeout(() => {
-          window.location.href = `/rsvp/confirmation/${invitationCode}`;
-        }, 2000);
-      } else {
-        console.error('Failed to submit RSVP');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit RSVP');
       }
+
+      setSubmitted(true);
+      
     } catch (error) {
-      console.error('Failed to submit RSVP:', error);
+      console.error('Error submitting RSVP:', error);
+      setError(error instanceof Error ? error.message : 'Failed to submit RSVP');
     } finally {
       setSubmitting(false);
     }
@@ -173,13 +171,23 @@ export function RSVPForm({ invitationCode: propInvitationCode }: RSVPFormProps) 
     );
   }
 
-  if (!invitation) {
+  if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Invitation Not Found</h1>
-          <p className="text-gray-600">The invitation you're looking for doesn't exist or has expired.</p>
-        </div>
+        <Card className="max-w-md mx-auto">
+          <CardContent className="p-6 text-center">
+            <div className="text-red-500 mb-4">
+              <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold mb-2">Error</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -187,163 +195,189 @@ export function RSVPForm({ invitationCode: propInvitationCode }: RSVPFormProps) 
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <CheckCircle className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">RSVP Submitted!</h1>
-          <p className="text-gray-600">Thank you for responding. We can't wait to celebrate with you!</p>
-        </div>
+        <Card className="max-w-md mx-auto">
+          <CardContent className="p-6 text-center">
+            <div className="text-green-500 mb-4">
+              <CheckCircle className="w-12 h-12 mx-auto" />
+            </div>
+            <h2 className="text-xl font-semibold mb-2">RSVP Submitted!</h2>
+            <p className="text-gray-600 mb-4">
+              Thank you for responding, {formData.guestName}! 
+              We can't wait to celebrate with you.
+            </p>
+            <div className="text-sm text-gray-500">
+              You will receive a confirmation email shortly.
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <Card className="shadow-2xl border-0">
-          <CardHeader className="text-center bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-t-lg">
-            <CardTitle className="text-3xl font-bold">
-              {invitation.wedding.brideName} & {invitation.wedding.groomName}
-            </CardTitle>
-            <p className="text-emerald-100 text-lg">Wedding Celebration</p>
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                <span>{formatWeddingDate(invitation.wedding.weddingDate)}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                <span>{invitation.wedding.venue}</span>
-              </div>
-            </div>
-          </CardHeader>
-          
-          <CardContent className="p-8 space-y-8">
-            {/* Guest Information */}
-            <div>
-              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Guest Information
-              </h3>
-              <div className="space-y-4">
-                {guests.map((guest, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-medium">Guest {index + 1}</h4>
-                      {guests.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeGuest(index)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          Remove
-                        </Button>
-                      )}
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor={`guest-${index}-name`}>Full Name</Label>
-                        <Input
-                          id={`guest-${index}-name`}
-                          value={guest.name}
-                          onChange={(e) => updateGuest(index, 'name', e.target.value)}
-                          placeholder="Enter full name"
-                          required
-                        />
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`guest-${index}-attending`}
-                          checked={guest.attending}
-                          onCheckedChange={(checked) => updateGuest(index, 'attending', checked)}
-                        />
-                        <Label htmlFor={`guest-${index}-attending`}>Will attend</Label>
-                      </div>
-                    </div>
-                    
-                    {guest.attending && (
-                      <div className="mt-4">
-                        <Label htmlFor={`guest-${index}-dietary`}>Dietary Restrictions</Label>
-                        <Input
-                          id={`guest-${index}-dietary`}
-                          value={guest.dietaryRestrictions || ''}
-                          onChange={(e) => updateGuest(index, 'dietaryRestrictions', e.target.value)}
-                          placeholder="Any allergies or dietary requirements"
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
-                
-                {invitation && guests.length < invitation.maxGuests && (
-                  <Button onClick={addGuest} variant="outline" className="w-full">
-                    Add Another Guest
-                  </Button>
-                )}
-              </div>
-            </div>
+  if (!invitationData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">No invitation data available</p>
+      </div>
+    );
+  }
 
-            {/* Event Responses */}
-            {invitation.events.length > 0 && (
-              <div>
-                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Event Attendance
-                </h3>
-                <div className="space-y-4">
-                  {invitation.events.map((event) => (
-                    <Card key={event.id} className="border-l-4 border-l-emerald-500">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h4 className="font-semibold text-lg">{event.name}</h4>
-                            <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4" />
-                                {new Date(event.date).toLocaleDateString()}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
-                                {event.startTime}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <MapPin className="h-4 w-4" />
-                                {event.venue}
-                              </span>
-                            </div>
-                            {event.description && (
-                              <p className="text-sm text-gray-600 mt-2">{event.description}</p>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <RadioGroup
-                          value={responses[`event-${event.id}`] || 'yes'}
-                          onValueChange={(value) => setResponses({...responses, [`event-${event.id}`]: value})}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="yes" id={`event-${event.id}-yes`} />
-                            <Label htmlFor={`event-${event.id}-yes`}>Yes, I'll attend</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="no" id={`event-${event.id}-no`} />
-                            <Label htmlFor={`event-${event.id}-no`}>No, I can't attend</Label>
-                          </div>
-                        </RadioGroup>
-                      </CardContent>
-                    </Card>
-                  ))}
+  const { invitation, wedding, events, questions } = invitationData;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 py-8">
+      <div className="max-w-2xl mx-auto px-4">
+        {/* Wedding Header */}
+        <Card className="mb-6">
+          <CardContent className="p-8 text-center">
+            <div className="mb-4">
+              <Heart className="w-12 h-12 text-pink-500 mx-auto mb-2" />
+              <h1 className="text-3xl font-bold text-gray-800">
+                {wedding.brideName} & {wedding.groomName}
+              </h1>
+              <p className="text-lg text-gray-600 mt-2">are getting married!</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="flex items-center justify-center gap-2">
+                <Calendar className="w-4 h-4 text-emerald-600" />
+                <span>{new Date(wedding.weddingDate).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <MapPin className="w-4 h-4 text-emerald-600" />
+                <span>{wedding.venue}</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <Clock className="w-4 h-4 text-emerald-600" />
+                <span>{wedding.ceremonyTime}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* RSVP Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-center">
+              <Users className="w-6 h-6 inline mr-2" />
+              RSVP Response
+            </CardTitle>
+            <p className="text-center text-gray-600">
+              Please respond by {new Date(wedding.weddingDate).toLocaleDateString()}
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Guest Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Guest Information</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="guestName">Full Name</Label>
+                    <Input
+                      id="guestName"
+                      value={formData.guestName}
+                      onChange={(e) => handleInputChange('guestName', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="guestEmail">Email</Label>
+                    <Input
+                      id="guestEmail"
+                      type="email"
+                      value={formData.guestEmail}
+                      onChange={(e) => handleInputChange('guestEmail', e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="guestPhone">Phone Number (Optional)</Label>
+                  <Input
+                    id="guestPhone"
+                    value={formData.guestPhone}
+                    onChange={(e) => handleInputChange('guestPhone', e.target.value)}
+                  />
                 </div>
               </div>
-            )}
 
-            {/* Custom Questions */}
-            {invitation.questions.length > 0 && (
-              <div>
-                <h3 className="text-xl font-semibold mb-4">Additional Information</h3>
+              {/* Event Attendance */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Event Attendance</h3>
+                
+                {events.map((event) => (
+                  <div key={event.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h4 className="font-semibold">{event.name}</h4>
+                        <p className="text-sm text-gray-600">
+                          {new Date(event.date).toLocaleDateString()} at {event.startTime}
+                        </p>
+                        <p className="text-sm text-gray-500">{event.venue}</p>
+                      </div>
+                      <Badge variant="outline">
+                        {event.name.toLowerCase().includes('ceremony') ? 'Ceremony' : 'Reception'}
+                      </Badge>
+                    </div>
+                    
+                    <RadioGroup
+                      value={event.name.toLowerCase().includes('ceremony') 
+                        ? (formData.attendingCeremony ? 'yes' : 'no')
+                        : (formData.attendingReception ? 'yes' : 'no')
+                      }
+                      onValueChange={(value) => {
+                        if (event.name.toLowerCase().includes('ceremony')) {
+                          handleInputChange('attendingCeremony', value === 'yes');
+                        } else {
+                          handleInputChange('attendingReception', value === 'yes');
+                        }
+                      }}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="yes" id={`${event.id}-yes`} />
+                        <Label htmlFor={`${event.id}-yes`}>Yes, I'll be there!</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="no" id={`${event.id}-no`} />
+                        <Label htmlFor={`${event.id}-no`}>Sorry, I can't make it</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                ))}
+              </div>
+
+              {/* Guest Count */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Number of Guests</h3>
+                <div>
+                  <Label htmlFor="numberOfGuests">How many people will attend?</Label>
+                  <Select
+                    value={formData.numberOfGuests.toString()}
+                    onValueChange={(value) => handleInputChange('numberOfGuests', parseInt(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: invitation.maxGuests }, (_, i) => i + 1).map(num => (
+                        <SelectItem key={num} value={num.toString()}>
+                          {num} {num === 1 ? 'Guest' : 'Guests'}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Custom Questions */}
+              {questions.length > 0 && (
                 <div className="space-y-4">
-                  {invitation.questions.map((question) => (
+                  <h3 className="text-lg font-semibold">Additional Information</h3>
+                  
+                  {questions.map((question) => (
                     <div key={question.id} className="space-y-2">
                       <Label htmlFor={`question-${question.id}`}>
                         {question.question}
@@ -353,38 +387,32 @@ export function RSVPForm({ invitationCode: propInvitationCode }: RSVPFormProps) 
                       {question.type === 'text' && (
                         <Input
                           id={`question-${question.id}`}
-                          value={responses[question.id] || ''}
-                          onChange={(e) => setResponses({...responses, [question.id]: e.target.value})}
+                          value={formData.responses[question.id] || ''}
+                          onChange={(e) => handleQuestionResponse(question.id, e.target.value)}
                           required={question.required}
                         />
                       )}
                       
-                      {question.type === 'boolean' && (
-                        <RadioGroup
-                          value={responses[question.id] || ''}
-                          onValueChange={(value) => setResponses({...responses, [question.id]: value})}
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="yes" id={`question-${question.id}-yes`} />
-                            <Label htmlFor={`question-${question.id}-yes`}>Yes</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="no" id={`question-${question.id}-no`} />
-                            <Label htmlFor={`question-${question.id}-no`}>No</Label>
-                          </div>
-                        </RadioGroup>
+                      {question.type === 'textarea' && (
+                        <Textarea
+                          id={`question-${question.id}`}
+                          value={formData.responses[question.id] || ''}
+                          onChange={(e) => handleQuestionResponse(question.id, e.target.value)}
+                          required={question.required}
+                          rows={3}
+                        />
                       )}
                       
-                      {question.type === 'select' && (
+                      {question.type === 'select' && question.options && (
                         <Select
-                          value={responses[question.id] || ''}
-                          onValueChange={(value) => setResponses({...responses, [question.id]: value})}
+                          value={formData.responses[question.id] || ''}
+                          onValueChange={(value) => handleQuestionResponse(question.id, value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select an option" />
                           </SelectTrigger>
                           <SelectContent>
-                            {question.options.map((option) => (
+                            {JSON.parse(question.options).map((option: string) => (
                               <SelectItem key={option} value={option}>
                                 {option}
                               </SelectItem>
@@ -392,40 +420,52 @@ export function RSVPForm({ invitationCode: propInvitationCode }: RSVPFormProps) 
                           </SelectContent>
                         </Select>
                       )}
-                      
-                      {question.type === 'number' && (
-                        <Input
-                          id={`question-${question.id}`}
-                          type="number"
-                          value={responses[question.id] || ''}
-                          onChange={(e) => setResponses({...responses, [question.id]: e.target.value})}
-                          required={question.required}
-                        />
-                      )}
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <Button 
-              onClick={submitRSVP} 
-              disabled={submitting}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 text-lg"
-            >
-              {submitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  <Heart className="h-5 w-5 mr-2" />
-                  Submit RSVP
-                </>
               )}
-            </Button>
+
+              {/* Dietary Restrictions */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Dietary Restrictions</h3>
+                <div>
+                  <Label htmlFor="dietaryRestrictions">Any dietary restrictions or allergies?</Label>
+                  <Textarea
+                    id="dietaryRestrictions"
+                    value={formData.dietaryRestrictions}
+                    onChange={(e) => handleInputChange('dietaryRestrictions', e.target.value)}
+                    placeholder="Please let us know about any dietary restrictions or allergies..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              {/* Message */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Message for the Couple</h3>
+                <div>
+                  <Label htmlFor="message">Leave a message for {wedding.brideName} & {wedding.groomName}</Label>
+                  <Textarea
+                    id="message"
+                    value={formData.message}
+                    onChange={(e) => handleInputChange('message', e.target.value)}
+                    placeholder="Share your excitement, well wishes, or any other message..."
+                    rows={4}
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-6">
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={submitting}
+                >
+                  {submitting ? 'Submitting...' : 'Submit RSVP'}
+                </Button>
+              </div>
+            </form>
           </CardContent>
         </Card>
       </div>
