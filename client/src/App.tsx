@@ -21,6 +21,7 @@ import { RSVPInvitationSender } from "@/components/RSVP/RSVPInvitationSender";
 import { SingleRSVPGenerator } from "@/components/RSVP/SingleRSVPGenerator";
 import { GoanWeddingRSVP } from "@/components/RSVP/GoanWeddingRSVP";
 import { CoupleDashboard } from "@/components/RSVP/CoupleDashboard";
+import Search from "@/pages/Search";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
@@ -45,6 +46,7 @@ function Router() {
         <Route path="/rsvp/confirmation/:code" component={RSVPConfirmation} />
         <Route path="/rsvp/manage/:weddingId" component={RSVPDashboard} />
         <Route path="/rsvp/dashboard/:weddingId" component={CoupleDashboard} />
+        <Route path="/search" component={Search} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
         <Route component={NotFound} />
       </Switch>

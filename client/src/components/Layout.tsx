@@ -13,11 +13,12 @@ export default function Layout({ children }: LayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigation = [
-    { name: "Vendors", href: "/vendors/all" },
+    { name: "Categories", href: "/vendors/all" },
     { name: "Venues", href: "/vendors/venues" },
     { name: "Blog", href: "/blog" },
+    { name: "Invitations", href: "/rsvp/generate" },
     { name: "RSVP", href: "/rsvp/create" },
-    { name: "About", href: "/about" },
+    { name: "Search", href: "/search" },
   ];
 
   return (
