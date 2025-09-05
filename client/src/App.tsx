@@ -18,6 +18,9 @@ import { RSVPForm } from "@/components/RSVP/RSVPForm";
 import { RSVPConfirmation } from "@/components/RSVP/RSVPConfirmation";
 import { RSVPDashboard } from "@/components/RSVP/RSVPDashboard";
 import { RSVPInvitationSender } from "@/components/RSVP/RSVPInvitationSender";
+import { SingleRSVPGenerator } from "@/components/RSVP/SingleRSVPGenerator";
+import { GoanWeddingRSVP } from "@/components/RSVP/GoanWeddingRSVP";
+import { CoupleDashboard } from "@/components/RSVP/CoupleDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
@@ -36,9 +39,12 @@ function Router() {
         <Route path="/couples/:slug" component={Couples} />
         <Route path="/rsvp/create" component={RSVPGenerator} />
         <Route path="/rsvp/send" component={RSVPInvitationSender} />
+        <Route path="/rsvp/generate" component={SingleRSVPGenerator} />
         <Route path="/rsvp/:invitationCode" component={RSVPForm} />
+        <Route path="/rsvp/goan/:weddingId" component={GoanWeddingRSVP} />
         <Route path="/rsvp/confirmation/:code" component={RSVPConfirmation} />
         <Route path="/rsvp/manage/:weddingId" component={RSVPDashboard} />
+        <Route path="/rsvp/dashboard/:weddingId" component={CoupleDashboard} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
         <Route component={NotFound} />
       </Switch>
