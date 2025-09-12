@@ -7,6 +7,20 @@ import { registerRoutes } from './routes';
 
 const app = new Hono<{ Bindings: Env }>();
 
+// Security middleware
+app.use('*', async (c, next) => {
+  // Security headers
+  c.header('X-Frame-Options', 'DENY');
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-XSS-Protection', '1; mode=block');
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  c.header('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com;");
+  
+  await next();
+});
+
 // Middleware
 app.use('*', logger());
 app.use('*', prettyJSON());
@@ -24,4 +38,7 @@ registerRoutes(app);
 
 // 404 for everything else (frontend will be served by Cloudflare Pages)
 app.all('*', () => new Response('Not Found', { status: 404 }));
+
+// Export for Cloudflare Workers
+export default app;
 

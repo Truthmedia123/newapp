@@ -13,11 +13,12 @@ export default function Layout({ children }: LayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigation = [
-    { name: "Vendors", href: "/vendors/all" },
+    { name: "Categories", href: "/vendors/all" },
     { name: "Venues", href: "/vendors/venues" },
     { name: "Blog", href: "/blog" },
-    { name: "RSVP", href: "/couples/priya-raj-2024" },
-    { name: "About", href: "/about" },
+    { name: "Search", href: "/search" },
+    { name: "RSVP", href: "/rsvp/generate" },
+
   ];
 
   return (
@@ -54,7 +55,7 @@ export default function Layout({ children }: LayoutProps) {
                   <Button
                     className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-all transform hover:scale-105"
                   >
-                    List Your Business
+                    Partner With Us
                   </Button>
                 </Link>
               </div>
@@ -81,7 +82,7 @@ export default function Layout({ children }: LayoutProps) {
                     ))}
                     <Link href="/list-business" onClick={() => setIsMenuOpen(false)}>
                       <Button className="w-full bg-red-500 hover:bg-red-600 text-white mt-4">
-                        List Your Business
+                        Partner With Us
                       </Button>
                     </Link>
                   </div>
@@ -114,8 +115,8 @@ export default function Layout({ children }: LayoutProps) {
                 <a href="#" className="text-gray-300 hover:text-red-500 transition-colors">
                   <i className="fab fa-instagram text-xl"></i>
                 </a>
-                <a href="https://wa.me/919769661682" className="text-gray-300 hover:text-red-500 transition-colors">
-                  <i className="fab fa-whatsapp text-xl"></i>
+                <a href="mailto:info@thegoanwedding.com" className="text-gray-300 hover:text-red-500 transition-colors">
+                  <i className="fas fa-envelope text-xl"></i>
                 </a>
               </div>
             </div>
@@ -135,10 +136,11 @@ export default function Layout({ children }: LayoutProps) {
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-300">
                 <li><Link href="/about" className="hover:text-red-500 transition-colors">About Us</Link></li>
-                <li><Link href="/list-business" className="hover:text-red-500 transition-colors">List Your Business</Link></li>
+                <li><Link href="/list-business" className="hover:text-red-500 transition-colors">Partner With Us</Link></li>
                 <li><Link href="/blog" className="hover:text-red-500 transition-colors">Blog</Link></li>
                 <li><a href="/privacy-policy" className="hover:text-red-500 transition-colors">Privacy Policy</a></li>
                 <li><a href="/terms-conditions" className="hover:text-red-500 transition-colors">Terms & Conditions</a></li>
+                <li><Link href="/admin/dashboard?token=admin-secret-2024" className="hover:text-red-500 transition-colors text-xs">Admin</Link></li>
               </ul>
             </div>
             
@@ -150,10 +152,6 @@ export default function Layout({ children }: LayoutProps) {
                   <span>info@thegoanwedding.com</span>
                 </div>
                 <div className="flex items-center">
-                  <i className="fas fa-phone mr-3 text-red-500"></i>
-                  <span>+91 9769661682</span>
-                </div>
-                <div className="flex items-center">
                   <i className="fas fa-map-marker-alt mr-3 text-red-500"></i>
                   <span>Goa, India</span>
                 </div>
@@ -162,7 +160,7 @@ export default function Layout({ children }: LayoutProps) {
           </div>
           
           <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 TheGoanWedding.com. All rights reserved. Founded by Noel Fernandes.</p>
+            <p>&copy; 2024 TheGoanWedding.com. All rights reserved.</p>
           </div>
         </div>
       </footer>

@@ -48,13 +48,8 @@ export default function Contact() {
     contactMutation.mutate(formData);
   };
 
-  const handleWhatsApp = () => {
-    const message = encodeURIComponent("Hi! I'd like to get in touch regarding TheGoanWedding.com services.");
-    window.open(`https://wa.me/919769661682?text=${message}`, '_blank');
-  };
-
-  const handleCall = () => {
-    window.location.href = "tel:+919769661682";
+  const handleEmail = () => {
+    window.location.href = "mailto:info@thegoanwedding.com?subject=Inquiry from TheGoanWedding.com";
   };
 
   return (
@@ -167,15 +162,6 @@ export default function Contact() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="bg-green-500 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i className="fas fa-phone text-white"></i>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-800 mb-1">Phone</h3>
-                    <p className="text-gray-600">+91 9769661682</p>
-                  </div>
-                </div>
 
                 <div className="flex items-start gap-4">
                   <div className="bg-teal-500 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
@@ -191,16 +177,10 @@ export default function Contact() {
                   <h3 className="font-semibold text-slate-800 mb-4">Quick Contact</h3>
                   <div className="space-y-3">
                     <Button 
-                      onClick={handleWhatsApp}
-                      className="w-full bg-green-500 hover:bg-green-600 text-white"
-                    >
-                      <i className="fab fa-whatsapp mr-2"></i>WhatsApp Us
-                    </Button>
-                    <Button 
-                      onClick={handleCall}
+                      onClick={handleEmail}
                       className="w-full bg-red-500 hover:bg-red-600 text-white"
                     >
-                      <i className="fas fa-phone mr-2"></i>Call Now
+                      <i className="fas fa-envelope mr-2"></i>Email Us
                     </Button>
                   </div>
                 </div>
@@ -231,7 +211,7 @@ export default function Contact() {
                 <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                   <p className="text-sm text-yellow-800">
                     <i className="fas fa-info-circle mr-2"></i>
-                    We're available 24/7 via WhatsApp for urgent wedding planning needs!
+                    We're available 24/7 via email for urgent wedding planning needs!
                   </p>
                 </div>
               </CardContent>
@@ -261,7 +241,7 @@ export default function Contact() {
                   <div>
                     <h4 className="font-semibold text-slate-800 mb-2">How can I book vendors?</h4>
                     <p className="text-sm text-gray-600">
-                      You can contact vendors directly through WhatsApp, phone calls, or email. All contact information is provided on vendor profiles.
+                      You can contact vendors directly through email or contact forms. All contact information is provided on vendor profiles.
                     </p>
                   </div>
                 </div>

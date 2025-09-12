@@ -42,7 +42,7 @@ export default function BlogPostPage() {
 
   // Create sample content for demonstration
   const sampleContent = post.title.includes("Top 10 Goan Wedding Trends") ? `
-    <p>Goa's wedding scene is evolving beautifully, blending traditional Portuguese-influenced customs with modern Indian celebrations. Here are the top 10 trends that are defining Goan weddings this year:</p>
+    <p>Goa's wedding scene is evolving beautifully, blending traditional customs with modern Indian celebrations. Here are the top 10 trends that are defining Goan weddings this year:</p>
     
     <h2>1. Beach Ceremony with Cultural Fusion</h2>
     <p>Couples are increasingly choosing beachfront ceremonies that incorporate both Christian and Hindu traditions, creating a unique spiritual experience against Goa's stunning coastline.</p>
@@ -53,15 +53,15 @@ export default function BlogPostPage() {
     <h2>3. Traditional Goan Cuisine</h2>
     <p>From bebinca to sorpotel, couples are bringing authentic Goan flavors to their wedding menus, often featuring live cooking stations with local chefs.</p>
     
-    <h2>4. Portuguese-Inspired Decor</h2>
-    <p>Azulejo tiles, colonial arches, and vintage Portuguese elements are being incorporated into wedding decor for that authentic Goan aesthetic.</p>
+    <h2>4. Heritage-Inspired Decor</h2>
+    <p>Traditional tiles, colonial arches, and vintage elements are being incorporated into wedding decor for that authentic Goan aesthetic.</p>
     
     <h2>5. Intimate Destination Weddings</h2>
     <p>Smaller, more intimate celebrations are trending, with couples choosing boutique venues that offer personalized experiences for their close family and friends.</p>
   ` : `
     <p>${post.excerpt}</p>
     <p>This comprehensive guide covers everything you need to know about planning your perfect wedding celebration in Goa. From vendor selection to cultural considerations, we'll walk you through each step of the process.</p>
-    <p>Goa offers a unique blend of Indian and Portuguese cultures, creating the perfect backdrop for unforgettable wedding celebrations. Whether you're planning an intimate beach ceremony or a grand celebration, this guide will help you navigate the process with confidence.</p>
+    <p>Goa offers a unique blend of Indian cultures, creating the perfect backdrop for unforgettable wedding celebrations. Whether you're planning an intimate beach ceremony or a grand celebration, this guide will help you navigate the process with confidence.</p>
   `;
 
   return (

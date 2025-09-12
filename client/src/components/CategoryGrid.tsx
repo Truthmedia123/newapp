@@ -5,7 +5,8 @@ const categories = [
   {
     name: "Photographers",
     slug: "photographers",
-    icon: "fas fa-camera",
+    icon: "/assets/Weddingphotographers2.png",
+    customIcon: true,
     color: "from-red-500 to-red-600",
     count: "120+"
   },
@@ -22,6 +23,14 @@ const categories = [
     icon: "fas fa-utensils",
     color: "from-yellow-500 to-yellow-600",
     count: "95+"
+  },
+  {
+    name: "Wedding Planners",
+    slug: "wedding-planners",
+    icon: "/assets/wedding-planner-icon.png.png",
+    customIcon: true,
+    color: "from-indigo-500 to-indigo-600",
+    count: "35+"
   },
   {
     name: "Bands & DJs",
@@ -63,7 +72,7 @@ export default function CategoryGrid() {
           <div className="w-16 md:w-24 h-1 bg-gradient-to-r from-red-500 to-teal-500 mx-auto mb-4 md:mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed section-subtitle-mobile px-4 sm:px-0">
             Discover our handpicked collection of Goa's most talented wedding professionals. 
-            Each category features verified vendors who specialize in creating magical moments.
+            Each category features trusted vendors who specialize in creating magical moments.
           </p>
         </div>
         
@@ -71,35 +80,53 @@ export default function CategoryGrid() {
           {categories.map((category, index) => (
             <Link key={category.slug} href={`/vendors/${category.slug}`}>
               <Card className="group cursor-pointer hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 bg-white/80 backdrop-blur-sm border-0 overflow-hidden">
-                <CardContent className="p-4 md:p-8 text-center relative">
-                  {/* Hover background effect */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
-                  
-                  {/* Icon container */}
-                  <div className="relative mb-3 md:mb-6">
-                    <div className={`bg-gradient-to-br ${category.color} w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg`}>
-                      <i className={`${category.icon} text-white text-lg md:text-2xl`}></i>
+                {category.slug === "wedding-planners" || category.slug === "photographers" ? (
+                  <CardContent className="p-0 relative h-40 md:h-48 overflow-hidden">
+                    <img 
+                      src={category.icon}
+                      alt={category.name}
+                      className="w-full h-full object-contain rounded-lg"
+                    />
+                  </CardContent>
+                ) : (
+                  <CardContent className="p-4 md:p-8 text-center relative">
+                    {/* Hover background effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                    
+                    {/* Icon container */}
+                    <div className="relative mb-3 md:mb-6">
+                      <div className={`bg-gradient-to-br ${category.color} w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg`}>
+                        {category.customIcon ? (
+                          <img 
+                            src={category.icon}
+                            alt={category.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <i className={`${category.icon} text-white text-lg md:text-2xl`}></i>
+                        )}
+                      </div>
+                      {/* Floating effect */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${category.color} w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-2xl mx-auto opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500`}></div>
                     </div>
-                    {/* Floating effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${category.color} w-12 h-12 md:w-20 md:h-20 rounded-xl md:rounded-2xl mx-auto opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500`}></div>
-                  </div>
-                  
-                  <h3 className="font-bold text-sm md:text-lg text-slate-800 mb-2 md:mb-3 group-hover:text-red-600 transition-colors duration-300 leading-tight">
-                    {category.name}
-                  </h3>
-                  
-                  <p className="text-xs md:text-sm text-gray-500 mb-2 md:mb-4 leading-relaxed">
-                    {category.count} Professional Vendors
-                  </p>
-                  
-                  {/* Decorative line */}
-                  <div className="w-0 h-0.5 bg-gradient-to-r from-red-500 to-teal-500 mx-auto group-hover:w-8 md:group-hover:w-16 transition-all duration-500 rounded-full"></div>
-                  
-                  {/* Arrow indicator */}
-                  <div className="mt-2 md:mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <i className="fas fa-arrow-right text-red-500 text-xs md:text-sm"></i>
-                  </div>
-                </CardContent>
+                    
+                    <h3 className="font-bold text-sm md:text-lg text-slate-800 mb-2 md:mb-3 group-hover:text-red-600 transition-colors duration-300 leading-tight">
+                      {category.name}
+                    </h3>
+                    
+                    <p className="text-xs md:text-sm text-gray-500 mb-2 md:mb-4 leading-relaxed">
+                      {category.count} Professional Vendors
+                    </p>
+                    
+                    {/* Decorative line */}
+                    <div className="w-0 h-0.5 bg-gradient-to-r from-red-500 to-teal-500 mx-auto group-hover:w-8 md:group-hover:w-16 transition-all duration-500 rounded-full"></div>
+                    
+                    {/* Arrow indicator */}
+                    <div className="mt-2 md:mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <i className="fas fa-arrow-right text-red-500 text-xs md:text-sm"></i>
+                    </div>
+                  </CardContent>
+                )}
               </Card>
             </Link>
           ))}

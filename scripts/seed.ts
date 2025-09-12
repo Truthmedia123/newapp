@@ -223,7 +223,7 @@ async function seed() {
     {
       title: "Traditional Goan Wedding Customs and Rituals",
       slug: "traditional-goan-wedding-customs-rituals",
-      excerpt: "Explore the rich cultural heritage of Goan weddings, from Portuguese influences to Hindu traditions that make these celebrations unique.",
+      excerpt: "Explore the rich cultural heritage of Goan weddings, from traditional influences to Hindu customs that make these celebrations unique.",
       content: "Full content about traditions...",
       featuredImage: "https://images.unsplash.com/photo-1465495976277-4387d4b0e4a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600",
       category: "Goan Culture",

@@ -34,7 +34,7 @@ export default function SearchBar({ onSearch, className = "" }: SearchBarProps) 
     <div className={`bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-white/20 ${className}`}>
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Find Your Perfect Vendors</h2>
-        <p className="text-gray-600">Search from 500+ verified wedding professionals</p>
+        <p className="text-gray-600">Search from 500+ trusted wedding professionals</p>
       </div>
       
       <form onSubmit={handleSearch} className="space-y-3 md:space-y-4">

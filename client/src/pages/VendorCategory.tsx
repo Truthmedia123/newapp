@@ -87,8 +87,6 @@ export default function VendorCategory() {
                 <SelectItem value="all">All Locations</SelectItem>
                 <SelectItem value="North Goa">North Goa</SelectItem>
                 <SelectItem value="South Goa">South Goa</SelectItem>
-                <SelectItem value="Panaji">Panaji</SelectItem>
-                <SelectItem value="Margao">Margao</SelectItem>
               </SelectContent>
             </Select>
             

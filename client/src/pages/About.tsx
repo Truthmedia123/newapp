@@ -30,7 +30,7 @@ export default function About() {
               </p>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
                 We believe every wedding should be a perfect blend of tradition and modernity, 
-                reflecting the unique Portuguese-Indian fusion that makes Goan celebrations so special.
+                reflecting the unique cultural heritage that makes Goan celebrations so special.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
                 Our platform serves as a bridge between couples planning their dream wedding and 
@@ -48,42 +48,6 @@ export default function About() {
           </div>
         </section>
 
-        {/* Founder Section */}
-        <section className="mb-16">
-          <Card className="bg-white shadow-xl">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-                <div className="text-center">
-                  <img 
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300" 
-                    alt="Noel Fernandes - Founder"
-                    className="w-48 h-48 object-cover rounded-full mx-auto mb-4 shadow-lg" 
-                  />
-                  <h3 className="text-2xl font-bold text-slate-800 mb-2">Noel Fernandes</h3>
-                  <p className="text-gray-600 font-medium">Founder & CEO</p>
-                </div>
-                <div className="lg:col-span-2">
-                  <h3 className="text-2xl font-bold text-slate-800 mb-4">Meet Our Founder</h3>
-                  <p className="text-gray-700 mb-4 leading-relaxed">
-                    Noel Fernandes, a native Goan with deep roots in the local wedding industry, 
-                    founded TheGoanWedding.com with a vision to preserve and celebrate the rich 
-                    wedding traditions of Goa while embracing modern conveniences.
-                  </p>
-                  <p className="text-gray-700 mb-4 leading-relaxed">
-                    With over a decade of experience in event management and a profound understanding 
-                    of Goan culture, Noel recognized the need for a comprehensive platform that could 
-                    connect couples with authentic, high-quality wedding vendors.
-                  </p>
-                  <p className="text-gray-700 leading-relaxed">
-                    His commitment to excellence and passion for creating memorable experiences 
-                    drives every aspect of TheGoanWedding.com, ensuring that each couple finds 
-                    the perfect vendors for their special day.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
 
         {/* Values Section */}
         <section className="mb-16">
@@ -161,7 +125,7 @@ export default function About() {
                   <div>
                     <h3 className="text-lg font-semibold text-slate-800 mb-2">Comprehensive Vendor Directory</h3>
                     <p className="text-gray-600">
-                      Access to hundreds of verified wedding vendors across all categories, 
+                      Access to hundreds of carefully curated wedding vendors across all categories, 
                       from photographers to caterers, venues to decorators.
                     </p>
                   </div>
@@ -172,7 +136,7 @@ export default function About() {
                     <i className="fas fa-star text-white text-sm"></i>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-800 mb-2">Verified Reviews & Ratings</h3>
+                    <h3 className="text-lg font-semibold text-slate-800 mb-2">Authentic Reviews & Ratings</h3>
                     <p className="text-gray-600">
                       Honest feedback from real couples to help you make informed decisions 
                       about your wedding vendors.
@@ -187,7 +151,7 @@ export default function About() {
                   <div>
                     <h3 className="text-lg font-semibold text-slate-800 mb-2">Direct Communication</h3>
                     <p className="text-gray-600">
-                      Connect directly with vendors through WhatsApp, phone calls, or email 
+                      Connect directly with vendors through email or contact forms 
                       for seamless coordination and planning.
                     </p>
                   </div>
@@ -226,7 +190,7 @@ export default function About() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 <div>
                   <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
-                  <p className="opacity-90">Verified Vendors</p>
+                  <p className="opacity-90">Trusted Vendors</p>
                 </div>
                 <div>
                   <div className="text-4xl md:text-5xl font-bold mb-2">1000+</div>
@@ -264,10 +228,10 @@ export default function About() {
                   <i className="fas fa-envelope mr-2"></i>Get in Touch
                 </a>
                 <a 
-                  href="https://wa.me/919769661682"
-                  className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all transform hover:scale-105 shadow-lg inline-block"
+                  href="mailto:info@thegoanwedding.com?subject=Inquiry from TheGoanWedding.com"
+                  className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all transform hover:scale-105 shadow-lg inline-block"
                 >
-                  <i className="fab fa-whatsapp mr-2"></i>WhatsApp Us
+                  <i className="fas fa-envelope mr-2"></i>Email Us
                 </a>
               </div>
             </CardContent>

@@ -61,14 +61,14 @@ export default function Home() {
               {/* Enhanced description */}
               <p className="text-lg md:text-xl lg:text-2xl text-gray-200 mb-8 md:mb-12 leading-relaxed max-w-4xl mx-auto px-4 sm:px-0">
                 Discover Goa's most exquisite wedding vendors and create unforgettable memories.
-                From stunning beach ceremonies to authentic Portuguese-Goan celebrations.
+                From stunning beach ceremonies to authentic traditional Goan celebrations.
               </p>
 
               {/* Trust indicators */}
               <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-white mb-1">500+</div>
-                  <div className="text-sm text-gray-300">Verified Vendors</div>
+                  <div className="text-sm text-gray-300">Trusted Vendors</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-white mb-1">1000+</div>
@@ -111,7 +111,7 @@ export default function Home() {
             <div className="w-16 md:w-24 h-1 bg-gradient-to-r from-teal-500 to-red-500 mx-auto mb-4 md:mb-6 rounded-full"></div>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed section-subtitle-mobile px-4 sm:px-0">
               Meet our carefully selected partners who have consistently delivered exceptional experiences.
-              These verified professionals are the heart of unforgettable Goan weddings.
+              These trusted professionals are the heart of unforgettable Goan weddings.
             </p>
           </div>
 
