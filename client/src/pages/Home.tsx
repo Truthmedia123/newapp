@@ -61,7 +61,7 @@ export default function Home() {
               {/* Enhanced description */}
               <p className="text-lg md:text-xl lg:text-2xl text-gray-200 mb-8 md:mb-12 leading-relaxed max-w-4xl mx-auto px-4 sm:px-0">
                 Discover Goa's most exquisite wedding vendors and create unforgettable memories.
-                From stunning beach ceremonies to authentic Portuguese-Goan celebrations.
+                From stunning beach ceremonies to authentic traditional Goan celebrations.
               </p>
 
               {/* Trust indicators */}

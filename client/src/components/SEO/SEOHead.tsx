@@ -16,20 +16,20 @@ interface SEOHeadProps {
 }
 
 export const SEOHead: React.FC<SEOHeadProps> = ({
-  title = "The Goan Wedding - Goa's Premier Wedding Vendor Directory",
+  title = "TheGoanWedding - Goa's Premier Wedding Vendor Directory",
   description = "Discover Goa's best wedding vendors including photographers, venues, caterers, and more. Plan your perfect Goan wedding with our comprehensive directory.",
   keywords = "Goa wedding, wedding vendors, wedding photography, wedding venues, wedding planning, Goan wedding",
   image = "/assets/hero.jpg",
   url = "https://thegoanwedding.com",
   type = "website",
-  author = "The Goan Wedding",
+  author = "TheGoanWedding",
   publishedTime,
   modifiedTime,
   section,
   tags = [],
   structuredData,
 }) => {
-  const fullTitle = title.includes("The Goan Wedding") ? title : `${title} | The Goan Wedding`;
+  const fullTitle = title.includes("TheGoanWedding") ? title : `${title} | TheGoanWedding`;
   const fullUrl = url.startsWith('http') ? url : `https://thegoanwedding.com${url}`;
   const fullImage = image.startsWith('http') ? image : `https://thegoanwedding.com${image}`;
 
@@ -37,7 +37,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   const defaultStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "The Goan Wedding",
+    "name": "TheGoanWedding",
     "description": description,
     "url": "https://thegoanwedding.com",
     "potentialAction": {
@@ -47,7 +47,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     },
     "publisher": {
       "@type": "Organization",
-      "name": "The Goan Wedding",
+      "name": "TheGoanWedding",
       "logo": {
         "@type": "ImageObject",
         "url": "https://thegoanwedding.com/icons/icon-512.png"
@@ -74,7 +74,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       <meta property="og:image" content={fullImage} />
       <meta property="og:url" content={fullUrl} />
       <meta property="og:type" content={type} />
-      <meta property="og:site_name" content="The Goan Wedding" />
+      <meta property="og:site_name" content="TheGoanWedding" />
       <meta property="og:locale" content="en_US" />
 
       {/* Twitter Card Tags */}
@@ -139,7 +139,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 // Hook for dynamic SEO updates
 export const useSEO = () => {
   const updateTitle = (title: string) => {
-    document.title = title.includes("The Goan Wedding") ? title : `${title} | The Goan Wedding`;
+    document.title = title.includes("TheGoanWedding") ? title : `${title} | TheGoanWedding`;
   };
 
   const updateMeta = (name: string, content: string) => {

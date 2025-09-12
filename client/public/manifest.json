@@ -1,6 +1,6 @@
 {
-  "name": "The Goan Wedding",
-  "short_name": "GoanWedding",
+  "name": "TheGoanWedding",
+  "short_name": "TheGoanWedding",
   "description": "Goa's Premier Wedding Vendor Directory",
   "start_url": "/",
   "display": "standalone",

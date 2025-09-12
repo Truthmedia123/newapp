@@ -30,7 +30,7 @@ export default function About() {
               </p>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
                 We believe every wedding should be a perfect blend of tradition and modernity, 
-                reflecting the unique Portuguese-Indian fusion that makes Goan celebrations so special.
+                reflecting the unique cultural heritage that makes Goan celebrations so special.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
                 Our platform serves as a bridge between couples planning their dream wedding and 

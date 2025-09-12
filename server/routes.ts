@@ -227,11 +227,14 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
   app.post("/api/weddings", async (c) => {
     try {
       const body = await c.req.json();
+      console.log('Creating wedding with data:', body);
       const db = getDb(c.env);
       const wedding = await db.insert(weddings).values(body).returning().get();
+      console.log('Wedding created successfully:', wedding);
       return c.json(wedding);
     } catch (error) {
-      return c.json({ error: "Failed to create wedding" }, 500);
+      console.error('Error creating wedding:', error);
+      return c.json({ error: "Failed to create wedding", details: error.message }, 500);
     }
   });
 

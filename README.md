@@ -1,4 +1,4 @@
-# 🏖️ The Goan Wedding - Premier Wedding Vendor Directory
+# 🏖️ TheGoanWedding - Premier Wedding Vendor Directory
 
 A beautiful, modern wedding vendor directory platform specifically designed for Goan weddings, featuring a comprehensive RSVP system, vendor management, and beautiful UI components.
 

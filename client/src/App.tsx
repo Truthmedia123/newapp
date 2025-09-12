@@ -13,17 +13,12 @@ import BlogPost from "@/pages/BlogPost";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Couples from "@/pages/Couples";
-import RSVPGenerator from "@/pages/RSVPGenerator";
-import { RSVPForm } from "@/components/RSVP/RSVPForm";
-import { RSVPConfirmation } from "@/components/RSVP/RSVPConfirmation";
-import { RSVPDashboard } from "@/components/RSVP/RSVPDashboard";
-import { RSVPInvitationSender } from "@/components/RSVP/RSVPInvitationSender";
-import { SingleRSVPGenerator } from "@/components/RSVP/SingleRSVPGenerator";
-import { GoanWeddingRSVP } from "@/components/RSVP/GoanWeddingRSVP";
-import { CoupleDashboard } from "@/components/RSVP/CoupleDashboard";
 import Search from "@/pages/Search";
-import TestRSVP from "@/pages/TestRSVP";
 import AdminDashboard from "@/pages/AdminDashboard";
+
+import RSVPGenerator from "@/pages/RSVPGenerator";
+import RSVPDashboard from "@/pages/RSVPDashboard";
+import RSVPForm from "@/pages/RSVPForm";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -39,16 +34,11 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
         <Route path="/couples/:slug" component={Couples} />
-        <Route path="/rsvp/create" component={RSVPGenerator} />
-        <Route path="/rsvp/send" component={RSVPInvitationSender} />
-        <Route path="/rsvp/generate" component={SingleRSVPGenerator} />
-        <Route path="/rsvp/:invitationCode" component={RSVPForm} />
-        <Route path="/rsvp/goan/:weddingId" component={GoanWeddingRSVP} />
-        <Route path="/rsvp/confirmation/:code" component={RSVPConfirmation} />
-        <Route path="/rsvp/manage/:weddingId" component={RSVPDashboard} />
-        <Route path="/rsvp/dashboard/:weddingId" component={CoupleDashboard} />
         <Route path="/search" component={Search} />
-        <Route path="/test-rsvp" component={TestRSVP} />
+
+        <Route path="/rsvp/generate" component={RSVPGenerator} />
+        <Route path="/rsvp/dashboard" component={RSVPDashboard} />
+        <Route path="/rsvp/:code" component={RSVPForm} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
         <Route component={NotFound} />
       </Switch>

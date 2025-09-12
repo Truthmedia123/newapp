@@ -54,7 +54,8 @@ export default function ListBusiness() {
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Interested in featuring your business on Goa's premier wedding platform? 
-            Get in touch with us to discuss partnership opportunities.
+            Join hundreds of trusted vendors and get in touch with us to discuss 
+            exclusive partnership opportunities that will grow your business.
           </p>
         </div>
 

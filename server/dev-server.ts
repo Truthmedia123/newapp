@@ -1,6 +1,9 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { setupVite, serveStatic, log } from "./vite";
 import { createServer } from "http";
+import { getDb } from "./db";
+import * as schema from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 const app = express();
 app.use(express.json());
@@ -142,6 +145,57 @@ app.get("/api/blog/:slug", (req, res) => {
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Wedding API routes for development
+app.get("/api/weddings", async (req, res) => {
+  try {
+    const db = getDb({});
+    const weddingsList = await db.select().from(schema.weddings).all();
+    res.json(weddingsList);
+  } catch (error) {
+    console.error('Error fetching weddings:', error);
+    res.status(500).json({ error: "Failed to fetch weddings" });
+  }
+});
+
+app.get("/api/weddings/:slug", async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const db = getDb({});
+    const wedding = await db.select().from(schema.weddings).where(eq(schema.weddings.slug, slug)).get();
+    
+    if (!wedding) {
+      return res.status(404).json({ error: "Wedding not found" });
+    }
+    res.json(wedding);
+  } catch (error) {
+    console.error('Error fetching wedding:', error);
+    res.status(500).json({ error: "Failed to fetch wedding" });
+  }
+});
+
+app.post("/api/weddings", async (req, res) => {
+  try {
+    const body = req.body;
+    console.log('Creating wedding with data:', body);
+    
+    // Convert date strings to Date objects
+    const weddingData = {
+      ...body,
+      weddingDate: new Date(body.weddingDate),
+      rsvpDeadline: body.rsvpDeadline ? new Date(body.rsvpDeadline) : null,
+      createdAt: new Date(),
+    };
+    
+    const db = getDb({});
+    const wedding = await db.insert(schema.weddings).values(weddingData).returning().get();
+    console.log('Wedding created successfully:', wedding);
+    res.json(wedding);
+  } catch (error) {
+    console.error('Error creating wedding:', error);
+    res.status(500).json({ error: "Failed to create wedding", details: error.message });
+  }
 });
 
 // Error handling

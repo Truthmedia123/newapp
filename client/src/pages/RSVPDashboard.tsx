@@ -1,319 +1,293 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'wouter';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Calendar, MessageSquare, Download, Mail, QrCode } from 'lucide-react';
-import { exportGuestList } from '@/utils/rsvpUtils';
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
+import { Users, CheckCircle, Clock, Download, Search } from "lucide-react";
 
-interface RSVPDashboardProps {
-  weddingId?: string;
+interface RSVPDashboardData {
+  wedding: any;
+  statistics: {
+    totalInvitations: number;
+    respondedCount: number;
+    pendingCount: number;
+    attendingCount: number;
+    totalGuests: number;
+    responseRate: number;
+  };
+  invitations: any[];
+  rsvpResponses: any[];
+  csvData: any[];
 }
 
-interface RSVPData {
-  wedding: {
-    brideName: string;
-    groomName: string;
-    weddingDate: string;
-    venue: string;
-  };
-  rsvps: Array<{
-    id: number;
-    guestName: string;
-    guestEmail: string;
-    numberOfGuests: number;
-    attendingCeremony: boolean;
-    attendingReception: boolean;
-    message: string;
-    createdAt: string;
-  }>;
-  invitations: Array<{
-    id: number;
-    guestName: string;
-    guestEmail: string;
-    status: string;
-    invitationCode: string;
-  }>;
-}
+export default function RSVPDashboard() {
+  const [weddingId, setWeddingId] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [shouldFetch, setShouldFetch] = useState(false);
 
-export default function RSVPDashboard({ weddingId: propWeddingId }: RSVPDashboardProps) {
-  const { weddingId: paramWeddingId } = useParams();
-  const weddingId = propWeddingId || paramWeddingId;
-  
-  const [data, setData] = useState<RSVPData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: dashboardData, isLoading, error } = useQuery<RSVPDashboardData>({
+    queryKey: [`/api/rsvp/manage/${weddingId}`],
+    enabled: shouldFetch && !!weddingId,
+    retry: false,
+  });
 
-  useEffect(() => {
-    if (weddingId) {
-      fetchRSVPData();
-    }
-  }, [weddingId]);
-
-  const fetchRSVPData = async () => {
-    try {
-      const response = await fetch(`/api/rsvp/dashboard/${weddingId}`);
-      if (response.ok) {
-        const rsvpData = await response.json();
-        setData(rsvpData);
-      }
-    } catch (error) {
-      console.error('Failed to fetch RSVP data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const sendReminder = async (invitationId: number) => {
-    try {
-      const response = await fetch(`/api/rsvp/reminder/${invitationId}`, {
-        method: 'POST'
+  const handleLoadDashboard = () => {
+    if (weddingId.trim()) {
+      setShouldFetch(true);
+    } else {
+      toast({
+        title: "Wedding ID Required",
+        description: "Please enter a valid wedding ID",
+        variant: "destructive"
       });
-      if (response.ok) {
-        // Show success message
-        console.log('Reminder sent successfully');
-      }
-    } catch (error) {
-      console.error('Failed to send reminder:', error);
     }
   };
 
-  const generateQRCode = (invitationCode: string) => {
-    const rsvpUrl = `${window.location.origin}/rsvp/${invitationCode}`;
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(rsvpUrl)}`;
+  const handleExportCSV = () => {
+    if (!dashboardData?.csvData) return;
+
+    const csvContent = [
+      ['Guest Name', 'Email', 'Attending Ceremony', 'Attending Reception', 'Number of Guests', 'Dietary Restrictions', 'Message', 'Submitted At'],
+      ...dashboardData.csvData.map(row => [
+        row.guestName,
+        row.guestEmail,
+        row.attendingCeremony,
+        row.attendingReception,
+        row.numberOfGuests,
+        row.dietaryRestrictions,
+        row.message,
+        new Date(row.submittedAt).toLocaleDateString()
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${dashboardData.wedding.brideName}-${dashboardData.wedding.groomName}-rsvp-responses.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    toast({ title: "CSV Downloaded Successfully!" });
   };
 
-  if (loading) {
+  const filteredResponses = dashboardData?.rsvpResponses.filter(response =>
+    response.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    response.guestEmail.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  if (!shouldFetch) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading RSVP dashboard...</p>
-        </div>
+      <div className="container mx-auto py-8 px-4">
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>RSVP Dashboard</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="weddingId">Wedding ID</Label>
+              <Input
+                id="weddingId"
+                value={weddingId}
+                onChange={(e) => setWeddingId(e.target.value)}
+                placeholder="Enter wedding ID"
+                type="number"
+              />
+            </div>
+            <Button onClick={handleLoadDashboard} className="w-full">
+              Load Dashboard
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  if (!data) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Wedding Not Found</h1>
-          <p className="text-gray-600">The wedding you're looking for doesn't exist.</p>
-        </div>
+      <div className="container mx-auto py-8 px-4">
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
+              <p className="mt-2">Loading dashboard...</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  const totalGuests = data.rsvps.reduce((sum, rsvp) => sum + rsvp.numberOfGuests, 0);
-  const attendingGuests = data.rsvps.filter(rsvp => rsvp.attendingCeremony).reduce((sum, rsvp) => sum + rsvp.numberOfGuests, 0);
-  const responseRate = data.invitations.length > 0 ? (data.rsvps.length / data.invitations.length) * 100 : 0;
+  if (error) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center text-red-600">
+              <p>Failed to load dashboard. Please check the wedding ID and try again.</p>
+              <Button 
+                onClick={() => setShouldFetch(false)} 
+                variant="outline" 
+                className="mt-4"
+              >
+                Back
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!dashboardData) return null;
+
+  const { wedding, statistics, rsvpResponses } = dashboardData;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">RSVP Dashboard</h1>
+    <div className="container mx-auto py-8 px-4 space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold">
+            {wedding.brideName} & {wedding.groomName}
+          </h1>
           <p className="text-gray-600">
-            {data.wedding.brideName} & {data.wedding.groomName} - {new Date(data.wedding.weddingDate).toLocaleDateString()}
+            {new Date(wedding.weddingDate).toLocaleDateString()} at {wedding.venue}
           </p>
         </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Invitations</p>
-                  <p className="text-2xl font-bold text-gray-900">{data.invitations.length}</p>
-                </div>
-                <Users className="h-8 w-8 text-blue-500" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Responses</p>
-                  <p className="text-2xl font-bold text-gray-900">{data.rsvps.length}</p>
-                </div>
-                <MessageSquare className="h-8 w-8 text-green-500" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Attending</p>
-                  <p className="text-2xl font-bold text-gray-900">{attendingGuests}</p>
-                </div>
-                <Calendar className="h-8 w-8 text-emerald-500" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Response Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">{responseRate.toFixed(1)}%</p>
-                </div>
-                <div className="h-8 w-8 bg-purple-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="responses" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="responses">RSVP Responses</TabsTrigger>
-            <TabsTrigger value="invitations">Invitations</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="responses" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>RSVP Responses</CardTitle>
-                  <Button onClick={() => exportGuestList(data.rsvps)} variant="outline">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {data.rsvps.map((rsvp) => (
-                    <div key={rsvp.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{rsvp.guestName}</h3>
-                        <p className="text-sm text-gray-600">{rsvp.guestEmail}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant={rsvp.attendingCeremony ? "default" : "secondary"}>
-                            {rsvp.numberOfGuests} guest{rsvp.numberOfGuests > 1 ? 's' : ''}
-                          </Badge>
-                          {rsvp.attendingCeremony && <Badge variant="outline">Ceremony</Badge>}
-                          {rsvp.attendingReception && <Badge variant="outline">Reception</Badge>}
-                        </div>
-                        {rsvp.message && (
-                          <p className="text-sm text-gray-600 mt-2 italic">"{rsvp.message}"</p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-500">
-                          {new Date(rsvp.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="invitations" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Invitation Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {data.invitations.map((invitation) => (
-                    <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{invitation.guestName}</h3>
-                        <p className="text-sm text-gray-600">{invitation.guestEmail}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant={
-                            invitation.status === 'responded' ? 'default' :
-                            invitation.status === 'viewed' ? 'secondary' : 'outline'
-                          }>
-                            {invitation.status}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => sendReminder(invitation.id)}
-                        >
-                          <Mail className="h-4 w-4 mr-1" />
-                          Remind
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(generateQRCode(invitation.invitationCode), '_blank')}
-                        >
-                          <QrCode className="h-4 w-4 mr-1" />
-                          QR Code
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Guest Breakdown</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span>Total Guests</span>
-                      <span className="font-semibold">{totalGuests}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Attending</span>
-                      <span className="font-semibold text-green-600">{attendingGuests}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Not Attending</span>
-                      <span className="font-semibold text-red-600">{totalGuests - attendingGuests}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Response Timeline</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span>Response Rate</span>
-                      <span className="font-semibold">{responseRate.toFixed(1)}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Pending</span>
-                      <span className="font-semibold text-yellow-600">
-                        {data.invitations.length - data.rsvps.length}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <Button onClick={() => setShouldFetch(false)} variant="outline">
+          Back
+        </Button>
       </div>
+
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total Invitations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{statistics.totalInvitations}</span>
+              <Users className="h-5 w-5 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Responses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{statistics.respondedCount}</span>
+              <CheckCircle className="h-5 w-5 text-green-500" />
+            </div>
+            <p className="text-xs text-gray-500">
+              {statistics.responseRate}% response rate
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Attending</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{statistics.attendingCount}</span>
+              <CheckCircle className="h-5 w-5 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total Guests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">{statistics.totalGuests}</span>
+              <Users className="h-5 w-5 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Search className="h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Search guests..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-64"
+          />
+        </div>
+        <Button onClick={handleExportCSV} className="w-full sm:w-auto">
+          <Download className="h-4 w-4 mr-2" />
+          Export CSV
+        </Button>
+      </div>
+
+      {/* Responses */}
+      <Card>
+        <CardHeader>
+          <CardTitle>RSVP Responses ({filteredResponses.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredResponses.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              {searchTerm ? "No guests match your search." : "No responses yet."}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredResponses.map((response) => (
+                <div key={response.id} className="border rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-semibold">{response.guestName}</h3>
+                      <p className="text-sm text-gray-600">{response.guestEmail}</p>
+                    </div>
+                    <div className="text-right text-sm text-gray-500">
+                      {new Date(response.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <Badge variant={response.attendingCeremony ? "default" : "secondary"}>
+                      Ceremony: {response.attendingCeremony ? "Yes" : "No"}
+                    </Badge>
+                    <Badge variant={response.attendingReception ? "default" : "secondary"}>
+                      Reception: {response.attendingReception ? "Yes" : "No"}
+                    </Badge>
+                    <Badge variant="outline">
+                      {response.numberOfGuests} guest{response.numberOfGuests > 1 ? 's' : ''}
+                    </Badge>
+                  </div>
+
+                  {response.dietaryRestrictions && (
+                    <div className="mb-2">
+                      <span className="text-sm font-medium">Dietary: </span>
+                      <span className="text-sm text-gray-600">{response.dietaryRestrictions}</span>
+                    </div>
+                  )}
+
+                  {response.message && (
+                    <div className="bg-gray-50 p-3 rounded italic text-sm">
+                      "{response.message}"
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

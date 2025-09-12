@@ -1,35 +1,12 @@
 import { drizzle } from 'drizzle-orm/d1';
-import { eq, like, or } from 'drizzle-orm';
 import * as schema from '../../shared/schema.ts';
 
 export async function onRequestGet({ env, request }) {
   try {
     const db = drizzle(env.DB, { schema });
-    const url = new URL(request.url);
-    const category = url.searchParams.get('category');
-    const location = url.searchParams.get('location');
-    const search = url.searchParams.get('search');
+    const weddingsList = await db.select().from(schema.weddings).all();
     
-    let query = db.select().from(schema.vendors);
-    
-    if (category) {
-      query = query.where(eq(schema.vendors.category, category));
-    }
-    if (location) {
-      query = query.where(eq(schema.vendors.location, location));
-    }
-    if (search) {
-      query = query.where(
-        or(
-          like(schema.vendors.name, `%${search}%`),
-          like(schema.vendors.description, `%${search}%`)
-        )
-      );
-    }
-    
-    const { results } = await query.all();
-    
-    return new Response(JSON.stringify(results), {
+    return new Response(JSON.stringify(weddingsList), {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -38,8 +15,8 @@ export async function onRequestGet({ env, request }) {
       },
     });
   } catch (error) {
-    console.error('Error fetching vendors:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch vendors' }), {
+    console.error('Error fetching weddings:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch weddings' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -50,10 +27,12 @@ export async function onRequestPost({ env, request }) {
   try {
     const db = drizzle(env.DB, { schema });
     const body = await request.json();
+    console.log('Creating wedding with data:', body);
     
-    const newVendor = await db.insert(schema.vendors).values(body).returning().get();
+    const wedding = await db.insert(schema.weddings).values(body).returning().get();
+    console.log('Wedding created successfully:', wedding);
     
-    return new Response(JSON.stringify(newVendor), {
+    return new Response(JSON.stringify(wedding), {
       status: 201,
       headers: {
         'Content-Type': 'application/json',
@@ -61,8 +40,8 @@ export async function onRequestPost({ env, request }) {
       },
     });
   } catch (error) {
-    console.error('Error creating vendor:', error);
-    return new Response(JSON.stringify({ error: 'Failed to create vendor' }), {
+    console.error('Error creating wedding:', error);
+    return new Response(JSON.stringify({ error: 'Failed to create wedding', details: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

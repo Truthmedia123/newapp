@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { RSVPHeader } from "@/components/RSVPHeader";
 import type { Wedding, Rsvp } from "@shared/schema";
 
 export default function Couples() {
@@ -163,6 +164,19 @@ export default function Couples() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-12">
+            {/* RSVP Header */}
+            <RSVPHeader
+              brideName={wedding.brideName}
+              groomName={wedding.groomName}
+              weddingDate={weddingDate}
+              ceremonyTime={wedding.ceremonyTime}
+              venue={wedding.venue}
+              isRsvpOpen={isRsvpOpen}
+              totalGuests={rsvps?.reduce((sum, rsvp) => sum + (rsvp.numberOfGuests || 1), 0) || 0}
+              totalResponses={rsvps?.length || 0}
+              onRsvpClick={() => setShowRsvpForm(true)}
+            />
+
             {/* Our Story */}
             {wedding.story && (
               <Card className="border-0 shadow-2xl">
@@ -178,7 +192,7 @@ export default function Couples() {
             )}
 
             {/* Gallery */}
-            {wedding.galleryImages && wedding.galleryImages.length > 0 && (
+            {wedding.galleryImages && Array.isArray(wedding.galleryImages) && wedding.galleryImages.length > 0 && (
               <Card className="border-0 shadow-2xl">
                 <CardHeader>
                   <CardTitle className="text-3xl font-bold text-center wedding-script text-teal-600">
@@ -188,7 +202,7 @@ export default function Couples() {
                 <CardContent>
                   <Carousel className="w-full">
                     <CarouselContent>
-                      {wedding.galleryImages.map((image, index) => (
+                      {wedding.galleryImages.map((image: string, index: number) => (
                         <CarouselItem key={index} className="md:basis-1/2">
                           <img 
                             src={image} 
@@ -218,7 +232,7 @@ export default function Couples() {
                     <div key={rsvp.id} className="bg-gradient-to-r from-red-50 to-teal-50 p-4 rounded-xl border">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-semibold text-gray-800">{rsvp.guestName}</h4>
-                        <Badge variant="secondary">{rsvp.numberOfGuests} guest{rsvp.numberOfGuests > 1 ? 's' : ''}</Badge>
+                        <Badge variant="secondary">{rsvp.numberOfGuests || 1} guest{(rsvp.numberOfGuests || 1) > 1 ? 's' : ''}</Badge>
                       </div>
                       {rsvp.message && (
                         <p className="text-sm text-gray-600 italic">"{rsvp.message}"</p>
