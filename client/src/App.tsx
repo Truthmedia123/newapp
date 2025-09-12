@@ -15,6 +15,7 @@ import Contact from "@/pages/Contact";
 import Couples from "@/pages/Couples";
 import Search from "@/pages/Search";
 import AdminDashboard from "@/pages/AdminDashboard";
+import WeddingTools from "@/pages/WeddingTools";
 
 import RSVPGenerator from "@/pages/RSVPGenerator";
 import RSVPDashboard from "@/pages/RSVPDashboard";
@@ -35,6 +36,7 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/couples/:slug" component={Couples} />
         <Route path="/search" component={Search} />
+        <Route path="/tools" component={WeddingTools} />
 
         <Route path="/rsvp/generate" component={RSVPGenerator} />
         <Route path="/rsvp/dashboard" component={RSVPDashboard} />
