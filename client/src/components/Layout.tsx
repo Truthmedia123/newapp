@@ -15,10 +15,10 @@ export default function Layout({ children }: LayoutProps) {
   const navigation = [
     { name: "Categories", href: "/vendors/all" },
     { name: "Venues", href: "/vendors/venues" },
+    { name: "Tools", href: "/tools" },
     { name: "Blog", href: "/blog" },
     { name: "Search", href: "/search" },
     { name: "RSVP", href: "/rsvp/generate" },
-
   ];
 
   return (
