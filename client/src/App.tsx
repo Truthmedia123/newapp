@@ -16,6 +16,9 @@ import Couples from "@/pages/Couples";
 import Search from "@/pages/Search";
 import AdminDashboard from "@/pages/AdminDashboard";
 import WeddingTools from "@/pages/WeddingTools";
+import VendorSubscription from "@/pages/VendorSubscription";
+import VendorChat from "@/pages/VendorChat";
+import GoanWeddingTimeline from "@/pages/GoanWeddingTimeline";
 
 import RSVPGenerator from "@/pages/RSVPGenerator";
 import RSVPDashboard from "@/pages/RSVPDashboard";
@@ -37,6 +40,9 @@ function Router() {
         <Route path="/couples/:slug" component={Couples} />
         <Route path="/search" component={Search} />
         <Route path="/tools" component={WeddingTools} />
+        <Route path="/vendor/subscription" component={VendorSubscription} />
+        <Route path="/vendor/chat" component={VendorChat} />
+        <Route path="/timeline" component={GoanWeddingTimeline} />
 
         <Route path="/rsvp/generate" component={RSVPGenerator} />
         <Route path="/rsvp/dashboard" component={RSVPDashboard} />
