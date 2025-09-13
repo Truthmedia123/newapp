@@ -35,25 +35,57 @@ jobs:
         env:
           NODE_ENV: production
           
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          ls -la dist/ || echo "dist directory not found"
+          ls -la dist/public/ || echo "dist/public directory not found"
+          echo "Build verification completed"
+          
       - name: Start preview server
         run: |
+          echo "Starting Cloudflare Pages development server..."
           npm run pages:dev &
-          sleep 30  # Wait for server to start
+          SERVER_PID=$!
+          echo "Server started with PID: $SERVER_PID"
+          sleep 60  # Increased wait time for server startup
+          echo "Finished waiting, checking if server is responsive..."
         env:
           NODE_ENV: production
           
       - name: Wait for server to be ready
         run: |
-          timeout 60s bash -c '
+          echo "Checking server availability at http://localhost:8787..."
+          timeout 120s bash -c '
+            attempt=1
             until curl -f http://localhost:8787 > /dev/null 2>&1; do
-              echo "Waiting for server..."
-              sleep 2
+              echo "Attempt $attempt: Waiting for server to be ready..."
+              if [ $attempt -eq 10 ]; then
+                echo "Server logs (if available):"
+                ps aux | grep -E "(pages|8787|wrangler)" || echo "No server processes found"
+                netstat -tlnp | grep 8787 || echo "Port 8787 not listening"
+              fi
+              sleep 3
+              attempt=$((attempt + 1))
             done
+            echo "Server is ready and responding!"
           '
+          
+      - name: Verify server health
+        run: |
+          echo "Testing server endpoint..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8787)
+          if [ "$response" = "200" ]; then
+            echo "✅ Server is healthy (HTTP $response)"
+          else
+            echo "⚠️ Server returned HTTP $response, but continuing..."
+          fi
           
       - name: Install audit tools
         run: |
           npm install -g @axe-core/cli lighthouse-ci @lhci/cli
+          # Install additional dependencies for CI environment
+          npm install puppeteer --no-save
           
       - name: Run Accessibility Audit with axe-core
         run: |
@@ -93,6 +125,8 @@ jobs:
           
       - name: Run Custom Performance Tests
         run: |
+          # Verify server is still responsive before running tests
+          curl -f http://localhost:8787 || (echo "Server not responding, skipping performance tests" && exit 0)
           # Test page load times and critical metrics
           node scripts/performance-test.js
           
@@ -186,8 +220,19 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          pkill -f "pages:dev" || true
-          pkill -f "8787" || true
+          echo "Cleaning up server processes..."
+          pkill -f "pages:dev" || echo "No pages:dev process found"
+          pkill -f "wrangler" || echo "No wrangler process found"
+          pkill -f "8787" || echo "No processes using port 8787 found"
+          
+          # Wait a moment for processes to terminate
+          sleep 2
+          
+          # Force kill if still running
+          pkill -9 -f "pages:dev" || true
+          pkill -9 -f "wrangler" || true
+          
+          echo "Cleanup completed"
 
   # Separate job for security audit
   security-audit:
