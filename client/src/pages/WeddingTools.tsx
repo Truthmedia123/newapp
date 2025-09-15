@@ -8,7 +8,10 @@ import CoupleSiteGenerator from '@/components/CoupleSiteGenerator';
 import GuestDashboard from '@/components/GuestDashboard';
 import EnhancedVendorSearchFilters from '@/components/EnhancedVendorSearchFilters';
 import VendorSpotlightCarousel from '@/components/VendorSpotlightCarousel';
-import { Calculator, Users, Globe, UserCheck, Search, Sparkles } from 'lucide-react';
+import VendorSubscriptionManager from '@/components/vendor/VendorSubscriptionManager';
+import VendorChatSystem from '@/components/communication/VendorChatSystem';
+import GoanWeddingTimelinePlanner from '@/components/cultural/GoanWeddingTimelinePlanner';
+import { Calculator, Users, Globe, UserCheck, Search, Sparkles, Smartphone, CreditCard, MessageSquare, Calendar } from 'lucide-react';
 
 export default function WeddingTools() {
   const [activeTab, setActiveTab] = useState('budget');
@@ -63,6 +66,30 @@ export default function WeddingTools() {
         </div>
       ),
       color: 'from-teal-500 to-teal-600'
+    },
+    {
+      id: 'timeline',
+      title: 'Cultural Timeline',
+      description: 'Plan authentic Goan wedding ceremonies and traditions',
+      icon: Calendar,
+      component: GoanWeddingTimelinePlanner,
+      color: 'from-orange-500 to-orange-600'
+    },
+    {
+      id: 'subscription',
+      title: 'Vendor Subscription',
+      description: 'Manage vendor listings and subscription plans',
+      icon: CreditCard,
+      component: VendorSubscriptionManager,
+      color: 'from-indigo-500 to-indigo-600'
+    },
+    {
+      id: 'chat',
+      title: 'Vendor Chat',
+      description: 'Real-time communication with wedding vendors',
+      icon: MessageSquare,
+      component: VendorChatSystem,
+      color: 'from-cyan-500 to-cyan-600'
     }
   ];
 
@@ -85,7 +112,7 @@ export default function WeddingTools() {
 
         {/* Tool Navigation Cards */}
         <div className="px-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {tools.map((tool) => {
               const Icon = tool.icon;
               return (

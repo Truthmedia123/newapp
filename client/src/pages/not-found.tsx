@@ -1,7 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 
+console.log("NotFound module loaded");
+
 export default function NotFound() {
+  console.log("NotFound component rendering");
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md mx-4">

@@ -16,47 +16,81 @@ import Couples from "@/pages/Couples";
 import Search from "@/pages/Search";
 import AdminDashboard from "@/pages/AdminDashboard";
 import WeddingTools from "@/pages/WeddingTools";
+import VendorSubscription from "@/pages/VendorSubscription";
+import VendorChat from "@/pages/VendorChat";
+import GoanWeddingTimeline from "@/pages/GoanWeddingTimeline";
 
-import RSVPGenerator from "@/pages/RSVPGenerator";
-import RSVPDashboard from "@/pages/RSVPDashboard";
-import RSVPForm from "@/pages/RSVPForm";
+// import RSVPGenerator from "@/pages/RSVPGenerator";
+// import RSVPDashboard from "@/pages/RSVPDashboard";
+// import RSVPForm from "@/pages/RSVPForm";
 import NotFound from "@/pages/not-found";
 
-function Router() {
-  return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/vendors/:category" component={VendorCategory} />
-        <Route path="/vendor/:id" component={VendorProfile} />
-        <Route path="/list-business" component={ListBusiness} />
-        <Route path="/blog" component={Blog} />
-        <Route path="/blog/:slug" component={BlogPost} />
-        <Route path="/about" component={About} />
-        <Route path="/contact" component={Contact} />
-        <Route path="/couples/:slug" component={Couples} />
-        <Route path="/search" component={Search} />
-        <Route path="/tools" component={WeddingTools} />
+console.log("App module loaded");
 
-        <Route path="/rsvp/generate" component={RSVPGenerator} />
-        <Route path="/rsvp/dashboard" component={RSVPDashboard} />
-        <Route path="/rsvp/:code" component={RSVPForm} />
-        <Route path="/admin/dashboard" component={AdminDashboard} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
-  );
+function Router() {
+  console.log("Router component rendering");
+  try {
+    return (
+      <Layout>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/vendors/:category" component={VendorCategory} />
+          <Route path="/vendor/:id" component={VendorProfile} />
+          <Route path="/list-business" component={ListBusiness} />
+          <Route path="/blog" component={Blog} />
+          <Route path="/blog/:slug" component={BlogPost} />
+          <Route path="/about" component={About} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/couples/:slug" component={Couples} />
+          <Route path="/search" component={Search} />
+          <Route path="/tools" component={WeddingTools} />
+          <Route path="/vendor/subscription" component={VendorSubscription} />
+          <Route path="/vendor/chat" component={VendorChat} />
+          <Route path="/timeline" component={GoanWeddingTimeline} />
+
+          {/* <Route path="/rsvp/generate" component={RSVPGenerator} />
+          <Route path="/rsvp/dashboard" component={RSVPDashboard} />
+          <Route path="/rsvp/:code" component={RSVPForm} /> */}
+          <Route path="/admin/dashboard" component={AdminDashboard} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
+    );
+  } catch (error) {
+    console.error("Error in Router component:", error);
+    throw error;
+  }
 }
 
 function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
+  console.log("App component rendering");
+  
+  // Add error boundary
+  try {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  } catch (error) {
+    console.error("Error in App component:", error);
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Application Error</h1>
+          <p className="text-gray-700 mb-4">Something went wrong while rendering the application.</p>
+          <p className="text-sm text-gray-500">Check the browser console for more details.</p>
+          <details className="mt-4 text-left bg-gray-100 p-4 rounded">
+            <summary className="cursor-pointer font-medium">Error details</summary>
+            <pre className="mt-2 text-xs overflow-auto">{error instanceof Error ? error.message : String(error)}</pre>
+          </details>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;

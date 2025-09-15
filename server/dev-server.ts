@@ -147,13 +147,30 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Simple test route
+app.get("/test", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Test Page</title>
+    </head>
+    <body>
+        <h1>Test Page</h1>
+        <p>If you can see this, the server is working correctly.</p>
+        <p><a href="/">Go to main app</a></p>
+    </body>
+    </html>
+  `);
+});
+
 // Wedding API routes for development
 app.get("/api/weddings", async (req, res) => {
   try {
     const db = getDb({});
     const weddingsList = await db.select().from(schema.weddings).all();
     res.json(weddingsList);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching weddings:', error);
     res.status(500).json({ error: "Failed to fetch weddings" });
   }
@@ -169,7 +186,7 @@ app.get("/api/weddings/:slug", async (req, res) => {
       return res.status(404).json({ error: "Wedding not found" });
     }
     res.json(wedding);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching wedding:', error);
     res.status(500).json({ error: "Failed to fetch wedding" });
   }
@@ -192,9 +209,9 @@ app.post("/api/weddings", async (req, res) => {
     const wedding = await db.insert(schema.weddings).values(weddingData).returning().get();
     console.log('Wedding created successfully:', wedding);
     res.json(wedding);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating wedding:', error);
-    res.status(500).json({ error: "Failed to create wedding", details: error.message });
+    res.status(500).json({ error: "Failed to create wedding", details: error.message || String(error) });
   }
 });
 
@@ -217,7 +234,7 @@ const server = createServer(app);
     serveStatic(app);
   }
   
-  const port = 3001;
+  const port = 8787;
   const listenOptions: any = {
     port,
     host: "0.0.0.0",
