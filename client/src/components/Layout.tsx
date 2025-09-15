@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import FloatingButtons from "./FloatingButtons";
 
+console.log("Layout module loaded");
+
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+  console.log("Layout component rendering with children:", children);
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -20,6 +23,8 @@ export default function Layout({ children }: LayoutProps) {
     { name: "Search", href: "/search" },
     { name: "RSVP", href: "/rsvp/generate" },
   ];
+
+  console.log("Layout rendering navigation menu");
 
   return (
     <div className="min-h-screen">

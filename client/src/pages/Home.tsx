@@ -8,14 +8,29 @@ import VendorCard from "@/components/VendorCard";
 import TestimonialSlider from "@/components/TestimonialSlider";
 import type { Vendor, BlogPost } from "@shared/schema";
 
+console.log("Home module loaded");
+
 export default function Home() {
-  const { data: featuredVendors } = useQuery<Vendor[]>({
+  console.log("Home component rendering");
+  
+  const { data: featuredVendors, error: vendorsError, isLoading: vendorsLoading } = useQuery<Vendor[]>({
     queryKey: ["/api/vendors/featured"],
   });
 
-  const { data: blogPosts } = useQuery<BlogPost[]>({
+  const { data: blogPosts, error: blogError, isLoading: blogLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
   });
+
+  // Log any errors
+  if (vendorsError) {
+    console.error("Vendors query error:", vendorsError);
+  }
+  
+  if (blogError) {
+    console.error("Blog query error:", blogError);
+  }
+
+  console.log("Home component rendering with data:", { featuredVendors, blogPosts, vendorsLoading, blogLoading });
 
   return (
     <div>
@@ -116,7 +131,11 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12 md:mb-16">
-            {featuredVendors?.slice(0, 6).map((vendor, index) => (
+            {vendorsLoading ? (
+              <div className="col-span-full text-center py-12">
+                <p>Loading featured vendors...</p>
+              </div>
+            ) : featuredVendors ? featuredVendors.slice(0, 6).map((vendor: Vendor, index: number) => (
               <div
                 key={vendor.id}
                 className="animate-fade-in-up"
@@ -124,7 +143,7 @@ export default function Home() {
               >
                 <VendorCard vendor={vendor} />
               </div>
-            ))}
+            )) : null}
           </div>
 
           <div className="text-center px-4 sm:px-0">
@@ -178,7 +197,11 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts?.slice(0, 3).map((post) => (
+            {blogLoading ? (
+              <div className="col-span-full text-center py-12">
+                <p>Loading blog posts...</p>
+              </div>
+            ) : blogPosts ? blogPosts.slice(0, 3).map((post: BlogPost) => (
               <Link key={post.id} href={`/blog/${post.slug}`}>
                 <Card className="group cursor-pointer hover:shadow-2xl transition-all transform hover:-translate-y-2 overflow-hidden">
                   <img
@@ -201,7 +224,7 @@ export default function Home() {
                   </CardContent>
                 </Card>
               </Link>
-            ))}
+            )) : null}
           </div>
 
           <div className="text-center mt-12">
