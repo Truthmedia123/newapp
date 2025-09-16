@@ -19,6 +19,7 @@ import WeddingTools from "@/pages/WeddingTools";
 import VendorSubscription from "@/pages/VendorSubscription";
 import VendorChat from "@/pages/VendorChat";
 import GoanWeddingTimeline from "@/pages/GoanWeddingTimeline";
+import MobileAnalytics from "@/pages/MobileAnalytics";
 
 // import RSVPGenerator from "@/pages/RSVPGenerator";
 // import RSVPDashboard from "@/pages/RSVPDashboard";
@@ -47,6 +48,7 @@ function Router() {
           <Route path="/vendor/subscription" component={VendorSubscription} />
           <Route path="/vendor/chat" component={VendorChat} />
           <Route path="/timeline" component={GoanWeddingTimeline} />
+          <Route path="/mobile-analytics" component={MobileAnalytics} />
 
           {/* <Route path="/rsvp/generate" component={RSVPGenerator} />
           <Route path="/rsvp/dashboard" component={RSVPDashboard} />
