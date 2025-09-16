@@ -13,6 +13,7 @@ interface SEOHeadProps {
   section?: string;
   tags?: string[];
   structuredData?: any;
+  children?: React.ReactNode;
 }
 
 export const SEOHead: React.FC<SEOHeadProps> = ({
@@ -28,6 +29,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   section,
   tags = [],
   structuredData,
+  children,
 }) => {
   const fullTitle = title.includes("TheGoanWedding") ? title : `${title} | TheGoanWedding`;
   const fullUrl = url.startsWith('http') ? url : `https://thegoanwedding.com${url}`;
@@ -132,6 +134,9 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       <meta name="geo.placename" content="Goa, India" />
       <meta name="geo.position" content="15.2993;74.1240" />
       <meta name="ICBM" content="15.2993, 74.1240" />
+      
+      {/* Additional children meta tags */}
+      {children}
     </>
   );
 };
@@ -179,9 +184,3 @@ export const useSEO = () => {
     updateStructuredData,
   };
 };
-
-
-
-
-
-
