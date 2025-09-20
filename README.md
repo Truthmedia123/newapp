@@ -1,6 +1,6 @@
 # 🏖️ TheGoanWedding - Premier Wedding Vendor Directory
 
-A beautiful, modern wedding vendor directory platform specifically designed for Goan weddings, featuring a comprehensive RSVP system, vendor management, and beautiful UI components.
+A beautiful, modern wedding vendor directory platform specifically designed for Goan weddings, featuring a comprehensive vendor management system and beautiful UI components.
 
 ## 🌟 Features
 
@@ -10,14 +10,6 @@ A beautiful, modern wedding vendor directory platform specifically designed for 
 - **Location Filtering**: North Goa & South Goa regions
 - **Advanced Search**: Price range, ratings, and multi-select filters
 - **Vendor Profiles**: Detailed profiles with photos, reviews, and contact info
-
-### 💒 RSVP System
-- **Single-Page RSVP Generator**: Create beautiful Goan wedding RSVPs instantly
-- **Instant Link & QR Code Generation**: Share with guests immediately
-- **Goan Wedding Features**: Traditional ceremony & reception, dietary considerations
-- **Guest Management**: Track responses, export to CSV, WhatsApp sharing
-- **Couple Dashboard**: Real-time statistics and guest management
-- **Beautiful Guest Forms**: Mobile-responsive with Goan wedding themes
 
 ### 🎨 Modern UI/UX
 - **Responsive Design**: Mobile-first approach
@@ -84,7 +76,6 @@ weddingreplit/
 ├── client/                 # React frontend
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
-│   │   │   ├── RSVP/       # RSVP system components
 │   │   │   ├── PWA/        # Progressive Web App features
 │   │   │   └── ui/         # Base UI components
 │   │   ├── pages/          # Page components
@@ -133,43 +124,13 @@ npm run optimize:images  # Optimize and compress images
 npm test                 # Run test suite
 ```
 
-## 🎯 RSVP System Usage
-
-### 1. Create RSVP
-Visit: `http://127.0.0.1:8787/rsvp/generate`
-
-1. Fill in wedding details (bride, groom, date, venue, times)
-2. Click "Generate Goan Wedding RSVP"
-3. Get instant links and QR codes
-4. Share with guests via WhatsApp or copy links
-
-### 2. Guest RSVP
-Guests visit the generated RSVP link to:
-- View beautiful Goan wedding invitation
-- Select ceremony/reception attendance
-- Provide guest count and dietary restrictions
-- Add Goan wedding specific details (children, transport, accommodation, traditional attire)
-- Leave messages for the couple
-
-### 3. Couple Dashboard
-Access via: `/rsvp/dashboard/{weddingId}`
-
-- View real-time response statistics
-- Track Goan wedding specific metrics
-- Export guest list to CSV
-- Share updates via WhatsApp
-- Search and filter responses
-
 ## 🏖️ Goan Wedding Features
 
 ### Traditional Elements
-- **Ceremony & Reception**: Separate timing for traditional Goan weddings
 - **Venue Suggestions**: Grand Hyatt, Taj Exotica, Marriott, etc.
 - **Traditional Timing**: 4:00 PM ceremony, 7:00 PM reception
-- **Goan Cuisine**: Dietary considerations for seafood, pork, traditional dishes
 
 ### Guest Experience
-- **Traditional Attire**: Option to indicate wearing traditional Goan attire
 - **Transportation**: Assistance for out-of-town guests
 - **Accommodation**: Help with hotel bookings
 - **Children**: Special considerations for families with children
@@ -187,13 +148,6 @@ The platform uses a Goan wedding color scheme:
 1. Use the admin dashboard: `/admin/dashboard?token=admin-secret-2024`
 2. Import CSV file with vendor data
 3. Or use Netlify CMS for content management
-
-### Customizing RSVP Questions
-Edit `client/src/components/RSVP/GoanWeddingRSVP.tsx` to add/modify:
-- Custom questions
-- Goan wedding specific fields
-- Dietary restriction options
-- Transportation/accommodation needs
 
 ## 🔧 Configuration
 

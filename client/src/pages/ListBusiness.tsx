@@ -50,7 +50,7 @@ export default function ListBusiness() {
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Partner with <span className="text-red-500">TheGoan</span><span className="text-blue-600">Wedding</span>
+            Partner with <span style={{ color: "var(--goan-coral)" }}>TheGoan</span><span style={{ color: "var(--goan-sea-blue)" }}>Wedding</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Interested in featuring your business on Goa's premier wedding platform? 

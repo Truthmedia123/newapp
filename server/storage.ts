@@ -6,7 +6,6 @@ import {
   businessSubmissions, 
   contacts,
   weddings,
-  rsvps,
   type Vendor, 
   type InsertVendor,
   type Review,
@@ -21,8 +20,6 @@ import {
   type InsertContact,
   type Wedding,
   type InsertWedding,
-  type Rsvp,
-  type InsertRsvp
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, like, and, desc, sql } from "drizzle-orm";
@@ -59,9 +56,6 @@ export interface IStorage {
   getWedding(slug: string): Promise<Wedding | undefined>;
   createWedding(wedding: InsertWedding): Promise<Wedding>;
 
-  // RSVPs
-  getWeddingRsvps(weddingId: number): Promise<Rsvp[]>;
-  createRsvp(rsvp: InsertRsvp): Promise<Rsvp>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -210,17 +204,6 @@ export class DatabaseStorage implements IStorage {
     return newWedding;
   }
 
-  async getWeddingRsvps(weddingId: number): Promise<Rsvp[]> {
-    return await db.select().from(rsvps).where(eq(rsvps.weddingId, weddingId)).orderBy(desc(rsvps.createdAt));
-  }
-
-  async createRsvp(rsvp: InsertRsvp): Promise<Rsvp> {
-    const [newRsvp] = await db
-      .insert(rsvps)
-      .values(rsvp)
-      .returning();
-    return newRsvp;
-  }
 }
 
 class InMemoryStorage implements IStorage {
@@ -231,8 +214,7 @@ class InMemoryStorage implements IStorage {
   private _businessSubmissions: BusinessSubmission[] = [];
   private _contacts: Contact[] = [];
   private _weddings: Wedding[] = [];
-  private _rsvps: Rsvp[] = [];
-  private _ids = { vendor: 1, review: 1, category: 1, post: 1, submission: 1, contact: 1, wedding: 1, rsvp: 1 };
+  private _ids = { vendor: 1, review: 1, category: 1, post: 1, submission: 1, contact: 1, wedding: 1 };
 
   constructor() {
     // Seed minimal demo data
@@ -255,7 +237,7 @@ class InMemoryStorage implements IStorage {
     ];
 
     this._weddings = [
-      { id: this._ids.wedding++, brideName: "Jane", groomName: "John", weddingDate: new Date() as any, venue: "City Hall", venueAddress: "123 Main St", ceremonyTime: "2:00 PM", receptionTime: "6:00 PM", coverImage: "", galleryImages: [], story: "Our story", slug: "jane-john", rsvpDeadline: new Date() as any, maxGuests: 100, isPublic: true, contactEmail: "contact@example.com", contactPhone: "", createdAt: new Date() as any },
+      { id: this._ids.wedding++, brideName: "Jane", groomName: "John", weddingDate: new Date() as any, venue: "City Hall", venueAddress: "123 Main St", ceremonyTime: "2:00 PM", receptionTime: "6:00 PM", coverImage: "", galleryImages: [], story: "Our story", slug: "jane-john", maxGuests: 100, isPublic: true, contactEmail: "contact@example.com", contactPhone: "", createdAt: new Date() as any },
     ];
   }
 
@@ -310,8 +292,6 @@ class InMemoryStorage implements IStorage {
   async getWedding(slug: string): Promise<Wedding | undefined> { return this._weddings.find(w => w.slug === slug); }
   async createWedding(wedding: InsertWedding): Promise<Wedding> { const w: Wedding = { id: this._ids.wedding++, createdAt: new Date() as any, ...wedding } as any; this._weddings.push(w); return w; }
 
-  async getWeddingRsvps(weddingId: number): Promise<Rsvp[]> { return this._rsvps.filter(r => r.weddingId === weddingId).sort((a,b)=>new Date(b.createdAt as any).getTime()-new Date(a.createdAt as any).getTime()); }
-  async createRsvp(rsvp: InsertRsvp): Promise<Rsvp> { const r: Rsvp = { id: this._ids.rsvp++, createdAt: new Date() as any, ...rsvp } as any; this._rsvps.push(r); return r; }
 }
 
 export const storage: IStorage = process.env.DATABASE_URL ? new DatabaseStorage() : new InMemoryStorage();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Edit, Trash2, Plus, FileText, BarChart2, Eye, Calendar } from 'lucide-react';
+import { Edit, Trash2, Plus, FileText, BarChart2, Eye, Calendar, Upload } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Calendar as CalendarIcon } from 'lucide-react';
@@ -43,6 +43,13 @@ interface Vendor {
   rating: number;
   contactEmail: string;
   isVerified: boolean;
+  // Social media fields
+  facebookUrl?: string;
+  instagramUrl?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  // Embed code field
+  embedCode?: string;
 }
 
 interface BlogPost {
@@ -54,12 +61,6 @@ interface BlogPost {
   published: boolean;
 }
 
-interface RsvpTemplate {
-  id: string;
-  name: string;
-  type: 'Hindu' | 'Christian' | 'Islamic';
-  config: any;
-}
 
 const ADMIN_TOKENS: Record<string, string> = {
   'admin-2025-goa': 'full-access',
@@ -140,6 +141,13 @@ export default function AdminDashboard() {
     to: new Date(),
   });
   
+  // Bulk import state
+  const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
+  const [isBulkImportPreviewOpen, setIsBulkImportPreviewOpen] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [parsedData, setParsedData] = useState<any[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Debug logging
   console.log('AdminDashboard rendering with:', { adminToken, isAuthenticated, userRole });
   
@@ -257,26 +265,6 @@ export default function AdminDashboard() {
     staleTime: 0,
   });
 
-  const { data: templates, isLoading: templatesLoading, error: templatesError } = useQuery<RsvpTemplate[]>({
-    queryKey: ['templates'],
-    queryFn: async () => {
-      try {
-        const response = await fetch('/api/rsvptemplates', { headers });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error('Error fetching templates:', error);
-        // Return mock data as fallback
-        return mockTemplates;
-      }
-    },
-    enabled: isAuthenticated,
-    retry: false,
-    staleTime: 0,
-  });
 
   // Mutations
   const createVendorMutation = useMutation({
@@ -416,74 +404,6 @@ export default function AdminDashboard() {
     },
   });
 
-  // Template mutations
-  const createTemplateMutation = useMutation({
-    mutationFn: (newTemplate: Omit<RsvpTemplate, 'id'>) => 
-      fetch('/api/rsvptemplates', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(newTemplate),
-      }).then(res => res.json()),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['templates'] });
-      toast({
-        title: 'Success',
-        description: 'RSVP template created successfully',
-      });
-    },
-    onError: (error: unknown) => {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to create RSVP template',
-      });
-    },
-  });
-
-  const updateTemplateMutation = useMutation({
-    mutationFn: (updatedTemplate: RsvpTemplate) => 
-      fetch(`/api/rsvptemplates/${updatedTemplate.id}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(updatedTemplate),
-      }).then(res => res.json()),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['templates'] });
-      toast({
-        title: 'Success',
-        description: 'RSVP template updated successfully',
-      });
-    },
-    onError: (error: unknown) => {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to update RSVP template',
-      });
-    },
-  });
-
-  const deleteTemplateMutation = useMutation({
-    mutationFn: (id: string) => 
-      fetch(`/api/rsvptemplates/${id}`, {
-        method: 'DELETE',
-        headers,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['templates'] });
-      toast({
-        title: 'Success',
-        description: 'RSVP template deleted successfully',
-      });
-    },
-    onError: (error: unknown) => {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to delete RSVP template',
-      });
-    },
-  });
 
   // Export analytics
   const exportAnalytics = async () => {
@@ -536,16 +456,7 @@ export default function AdminDashboard() {
         description: postsError instanceof Error ? postsError.message : 'Failed to fetch posts',
       });
     }
-    
-    if (templatesError) {
-      console.error('Templates error:', templatesError);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: templatesError instanceof Error ? templatesError.message : 'Failed to fetch templates',
-      });
-    }
-  }, [vendorsError, postsError, templatesError]);
+  }, [vendorsError, postsError]);
 
   // Mock data for initial state if API is unavailable
   const mockVendors: Vendor[] = [
@@ -628,35 +539,6 @@ export default function AdminDashboard() {
     },
   ];
 
-  const mockTemplates: RsvpTemplate[] = [
-    {
-      id: '1',
-      name: 'Hindu Wedding RSVP',
-      type: 'Hindu',
-      config: {
-        fields: ['name', 'email', 'attendance', 'dietary'],
-        customMessage: 'We cordially invite you to celebrate our special day',
-      },
-    },
-    {
-      id: '2',
-      name: 'Christian Wedding RSVP',
-      type: 'Christian',
-      config: {
-        fields: ['name', 'email', 'attendance', 'plusOne'],
-        customMessage: 'You are cordially invited to witness our union',
-      },
-    },
-    {
-      id: '3',
-      name: 'Islamic Wedding RSVP',
-      type: 'Islamic',
-      config: {
-        fields: ['name', 'email', 'attendance'],
-        customMessage: 'We invite you to share in our joy',
-      },
-    },
-  ];
 
   // Vendor management state
   const [vendorForm, setVendorForm] = useState<Omit<Vendor, 'id'> & { id?: string }>({
@@ -667,6 +549,13 @@ export default function AdminDashboard() {
     rating: 0,
     contactEmail: '',
     isVerified: false,
+    // Social media fields
+    facebookUrl: '',
+    instagramUrl: '',
+    linkedinUrl: '',
+    twitterUrl: '',
+    // Embed code field
+    embedCode: '',
   });
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
 
@@ -682,17 +571,8 @@ export default function AdminDashboard() {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  // Template management state
-  const [templateForm, setTemplateForm] = useState<Omit<RsvpTemplate, 'id'> & { id?: string }>({
-    name: '',
-    type: 'Hindu',
-    config: {},
-  });
-  const [templateConfig, setTemplateConfig] = useState('');
-  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
-
   // Handle vendor form changes
-  const handleVendorChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleVendorChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
@@ -718,11 +598,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Handle template form changes
-  const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setTemplateForm(prev => ({ ...prev, [name]: value }));
-  };
 
   // Handle vendor form submit
   const handleVendorSubmit = (e: React.FormEvent) => {
@@ -741,6 +616,11 @@ export default function AdminDashboard() {
       rating: 0,
       contactEmail: '',
       isVerified: false,
+      facebookUrl: '',
+      instagramUrl: '',
+      linkedinUrl: '',
+      twitterUrl: '',
+      embedCode: '',
     });
   };
 
@@ -763,31 +643,6 @@ export default function AdminDashboard() {
     setPostContent('');
   };
 
-  // Handle template form submit
-  const handleTemplateSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const config = JSON.parse(templateConfig);
-      if (templateForm.id) {
-        updateTemplateMutation.mutate({ ...templateForm, id: templateForm.id, config } as RsvpTemplate);
-      } else {
-        createTemplateMutation.mutate({ ...templateForm, config });
-      }
-      setIsTemplateModalOpen(false);
-      setTemplateForm({
-        name: '',
-        type: 'Hindu',
-        config: {},
-      });
-      setTemplateConfig('');
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Invalid JSON in config field',
-      });
-    }
-  };
 
   // Open vendor modal for editing
   const openVendorEdit = (vendor: Vendor) => {
@@ -801,12 +656,6 @@ export default function AdminDashboard() {
     setIsPostModalOpen(true);
   };
 
-  // Open template modal for editing
-  const openTemplateEdit = (template: RsvpTemplate) => {
-    setTemplateForm(template);
-    setTemplateConfig(JSON.stringify(template.config, null, 2));
-    setIsTemplateModalOpen(true);
-  };
 
   // Confirm vendor deletion
   const confirmVendorDelete = (id: string, name: string) => {
@@ -822,12 +671,89 @@ export default function AdminDashboard() {
     }
   };
 
-  // Confirm template deletion
-  const confirmTemplateDelete = (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete template "${name}"?`)) {
-      deleteTemplateMutation.mutate(id);
+
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setCsvFile(file);
+      parseCSV(file);
     }
   };
+
+  // Parse CSV file
+  const parseCSV = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      const lines = content.split('\n');
+      const headers = lines[0].split(',').map(header => header.trim().replace(/['"]+/g, ''));
+      
+      const data = lines.slice(1).map(line => {
+        const values = line.split(',').map(value => value.trim().replace(/['"]+/g, ''));
+        const obj: any = {};
+        headers.forEach((header, index) => {
+          obj[header] = values[index] || '';
+        });
+        return obj;
+      }).filter(row => Object.values(row).some(val => val !== '')); // Filter out empty rows
+      
+      setParsedData(data);
+    };
+    reader.readAsText(file);
+  };
+
+  // Handle bulk vendor import
+  const handleBulkImport = async () => {
+    if (parsedData.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No data to import',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/vendors/bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-token': adminToken,
+        },
+        body: JSON.stringify({ vendors: parsedData }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to import vendors');
+      }
+
+      const result = await response.json();
+      toast({
+        title: 'Success',
+        description: `Imported ${result.imported} vendors successfully`,
+      });
+
+      // Refresh vendors list
+      queryClient.invalidateQueries({ queryKey: ['vendors'] });
+      
+      // Reset state
+      setIsBulkImportModalOpen(false);
+      setIsBulkImportPreviewOpen(false);
+      setCsvFile(null);
+      setParsedData([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to import vendors',
+      });
+    }
+  };
+
 
   // Enhanced rendering with error boundary
   return (
@@ -863,22 +789,19 @@ export default function AdminDashboard() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="mt-2 text-gray-600">Manage vendors, blog posts, and RSVP templates</p>
+              <p className="mt-2 text-gray-600">Manage vendors and blog posts</p>
               <div className="mt-2 text-sm text-gray-500">
                 Token: {adminToken} | Role: {userRole}
               </div>
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 {checkPermissions(adminToken, 'vendors') && (
                   <TabsTrigger value="vendors">Vendors</TabsTrigger>
                 )}
                 {checkPermissions(adminToken, 'blog') && (
                   <TabsTrigger value="blog">Blog</TabsTrigger>
-                )}
-                {ADMIN_TOKENS[adminToken] === 'full-access' && (
-                  <TabsTrigger value="templates">RSVP Templates</TabsTrigger>
                 )}
                 {ADMIN_TOKENS[adminToken] === 'full-access' && (
                   <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -891,124 +814,343 @@ export default function AdminDashboard() {
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Vendor Management</CardTitle>
                     {checkPermissions(adminToken, 'vendors') && (
-                      <Dialog open={isVendorModalOpen} onOpenChange={setIsVendorModalOpen}>
-                        <DialogTrigger asChild>
-                          <Button onClick={() => setVendorForm({
-                            name: '',
-                            category: '',
-                            location: '',
-                            priceRange: [0, 0],
-                            rating: 0,
-                            contactEmail: '',
-                            isVerified: false,
-                          })}>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Vendor
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                          <DialogHeader>
-                            <DialogTitle>{vendorForm.id ? 'Edit Vendor' : 'Add Vendor'}</DialogTitle>
-                          </DialogHeader>
-                          <form onSubmit={handleVendorSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex space-x-2">
+                        <Dialog open={isBulkImportModalOpen} onOpenChange={setIsBulkImportModalOpen}>
+                          <DialogTrigger asChild>
+                            <Button variant="outline">
+                              <Upload className="h-4 w-4 mr-2" />
+                              Bulk Import
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Bulk Import Vendors</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
                               <div>
-                                <label className="text-sm font-medium">Name</label>
-                                <Input
-                                  name="name"
-                                  value={vendorForm.name}
-                                  onChange={handleVendorChange}
-                                  required
-                                />
+                                <p className="text-sm text-gray-600 mb-2">
+                                  Download the <a 
+                                    href="/vendor-import-template.csv" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:underline"
+                                  >
+                                    CSV template
+                                  </a> to see the required format.
+                                </p>
                               </div>
                               <div>
-                                <label className="text-sm font-medium">Category</label>
+                                <label className="text-sm font-medium">Upload CSV File</label>
                                 <Input
-                                  name="category"
-                                  value={vendorForm.category}
-                                  onChange={handleVendorChange}
-                                  required
+                                  type="file"
+                                  accept=".csv"
+                                  ref={fileInputRef}
+                                  onChange={handleFileUpload}
                                 />
                               </div>
-                              <div>
-                                <label className="text-sm font-medium">Location</label>
-                                <Input
-                                  name="location"
-                                  value={vendorForm.location}
-                                  onChange={handleVendorChange}
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium">Contact Email</label>
-                                <Input
-                                  name="contactEmail"
-                                  type="email"
-                                  value={vendorForm.contactEmail}
-                                  onChange={handleVendorChange}
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium">Min Price</label>
-                                <Input
-                                  name="minPrice"
-                                  type="number"
-                                  value={vendorForm.priceRange[0]}
-                                  onChange={handleVendorChange}
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium">Max Price</label>
-                                <Input
-                                  name="maxPrice"
-                                  type="number"
-                                  value={vendorForm.priceRange[1]}
-                                  onChange={handleVendorChange}
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium">Rating</label>
-                                <Input
-                                  name="rating"
-                                  type="number"
-                                  step="0.1"
-                                  min="0"
-                                  max="5"
-                                  value={vendorForm.rating}
-                                  onChange={handleVendorChange}
-                                  required
-                                />
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  id="isVerified"
-                                  name="isVerified"
-                                  checked={vendorForm.isVerified}
-                                  onChange={handleVendorChange}
-                                  className="h-4 w-4"
-                                />
-                                <label htmlFor="isVerified" className="text-sm font-medium">Verified</label>
-                              </div>
-                            </div>
-                            <div>
-                              <label className="text-sm font-medium">Image</label>
-                              <Input type="file" accept="image/*" />
+                              
+                              {parsedData.length > 0 && (
+                                <div>
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h3 className="text-sm font-medium">Preview ({parsedData.length} records)</h3>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      onClick={() => setIsBulkImportPreviewOpen(true)}
+                                    >
+                                      View All
+                                    </Button>
+                                  </div>
+                                  <div className="border rounded-md max-h-60 overflow-y-auto">
+                                    <Table>
+                                      <TableHead>
+                                        <TableRow>
+                                          <TableCell>Name</TableCell>
+                                          <TableCell>Category</TableCell>
+                                          <TableCell>Location</TableCell>
+                                          <TableCell>Facebook</TableCell>
+                                          <TableCell>Instagram</TableCell>
+                                          <TableCell>Embed Code</TableCell>
+                                        </TableRow>
+                                      </TableHead>
+                                      <TableBody>
+                                        {parsedData.slice(0, 5).map((row, index) => (
+                                          <TableRow key={index}>
+                                            <TableCell className="text-xs">{row.name}</TableCell>
+                                            <TableCell className="text-xs">{row.category}</TableCell>
+                                            <TableCell className="text-xs">{row.location}</TableCell>
+                                            <TableCell className="text-xs">{row.facebookUrl || ''}</TableCell>
+                                            <TableCell className="text-xs">{row.instagramUrl || ''}</TableCell>
+                                            <TableCell className="text-xs">{row.embedCode ? 'Yes' : 'No'}</TableCell>
+                                          </TableRow>
+                                        ))}
+                                      </TableBody>
+                                    </Table>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             <DialogFooter>
-                              <Button type="button" variant="outline" onClick={() => setIsVendorModalOpen(false)}>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setIsBulkImportModalOpen(false)}
+                              >
                                 Cancel
                               </Button>
-                              <Button type="submit">
-                                {vendorForm.id ? 'Update Vendor' : 'Add Vendor'}
+                              <Button 
+                                type="button" 
+                                onClick={handleBulkImport}
+                                disabled={parsedData.length === 0}
+                              >
+                                Import Vendors
                               </Button>
                             </DialogFooter>
-                          </form>
-                        </DialogContent>
-                      </Dialog>
+                          </DialogContent>
+                        </Dialog>
+                        
+                        {/* Bulk Import Preview Dialog */}
+                        <Dialog open={isBulkImportPreviewOpen} onOpenChange={setIsBulkImportPreviewOpen}>
+                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>Bulk Import Preview</DialogTitle>
+                            </DialogHeader>
+                            <div className="border rounded-md max-h-[60vh] overflow-y-auto">
+                              <Table>
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>Category</TableCell>
+                                    <TableCell>Location</TableCell>
+                                    <TableCell>Price Range</TableCell>
+                                    <TableCell>Rating</TableCell>
+                                    <TableCell>Contact Email</TableCell>
+                                    <TableCell>Verified</TableCell>
+                                    <TableCell>Facebook</TableCell>
+                                    <TableCell>Instagram</TableCell>
+                                    <TableCell>LinkedIn</TableCell>
+                                    <TableCell>Twitter</TableCell>
+                                    <TableCell>Embed Code</TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {parsedData.map((row, index) => (
+                                    <TableRow key={index}>
+                                      <TableCell className="text-xs">{row.name}</TableCell>
+                                      <TableCell className="text-xs">{row.category}</TableCell>
+                                      <TableCell className="text-xs">{row.location}</TableCell>
+                                      <TableCell className="text-xs">{row.priceRange}</TableCell>
+                                      <TableCell className="text-xs">{row.rating}</TableCell>
+                                      <TableCell className="text-xs">{row.contactEmail}</TableCell>
+                                      <TableCell className="text-xs">{row.isVerified ? 'Yes' : 'No'}</TableCell>
+                                      <TableCell className="text-xs">{row.facebookUrl || ''}</TableCell>
+                                      <TableCell className="text-xs">{row.instagramUrl || ''}</TableCell>
+                                      <TableCell className="text-xs">{row.linkedinUrl || ''}</TableCell>
+                                      <TableCell className="text-xs">{row.twitterUrl || ''}</TableCell>
+                                      <TableCell className="text-xs">{row.embedCode ? 'Yes' : 'No'}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                            <DialogFooter>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setIsBulkImportPreviewOpen(false)}
+                              >
+                                Close
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                        
+                        <Dialog open={isVendorModalOpen} onOpenChange={setIsVendorModalOpen}>
+                          <DialogTrigger asChild>
+                            <Button onClick={() => setVendorForm({
+                              name: '',
+                              category: '',
+                              location: '',
+                              priceRange: [0, 0],
+                              rating: 0,
+                              contactEmail: '',
+                              isVerified: false,
+                              facebookUrl: '',
+                              instagramUrl: '',
+                              linkedinUrl: '',
+                              twitterUrl: '',
+                              embedCode: '',
+                            })}>
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Vendor
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>{vendorForm.id ? 'Edit Vendor' : 'Add Vendor'}</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleVendorSubmit} className="space-y-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="text-sm font-medium">Name</label>
+                                  <Input
+                                    name="name"
+                                    value={vendorForm.name}
+                                    onChange={handleVendorChange}
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Category</label>
+                                  <Input
+                                    name="category"
+                                    value={vendorForm.category}
+                                    onChange={handleVendorChange}
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Location</label>
+                                  <Input
+                                    name="location"
+                                    value={vendorForm.location}
+                                    onChange={handleVendorChange}
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Contact Email</label>
+                                  <Input
+                                    name="contactEmail"
+                                    type="email"
+                                    value={vendorForm.contactEmail}
+                                    onChange={handleVendorChange}
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Min Price</label>
+                                  <Input
+                                    name="minPrice"
+                                    type="number"
+                                    value={vendorForm.priceRange[0]}
+                                    onChange={handleVendorChange}
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Max Price</label>
+                                  <Input
+                                    name="maxPrice"
+                                    type="number"
+                                    value={vendorForm.priceRange[1]}
+                                    onChange={handleVendorChange}
+                                    required
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Rating</label>
+                                  <Input
+                                    name="rating"
+                                    type="number"
+                                    step="0.1"
+                                    min="0"
+                                    max="5"
+                                    value={vendorForm.rating}
+                                    onChange={handleVendorChange}
+                                    required
+                                  />
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="checkbox"
+                                    id="isVerified"
+                                    name="isVerified"
+                                    checked={vendorForm.isVerified}
+                                    onChange={handleVendorChange}
+                                    className="h-4 w-4"
+                                  />
+                                  <label htmlFor="isVerified" className="text-sm font-medium">Verified</label>
+                                </div>
+                              </div>
+                              
+                              {/* Social Media Fields */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                  <label htmlFor="facebookUrl" className="text-sm font-medium">Facebook URL</label>
+                                  <Input
+                                    id="facebookUrl"
+                                    name="facebookUrl"
+                                    value={vendorForm.facebookUrl || ''}
+                                    onChange={handleVendorChange}
+                                    placeholder="https://facebook.com/vendor"
+                                  />
+                                </div>
+                                <div>
+                                  <label htmlFor="instagramUrl" className="text-sm font-medium">Instagram URL</label>
+                                  <Input
+                                    id="instagramUrl"
+                                    name="instagramUrl"
+                                    value={vendorForm.instagramUrl || ''}
+                                    onChange={handleVendorChange}
+                                    placeholder="https://instagram.com/vendor"
+                                  />
+                                </div>
+                                <div>
+                                  <label htmlFor="linkedinUrl" className="text-sm font-medium">LinkedIn URL</label>
+                                  <Input
+                                    id="linkedinUrl"
+                                    name="linkedinUrl"
+                                    value={vendorForm.linkedinUrl || ''}
+                                    onChange={handleVendorChange}
+                                    placeholder="https://linkedin.com/in/vendor"
+                                  />
+                                </div>
+                                <div>
+                                  <label htmlFor="twitterUrl" className="text-sm font-medium">Twitter URL</label>
+                                  <Input
+                                    id="twitterUrl"
+                                    name="twitterUrl"
+                                    value={vendorForm.twitterUrl || ''}
+                                    onChange={handleVendorChange}
+                                    placeholder="https://twitter.com/vendor"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Embed Code Field */}
+                              <div className="mt-4">
+                                <label htmlFor="embedCode" className="text-sm font-medium">Embed Code</label>
+                                <textarea
+                                  id="embedCode"
+                                  name="embedCode"
+                                  value={vendorForm.embedCode || ''}
+                                  onChange={handleVendorChange}
+                                  placeholder="<blockquote class='instagram-media' data-instgrm-permalink='https://www.instagram.com/p/POST_ID/' data-instgrm-version='14'></blockquote>"
+                                  rows={4}
+                                  className="w-full font-mono text-sm border rounded-md p-2"
+                                />
+                                <p className="mt-1 text-xs text-gray-500">
+                                  Paste any valid embed snippet (Instagram, Facebook, YouTube).
+                                </p>
+                              </div>
+
+                              <div>
+                                <label className="text-sm font-medium">Image</label>
+                                <Input type="file" accept="image/*" />
+                              </div>
+                              <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => setIsVendorModalOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button type="submit">
+                                  {vendorForm.id ? 'Update Vendor' : 'Add Vendor'}
+                                </Button>
+                              </DialogFooter>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
                     )}
                   </CardHeader>
                   <CardContent>
@@ -1253,129 +1395,6 @@ export default function AdminDashboard() {
                 </Card>
               </TabsContent>
 
-              {/* RSVP Templates Tab */}
-              <TabsContent value="templates" className="space-y-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>RSVP Templates</CardTitle>
-                    {ADMIN_TOKENS[adminToken] === 'full-access' && (
-                      <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
-                        <DialogTrigger asChild>
-                          <Button onClick={() => setTemplateForm({
-                            name: '',
-                            type: 'Hindu',
-                            config: {},
-                          })}>
-                            <Plus className="h-4 w-4 mr-2" />
-                            New Template
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>{templateForm.id ? 'Edit Template' : 'New Template'}</DialogTitle>
-                          </DialogHeader>
-                          <form onSubmit={handleTemplateSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div>
-                                <label className="text-sm font-medium">Name</label>
-                                <Input
-                                  name="name"
-                                  value={templateForm.name}
-                                  onChange={handleTemplateChange}
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <label className="text-sm font-medium">Type</label>
-                                <select
-                                  name="type"
-                                  value={templateForm.type}
-                                  onChange={handleTemplateChange}
-                                  className="w-full p-2 border rounded"
-                                  required
-                                >
-                                  <option value="Hindu">Hindu</option>
-                                  <option value="Christian">Christian</option>
-                                  <option value="Islamic">Islamic</option>
-                                </select>
-                              </div>
-                            </div>
-                            <div>
-                              <label className="text-sm font-medium">Configuration (JSON)</label>
-                              <textarea
-                                value={templateConfig}
-                                onChange={(e) => setTemplateConfig(e.target.value)}
-                                className="w-full h-32 p-2 border rounded font-mono text-sm"
-                                placeholder='{"fields": ["name", "email", "attendance"], "customMessage": "You are invited..."}'
-                                required
-                              />
-                            </div>
-                            <DialogFooter>
-                              <Button type="button" variant="outline" onClick={() => setIsTemplateModalOpen(false)}>
-                                Cancel
-                              </Button>
-                              <Button type="submit">
-                                {templateForm.id ? 'Update Template' : 'Create Template'}
-                              </Button>
-                            </DialogFooter>
-                          </form>
-                        </DialogContent>
-                      </Dialog>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    {templatesLoading ? (
-                      <div className="space-y-4">
-                        {[...Array(3)].map((_, i) => (
-                          <div key={i} className="h-16 bg-gray-200 rounded animate-pulse"></div>
-                        ))}
-                      </div>
-                    ) : (
-                      <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Actions</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {(templates || mockTemplates).map((template: RsvpTemplate) => (
-                            <TableRow key={template.id}>
-                              <TableCell className="font-medium">{template.name}</TableCell>
-                              <TableCell>{template.type}</TableCell>
-                              <TableCell>
-                                <div className="flex space-x-2">
-                                  {ADMIN_TOKENS[adminToken] === 'full-access' ? (
-                                    <>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => openTemplateEdit(template)}
-                                      >
-                                        <Edit className="h-4 w-4" />
-                                      </Button>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => confirmTemplateDelete(template.id, template.name)}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </>
-                                  ) : (
-                                    <span className="text-muted-foreground">No access</span>
-                                  )}
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
 
               {/* Analytics Tab */}
               <TabsContent value="analytics" className="space-y-6">

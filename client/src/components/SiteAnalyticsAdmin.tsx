@@ -152,7 +152,6 @@ export default function SiteAnalyticsAdmin({
       { goal: 'Contact Form Submission', completions: 145, value: 2500, conversionRate: 0.91 },
       { goal: 'Vendor Inquiry', completions: 89, value: 1800, conversionRate: 0.56 },
       { goal: 'Newsletter Signup', completions: 234, value: 500, conversionRate: 1.48 },
-      { goal: 'RSVP Creation', completions: 67, value: 1200, conversionRate: 0.42 }
     ]
   };
 

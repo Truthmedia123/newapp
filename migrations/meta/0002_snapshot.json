@@ -401,103 +401,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.rsvps": {
-      "name": "rsvps",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "wedding_id": {
-          "name": "wedding_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "guest_name": {
-          "name": "guest_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "guest_email": {
-          "name": "guest_email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "guest_phone": {
-          "name": "guest_phone",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "attending_ceremony": {
-          "name": "attending_ceremony",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
-        },
-        "attending_reception": {
-          "name": "attending_reception",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
-        },
-        "number_of_guests": {
-          "name": "number_of_guests",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 1
-        },
-        "dietary_restrictions": {
-          "name": "dietary_restrictions",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "message": {
-          "name": "message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "rsvps_wedding_id_weddings_id_fk": {
-          "name": "rsvps_wedding_id_weddings_id_fk",
-          "tableFrom": "rsvps",
-          "tableTo": "weddings",
-          "columnsFrom": [
-            "wedding_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.vendors": {
       "name": "vendors",
       "schema": "",
@@ -729,12 +632,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        "rsvp_deadline": {
-          "name": "rsvp_deadline",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
         },
         "max_guests": {
           "name": "max_guests",

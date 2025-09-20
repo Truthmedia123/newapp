@@ -20,11 +20,6 @@ import VendorSubscription from "@/pages/VendorSubscription";
 import VendorChat from "@/pages/VendorChat";
 import GoanWeddingTimeline from "@/pages/GoanWeddingTimeline";
 import MobileAnalytics from "@/pages/MobileAnalytics";
-
-import RSVPGenerator from "@/pages/RSVPGenerator";
-import RSVPDashboard from "@/pages/RSVPDashboard";
-import RSVPForm from "@/pages/RSVPForm";
-import RSVPGuestPage from "@/pages/RSVPGuestPage";
 import NotFound from "@/pages/not-found";
 
 console.log("App module loaded");
@@ -53,10 +48,6 @@ function Router() {
           <Route path="/vendor/chat" component={VendorChat} />
           <Route path="/timeline" component={GoanWeddingTimeline} />
           <Route path="/mobile-analytics" component={MobileAnalytics} />
-
-          <Route path="/rsvp/generate" component={RSVPGenerator} />
-          <Route path="/rsvp/dashboard" component={RSVPDashboard} />
-          <Route path="/rsvp/:code" component={RSVPGuestPage} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route component={NotFound} />
         </Switch>

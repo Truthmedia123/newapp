@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+
+// Extend window interface for social media SDKs
+declare global {
+  interface Window {
+    instgrm?: {
+      Embeds: {
+        process: () => void;
+      };
+    };
+    FB?: {
+      XFBML: {
+        parse: () => void;
+      };
+    };
+  }
+}
+
 import type { Vendor, Review } from "@shared/schema";
 
 export default function VendorProfile() {
@@ -30,6 +47,21 @@ export default function VendorProfile() {
   const { data: reviews } = useQuery<Review[]>({
     queryKey: [`/api/vendors/${id}/reviews`],
   });
+
+  // Initialize social media embeds
+  useEffect(() => {
+    if (vendor?.embedCode) {
+      // Process Instagram embeds
+      if (typeof window !== 'undefined' && window.instgrm) {
+        window.instgrm.Embeds.process();
+      }
+
+      // Process Facebook embeds
+      if (typeof window !== 'undefined' && window.FB) {
+        window.FB.XFBML.parse();
+      }
+    }
+  }, [vendor?.embedCode]);
 
   const createReviewMutation = useMutation({
     mutationFn: async (reviewData: typeof reviewForm) => {
@@ -91,6 +123,10 @@ export default function VendorProfile() {
     );
   }
 
+  // Type definitions for vendor data
+  type Service = string;
+  type GalleryImage = string;
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
@@ -122,11 +158,11 @@ export default function VendorProfile() {
               <CardContent>
                 <p className="text-gray-700 leading-relaxed">{vendor.description}</p>
                 
-                {vendor.services && vendor.services.length > 0 && (
+                {vendor.services && (vendor.services as unknown as Service[]).length > 0 && (
                   <div className="mt-6">
                     <h3 className="font-semibold mb-3">Services Offered:</h3>
                     <div className="flex flex-wrap gap-2">
-                      {vendor.services.map((service, index) => (
+                      {(vendor.services as unknown as Service[]).map((service: Service, index: number) => (
                         <Badge key={index} variant="secondary">{service}</Badge>
                       ))}
                     </div>
@@ -136,7 +172,7 @@ export default function VendorProfile() {
             </Card>
 
             {/* Gallery */}
-            {vendor.gallery && vendor.gallery.length > 0 && (
+            {vendor.gallery && (vendor.gallery as unknown as GalleryImage[]).length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Gallery</CardTitle>
@@ -144,7 +180,7 @@ export default function VendorProfile() {
                 <CardContent>
                   <Carousel className="w-full">
                     <CarouselContent>
-                      {vendor.gallery.map((image, index) => (
+                      {(vendor.gallery as unknown as GalleryImage[]).map((image: GalleryImage, index: number) => (
                         <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                           <img 
                             src={image} 
@@ -161,11 +197,26 @@ export default function VendorProfile() {
               </Card>
             )}
 
+            {/* Social Media Embeds */}
+            {vendor.embedCode && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Social Media Content</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div 
+                    className="vendor-embed"
+                    dangerouslySetInnerHTML={{ __html: vendor.embedCode }} 
+                  />
+                </CardContent>
+              </Card>
+            )}
+
             {/* Social Media Content */}
             {(vendor.instagram || vendor.youtube) && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Social Media & Content</CardTitle>
+                  <CardTitle>Follow Us</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -314,7 +365,7 @@ export default function VendorProfile() {
                 )}
 
                 <div className="space-y-4">
-                  {reviews?.map((review) => (
+                  {reviews?.map((review: Review) => (
                     <div key={review.id} className="border-b pb-4 last:border-b-0">
                       <div className="flex items-center justify-between mb-2">
                         <div>
@@ -332,10 +383,6 @@ export default function VendorProfile() {
                       <p className="text-gray-700">{review.comment}</p>
                     </div>
                   ))}
-                  
-                  {!reviews?.length && (
-                    <p className="text-gray-500 text-center py-8">No reviews yet. Be the first to review!</p>
-                  )}
                 </div>
               </CardContent>
             </Card>
