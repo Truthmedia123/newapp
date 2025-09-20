@@ -10,69 +10,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { RSVPHeader } from "@/components/RSVPHeader";
 import { convertTo12HourFormat } from "@/lib/timeUtils";
-import type { Wedding, Rsvp } from "@shared/schema";
+import type { Wedding } from "@shared/schema";
 
 export default function Couples() {
   const { slug } = useParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [showRsvpForm, setShowRsvpForm] = useState(false);
-  const [rsvpForm, setRsvpForm] = useState({
-    guestName: "",
-    guestEmail: "",
-    guestPhone: "",
-    attendingCeremony: true,
-    attendingReception: true,
-    numberOfGuests: 1,
-    dietaryRestrictions: "",
-    message: ""
-  });
 
   const { data: wedding, isLoading } = useQuery<Wedding>({
     queryKey: [`/api/weddings/${slug}`],
   });
-
-  const { data: rsvps } = useQuery<Rsvp[]>({
-    queryKey: [`/api/weddings/${wedding?.id}/rsvps`],
-    enabled: !!wedding?.id,
-  });
-
-  const createRsvpMutation = useMutation({
-    mutationFn: async (rsvpData: typeof rsvpForm) => {
-      const response = await fetch(`/api/weddings/${wedding!.id}/rsvps`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(rsvpData),
-      });
-      if (!response.ok) throw new Error('Failed to create RSVP');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/weddings/${wedding!.id}/rsvps`] });
-      toast({ title: "RSVP submitted successfully!" });
-      setShowRsvpForm(false);
-      setRsvpForm({
-        guestName: "",
-        guestEmail: "",
-        guestPhone: "",
-        attendingCeremony: true,
-        attendingReception: true,
-        numberOfGuests: 1,
-        dietaryRestrictions: "",
-        message: ""
-      });
-    },
-    onError: () => {
-      toast({ title: "Failed to submit RSVP", variant: "destructive" });
-    }
-  });
-
-  const handleSubmitRsvp = (e: React.FormEvent) => {
-    e.preventDefault();
-    createRsvpMutation.mutate(rsvpForm);
-  };
 
   if (isLoading) {
     return (
@@ -97,7 +45,6 @@ export default function Couples() {
   }
 
   const weddingDate = new Date(wedding.weddingDate);
-  const isRsvpOpen = !wedding.rsvpDeadline || new Date() < new Date(wedding.rsvpDeadline);
   
   // Function to get ceremony icon based on ceremony type
   const getCeremonyIcon = (ceremonyType?: string) => {
@@ -202,17 +149,6 @@ export default function Couples() {
               </div>
             )}
           </div>
-          
-          {isRsvpOpen && (
-            <div className="mt-8">
-              <Button
-                onClick={() => setShowRsvpForm(true)}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 rounded-full font-bold text-lg shadow-2xl transform hover:scale-105 transition-all"
-              >
-                <i className="fas fa-heart mr-3"></i>RSVP Now
-              </Button>
-            </div>
-          )}
         </div>
       </section>
 
@@ -220,22 +156,6 @@ export default function Couples() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-12">
-            {/* RSVP Header - Updated to hide analytics and pass venue props */}
-            <RSVPHeader
-              brideName={wedding.brideName}
-              groomName={wedding.groomName}
-              weddingDate={weddingDate}
-              ceremonyTime={wedding.ceremonyTime}
-              venue={wedding.venue}
-              isRsvpOpen={isRsvpOpen}
-              onRsvpClick={() => setShowRsvpForm(true)}
-              ceremonyDetails={wedding.ceremonyDetails}
-              ceremonyVenue={wedding.ceremonyVenue}
-              ceremonyVenueAddress={wedding.ceremonyVenueAddress}
-              receptionVenue={wedding.receptionVenue}
-              receptionVenueAddress={wedding.receptionVenueAddress}
-            />
-
             {/* Our Story */}
             {wedding.story && (
               <Card className="border-0 shadow-2xl">
@@ -277,8 +197,6 @@ export default function Couples() {
                 </CardContent>
               </Card>
             )}
-
-            {/* RSVP List - REMOVED as per user request */}
           </div>
 
           {/* Sidebar */}
@@ -358,19 +276,6 @@ export default function Couples() {
                     </div>
                   </div>
                 )}
-
-                {/* RSVP Deadline */}
-                {wedding.rsvpDeadline && (
-                  <div className="detail-item">
-                    <span className="text-2xl text-amber-500">⏰</span>
-                    <div>
-                      <strong className="font-wedding text-gray-800 text-base tracking-wide">RSVP Deadline</strong>
-                      <p className="font-serif text-gray-600 text-sm">
-                        {new Date(wedding.rsvpDeadline).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
@@ -402,158 +307,6 @@ export default function Couples() {
           </div>
         </div>
       </div>
-
-      {/* RSVP Modal */}
-      {showRsvpForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold font-elegant text-red-600">
-                  RSVP for {wedding.brideName} & {wedding.groomName}
-                </CardTitle>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => setShowRsvpForm(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <i className="fas fa-times"></i>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmitRsvp} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="guestName" className="font-wedding">Full Name *</Label>
-                    <Input
-                      id="guestName"
-                      value={rsvpForm.guestName}
-                      onChange={(e) => setRsvpForm({...rsvpForm, guestName: e.target.value})}
-                      required
-                      className="font-serif"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="guestEmail" className="font-wedding">Email *</Label>
-                    <Input
-                      id="guestEmail"
-                      type="email"
-                      value={rsvpForm.guestEmail}
-                      onChange={(e) => setRsvpForm({...rsvpForm, guestEmail: e.target.value})}
-                      required
-                      className="font-serif"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="guestPhone" className="font-wedding">Phone Number</Label>
-                    <Input
-                      id="guestPhone"
-                      type="tel"
-                      value={rsvpForm.guestPhone}
-                      onChange={(e) => setRsvpForm({...rsvpForm, guestPhone: e.target.value})}
-                      className="font-serif"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="numberOfGuests" className="font-wedding">Number of Guests</Label>
-                    <Input
-                      id="numberOfGuests"
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={rsvpForm.numberOfGuests}
-                      onChange={(e) => setRsvpForm({...rsvpForm, numberOfGuests: parseInt(e.target.value)})}
-                      className="font-serif"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <Label className="font-wedding">Attendance</Label>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="attendingCeremony"
-                      checked={rsvpForm.attendingCeremony}
-                      onCheckedChange={(checked) => 
-                        setRsvpForm({...rsvpForm, attendingCeremony: checked as boolean})
-                      }
-                    />
-                    <Label htmlFor="attendingCeremony" className="font-serif">I will attend the wedding ceremony</Label>
-                  </div>
-                  
-                  {wedding.receptionTime && (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="attendingReception"
-                        checked={rsvpForm.attendingReception}
-                        onCheckedChange={(checked) => 
-                          setRsvpForm({...rsvpForm, attendingReception: checked as boolean})
-                        }
-                      />
-                      <Label htmlFor="attendingReception" className="font-serif">I will attend the reception</Label>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <Label htmlFor="dietaryRestrictions" className="font-wedding">Dietary Restrictions</Label>
-                  <Input
-                    id="dietaryRestrictions"
-                    value={rsvpForm.dietaryRestrictions}
-                    onChange={(e) => setRsvpForm({...rsvpForm, dietaryRestrictions: e.target.value})}
-                    placeholder="Any allergies or dietary requirements"
-                    className="font-serif"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="message" className="font-wedding">Message for the Couple</Label>
-                  <Textarea
-                    id="message"
-                    value={rsvpForm.message}
-                    onChange={(e) => setRsvpForm({...rsvpForm, message: e.target.value})}
-                    placeholder="Send your best wishes to the happy couple"
-                    rows={3}
-                    className="font-serif"
-                  />
-                </div>
-
-                <div className="flex gap-4">
-                  <Button 
-                    type="submit" 
-                    disabled={createRsvpMutation.isPending}
-                    className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 font-wedding"
-                  >
-                    {createRsvpMutation.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-heart mr-2"></i>
-                        Submit RSVP
-                      </>
-                    )}
-                  </Button>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setShowRsvpForm(false)}
-                    className="flex-1 font-wedding"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

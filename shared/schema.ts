@@ -26,6 +26,13 @@ export const vendors = sqliteTable("vendors", {
   rating: real("rating").default(0),
   reviewCount: integer("review_count").default(0),
   createdAt: integer("created_at", { mode: "timestamp" }),
+  // Social media fields
+  facebookUrl: text("facebook_url"),
+  instagramUrl: text("instagram_url"),
+  linkedinUrl: text("linkedin_url"),
+  twitterUrl: text("twitter_url"),
+  // Embed code field for social media embeds
+  embedCode: text("embed_code"),
 });
 
 export const reviews = sqliteTable("reviews", {
@@ -104,7 +111,6 @@ export const weddings = sqliteTable("weddings", {
   galleryImages: text("gallery_images"), // SQLite doesn't support arrays, will store as JSON string
   story: text("story"),
   slug: text("slug").notNull(),
-  rsvpDeadline: integer("rsvp_deadline", { mode: "timestamp" }),
   maxGuests: integer("max_guests").default(100),
   isPublic: integer("is_public", { mode: "boolean" }).default(true),
   contactEmail: text("contact_email").notNull(),
@@ -117,55 +123,6 @@ export const weddings = sqliteTable("weddings", {
   receptionVenueAddress: text("reception_venue_address"),
   // Secret link for admin dashboard access
   adminSecretLink: text("admin_secret_link").unique(),
-});
-
-export const rsvps = sqliteTable("rsvps", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  weddingId: integer("wedding_id").notNull().references(() => weddings.id),
-  invitationId: integer("invitation_id").notNull().references(() => rsvpInvitations.id),
-  guestName: text("guest_name").notNull(),
-  guestEmail: text("guest_email").notNull(),
-  guestPhone: text("guest_phone"),
-  attendingCeremony: integer("attending_ceremony", { mode: "boolean" }).default(true),
-  attendingReception: integer("attending_reception", { mode: "boolean" }).default(true),
-  numberOfGuests: integer("number_of_guests").default(1),
-  dietaryRestrictions: text("dietary_restrictions"),
-  message: text("message"),
-  createdAt: integer("created_at", { mode: "timestamp" }),
-});
-
-export const rsvpInvitations = sqliteTable("rsvp_invitations", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  weddingId: integer("wedding_id").notNull().references(() => weddings.id),
-  guestName: text("guest_name").notNull(),
-  guestEmail: text("guest_email").notNull(),
-  invitationCode: text("invitation_code").notNull().unique(),
-  maxGuests: integer("max_guests").default(1),
-  allowPlusOne: integer("allow_plus_one", { mode: "boolean" }).default(false),
-  invitedEvents: text("invited_events"), // JSON array of event IDs
-  isFamily: integer("is_family", { mode: "boolean" }).default(false),
-  status: text("status").default("sent"), // sent, viewed, responded
-  sentAt: integer("sent_at", { mode: "timestamp" }),
-  viewedAt: integer("viewed_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }),
-});
-
-export const rsvpQuestions = sqliteTable("rsvp_questions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  weddingId: integer("wedding_id").notNull().references(() => weddings.id),
-  question: text("question").notNull(),
-  type: text("type").notNull(), // text, select, multiselect, boolean, number
-  options: text("options"), // JSON array for select types
-  required: integer("required", { mode: "boolean" }).default(false),
-  eventSpecific: text("event_specific"), // null for all events, or event ID
-  order: integer("order").default(0),
-});
-
-export const rsvpResponses = sqliteTable("rsvp_responses", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  rsvpId: integer("rsvp_id").notNull().references(() => rsvps.id),
-  questionId: integer("question_id").notNull().references(() => rsvpQuestions.id),
-  answer: text("answer").notNull(),
 });
 
 export const weddingEvents = sqliteTable("wedding_events", {
@@ -182,15 +139,6 @@ export const weddingEvents = sqliteTable("wedding_events", {
   isPrivate: integer("is_private", { mode: "boolean" }).default(false),
   maxGuests: integer("max_guests"),
   order: integer("order").default(0),
-});
-
-// Add RSVP templates table
-export const rsvpTemplates = sqliteTable("rsvp_templates", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  type: text("type").notNull(), // 'Hindu' | 'Christian' | 'Islamic'
-  config: text("config").notNull(), // JSON string
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
 });
 
 // Insert schemas
@@ -232,32 +180,8 @@ export const insertWeddingSchema = createInsertSchema(weddings).omit({
   createdAt: true,
 });
 
-export const insertRsvpSchema = createInsertSchema(rsvps).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertRsvpInvitationSchema = createInsertSchema(rsvpInvitations).omit({
-  id: true,
-  createdAt: true,
-});
-
-export const insertRsvpQuestionSchema = createInsertSchema(rsvpQuestions).omit({
-  id: true,
-});
-
-export const insertRsvpResponseSchema = createInsertSchema(rsvpResponses).omit({
-  id: true,
-});
-
 export const insertWeddingEventSchema = createInsertSchema(weddingEvents).omit({
   id: true,
-});
-
-// Add RSVP template insert schema
-export const insertRsvpTemplateSchema = createInsertSchema(rsvpTemplates).omit({
-  id: true,
-  createdAt: true,
 });
 
 // Types
@@ -275,17 +199,5 @@ export type Contact = typeof contacts.$inferSelect;
 export type InsertContact = z.infer<typeof insertContactSchema>;
 export type Wedding = typeof weddings.$inferSelect;
 export type InsertWedding = z.infer<typeof insertWeddingSchema>;
-export type Rsvp = typeof rsvps.$inferSelect;
-export type InsertRsvp = z.infer<typeof insertRsvpSchema>;
-export type RsvpInvitation = typeof rsvpInvitations.$inferSelect;
-export type InsertRsvpInvitation = z.infer<typeof insertRsvpInvitationSchema>;
-export type RsvpQuestion = typeof rsvpQuestions.$inferSelect;
-export type InsertRsvpQuestion = z.infer<typeof insertRsvpQuestionSchema>;
-export type RsvpResponse = typeof rsvpResponses.$inferSelect;
-export type InsertRsvpResponse = z.infer<typeof insertRsvpResponseSchema>;
 export type WeddingEvent = typeof weddingEvents.$inferSelect;
 export type InsertWeddingEvent = z.infer<typeof insertWeddingEventSchema>;
-
-// Add RSVP template types
-export type RsvpTemplate = typeof rsvpTemplates.$inferSelect;
-export type InsertRsvpTemplate = z.infer<typeof insertRsvpTemplateSchema>;

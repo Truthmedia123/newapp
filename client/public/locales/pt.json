@@ -38,7 +38,6 @@
     "tools": "",
     "blog": "",
     "search": "",
-    "rsvp": "",
     "list_business": "",
     "about": "",
     "contact": ""
@@ -97,8 +96,7 @@
     "vendor_search": "",
     "couple_site": "",
     "planning_checklist": "",
-    "timeline_manager": "",
-    "rsvp_manager": ""
+    "timeline_manager": ""
   },
   "budget": {
     "title": "",
@@ -151,28 +149,12 @@
     "import_csv": "",
     "search_guests": "",
     "all_status": "",
-    "rsvp_status": "",
     "plus_one": "",
     "dietary": "",
     "group": "",
     "actions": "",
     "invitation_sent": "",
     "notes": ""
-  },
-  "rsvp": {
-    "title": "",
-    "generate": "",
-    "dashboard": "",
-    "will_attend": "",
-    "cannot_attend": "",
-    "event_details": "",
-    "guest_information": "",
-    "dietary_preferences": "",
-    "special_requests": "",
-    "plus_one_details": "",
-    "thank_you": "",
-    "rsvp_code": "",
-    "deadline": ""
   },
   "blog": {
     "title": "",

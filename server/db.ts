@@ -72,61 +72,11 @@ function getDevDatabase() {
           gallery_images TEXT,
           story TEXT,
           slug TEXT NOT NULL,
-          rsvp_deadline INTEGER,
           max_guests INTEGER DEFAULT 100,
           is_public INTEGER DEFAULT 1,
           contact_email TEXT NOT NULL,
           contact_phone TEXT,
           created_at INTEGER
-        );
-        
-        CREATE TABLE IF NOT EXISTS rsvp_invitations (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          wedding_id INTEGER NOT NULL REFERENCES weddings(id),
-          guest_name TEXT NOT NULL,
-          guest_email TEXT NOT NULL,
-          invitation_code TEXT NOT NULL UNIQUE,
-          max_guests INTEGER DEFAULT 1,
-          allow_plus_one INTEGER DEFAULT 0,
-          invited_events TEXT,
-          is_family INTEGER DEFAULT 0,
-          status TEXT DEFAULT 'sent',
-          sent_at INTEGER,
-          viewed_at INTEGER,
-          created_at INTEGER
-        );
-        
-        CREATE TABLE IF NOT EXISTS rsvps (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          wedding_id INTEGER NOT NULL REFERENCES weddings(id),
-          invitation_id INTEGER NOT NULL REFERENCES rsvp_invitations(id),
-          guest_name TEXT NOT NULL,
-          guest_email TEXT NOT NULL,
-          guest_phone TEXT,
-          attending_ceremony INTEGER DEFAULT 1,
-          attending_reception INTEGER DEFAULT 1,
-          number_of_guests INTEGER DEFAULT 1,
-          dietary_restrictions TEXT,
-          message TEXT,
-          created_at INTEGER
-        );
-        
-        CREATE TABLE IF NOT EXISTS rsvp_questions (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          wedding_id INTEGER NOT NULL REFERENCES weddings(id),
-          question TEXT NOT NULL,
-          type TEXT NOT NULL,
-          options TEXT,
-          required INTEGER DEFAULT 0,
-          event_specific TEXT,
-          "order" INTEGER DEFAULT 0
-        );
-        
-        CREATE TABLE IF NOT EXISTS rsvp_responses (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          rsvp_id INTEGER NOT NULL REFERENCES rsvps(id),
-          question_id INTEGER NOT NULL REFERENCES rsvp_questions(id),
-          answer TEXT NOT NULL
         );
         
         CREATE TABLE IF NOT EXISTS wedding_events (

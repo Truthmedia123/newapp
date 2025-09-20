@@ -10,7 +10,7 @@ const PAGES_TO_TEST = [
   { path: '/search', name: 'Search' },
   { path: '/tools', name: 'Wedding Tools' },
   { path: '/blog', name: 'Blog' },
-  { path: '/rsvp/generate', name: 'RSVP Generator' }
+
 ];
 
 async function measurePagePerformance(page, url, pageName) {

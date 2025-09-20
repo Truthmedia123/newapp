@@ -21,7 +21,6 @@ export default function Layout({ children }: LayoutProps) {
     { name: "Tools", href: "/tools" },
     { name: "Blog", href: "/blog" },
     { name: "Search", href: "/search" },
-    { name: "RSVP", href: "/rsvp/generate" },
   ];
 
   console.log("Layout rendering navigation menu");
