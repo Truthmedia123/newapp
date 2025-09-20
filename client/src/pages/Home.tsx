@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import SearchBar from "@/components/SearchBar";
 import CategoryGrid from "@/components/CategoryGrid";
-import VendorCard from "@/components/VendorCard";
+import SimplifiedVendorCard from "@/components/SimplifiedVendorCard";
 import TestimonialSlider from "@/components/TestimonialSlider";
 import type { Vendor, BlogPost } from "@shared/schema";
 
@@ -130,7 +130,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12 md:mb-16">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6 mb-8 md:mb-12">
             {vendorsLoading ? (
               <div className="col-span-full text-center py-12">
                 <p>Loading featured vendors...</p>
@@ -141,7 +141,7 @@ export default function Home() {
                 className="animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <VendorCard vendor={vendor} />
+                <SimplifiedVendorCard vendor={vendor} />
               </div>
             )) : null}
           </div>

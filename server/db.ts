@@ -15,17 +15,22 @@ export interface Env {
 let devDb: ReturnType<typeof drizzleBetterSQLite> | null = null;
 
 function getDevDatabase() {
+  console.log('Initializing dev database...');
   if (!devDb) {
     try {
       // Ensure the directory exists
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = dirname(__filename);
       const dbDir = join(__dirname, '../.db');
+      console.log('Database directory:', dbDir);
       mkdirSync(dbDir, { recursive: true });
       
-      const sqlite = new Database(join(dbDir, 'dev.db'));
+      const dbPath = join(dbDir, 'dev.db');
+      console.log('Database path:', dbPath);
+      const sqlite = new Database(dbPath);
       devDb = drizzleBetterSQLite(sqlite, { schema });
       
+      console.log('Creating tables if they do not exist...');
       // Initialize tables
       sqlite.exec(`
         CREATE TABLE IF NOT EXISTS vendors (
@@ -141,12 +146,49 @@ function getDevDatabase() {
         );
       `);
       
+      console.log('Tables created. Checking for schema migration...');
+      // Schema migration: Add new columns to weddings table if they don't exist
+      try {
+        // Check if the ceremony_venue column exists
+        const checkColumnQuery = `PRAGMA table_info(weddings)`;
+        const columns = sqlite.prepare(checkColumnQuery).all();
+        const columnNames = columns.map((col: any) => col.name);
+        
+        console.log('Current database columns:', columnNames);
+        
+        if (!columnNames.includes('ceremony_venue')) {
+          console.log('Migrating database schema: Adding new venue columns to weddings table');
+          // Add columns one by one (SQLite limitation)
+          sqlite.exec(`ALTER TABLE weddings ADD COLUMN ceremony_venue TEXT;`);
+          console.log('Added ceremony_venue column');
+          sqlite.exec(`ALTER TABLE weddings ADD COLUMN ceremony_venue_address TEXT;`);
+          console.log('Added ceremony_venue_address column');
+          sqlite.exec(`ALTER TABLE weddings ADD COLUMN reception_venue TEXT;`);
+          console.log('Added reception_venue column');
+          sqlite.exec(`ALTER TABLE weddings ADD COLUMN reception_venue_address TEXT;`);
+          console.log('Added reception_venue_address column');
+          console.log('✅ Database schema migration completed');
+        } else {
+          console.log('✅ Database schema is up to date');
+        }
+        
+        // Verify the columns were added
+        const updatedColumns = sqlite.prepare(checkColumnQuery).all();
+        const updatedColumnNames = updatedColumns.map((col: any) => col.name);
+        console.log('Updated database columns:', updatedColumnNames);
+      } catch (migrationError: any) {
+        console.error('Error during database schema migration:', migrationError.message);
+        console.error('Error stack:', migrationError.stack);
+      }
+      
       console.log('✅ Local SQLite database initialized');
-    } catch (error) {
-      console.error('Failed to initialize local database:', error);
+    } catch (error: any) {
+      console.error('Failed to initialize local database:', error.message);
+      console.error('Error stack:', error.stack);
       throw error;
     }
   }
+  console.log('Returning dev database instance');
   return devDb;
 }
 

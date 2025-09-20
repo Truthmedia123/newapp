@@ -1,4 +1,5 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import type { QueryFunction } from "@tanstack/react-query";
 
 console.log("queryClient module loaded");
 
@@ -40,7 +41,7 @@ export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
-  async ({ queryKey }) => {
+  async ({ queryKey }: { queryKey: string[] }) => {
     try {
       console.log("Fetching data for queryKey:", queryKey);
       const res = await fetch(queryKey[0] as string, {
@@ -60,8 +61,8 @@ export const getQueryFn: <T>(options: {
       return data;
     } catch (error) {
       console.error(`Error fetching from ${queryKey[0]}:`, error);
-      // Instead of throwing, let's return a default value to prevent app crash
-      return null as any;
+      // Re-throw the error so the UI can handle it properly
+      throw error;
     }
   };
 

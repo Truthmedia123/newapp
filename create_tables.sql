@@ -17,7 +17,12 @@ CREATE TABLE IF NOT EXISTS weddings (
   is_public INTEGER DEFAULT 1,
   contact_email TEXT NOT NULL,
   contact_phone TEXT,
-  created_at INTEGER
+  created_at INTEGER,
+  -- Added separate ceremony and reception venues
+  ceremony_venue TEXT,
+  ceremony_venue_address TEXT,
+  reception_venue TEXT,
+  reception_venue_address TEXT
 );
 
 -- Create rsvp_invitations table

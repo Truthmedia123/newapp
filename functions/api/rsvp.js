@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/d1';
 import { eq } from 'drizzle-orm';
-import * as schema from '../../shared/schema.ts';
+import * as schema from '../../shared/schema';
 
 // Helper function for generating invitation codes
 function generateInvitationCode() {
@@ -14,63 +14,10 @@ export async function onRequestPost({ env, request }) {
     const path = url.pathname;
     const db = drizzle(env.DB, { schema });
     
-    if (path.includes('/invitations')) {
-      // Handle POST /api/rsvp/invitations
-      const body = await request.json();
-      
-      // Validate input
-      if (!Array.isArray(body) || body.length === 0) {
-        return new Response(JSON.stringify({ error: "Invalid guest list" }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
 
-      const invitations = [];
-      for (const guest of body) {
-        // Validate required fields
-        if (!guest.wedding_id || !guest.guest_name || !guest.guest_email) {
-          return new Response(JSON.stringify({ error: "Missing required fields: wedding_id, guest_name, guest_email" }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          });
-        }
-
-        // Generate unique invitation code
-        const invitationCode = generateInvitationCode();
-        
-        const invitation = await db.insert(schema.rsvpInvitations).values({
-          weddingId: guest.wedding_id,
-          guestName: guest.guest_name,
-          guestEmail: guest.guest_email,
-          invitationCode,
-          maxGuests: guest.max_guests || 1,
-          allowPlusOne: guest.allow_plus_one || false,
-          status: "sent",
-          sentAt: new Date(),
-          createdAt: new Date()
-        }).returning().get();
-
-        invitations.push({
-          ...invitation,
-          rsvpLink: `${url.origin}/rsvp/${invitationCode}`
-        });
-      }
-
-      return new Response(JSON.stringify({ 
-        success: true, 
-        invitations,
-        message: `Generated ${invitations.length} invitation links`
-      }), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    }
     
-    if (path.includes('/submit')) {
-      // Handle POST /api/rsvp/submit
+    if (path.endsWith('/rsvp') || path.includes('/submit')) {
+      // Handle POST /api/rsvp
       const body = await request.json();
       
       // Validate required fields
@@ -171,6 +118,91 @@ export async function onRequestGet({ env, request }) {
     const url = new URL(request.url);
     const path = url.pathname;
     const db = drizzle(env.DB, { schema });
+    
+    // Handle GET /api/rsvp/manage/secret/:secret
+    const manageMatch = path.match(/\/manage\/secret\/([^/]+)$/);
+    if (manageMatch) {
+      const secret = manageMatch[1];
+      
+      // Find wedding by admin secret link
+      const wedding = await db.select()
+        .from(schema.weddings)
+        .where(eq(schema.weddings.adminSecretLink, secret))
+        .get();
+
+      if (!wedding) {
+        return new Response(JSON.stringify({ error: "Wedding not found" }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Get all invitations for this wedding
+      const invitations = await db.select()
+        .from(schema.rsvpInvitations)
+        .where(eq(schema.rsvpInvitations.weddingId, wedding.id))
+        .all();
+
+      // Get all RSVPs for this wedding
+      const rsvps = await db.select()
+        .from(schema.rsvps)
+        .leftJoin(schema.rsvpInvitations, eq(schema.rsvps.invitationId, schema.rsvpInvitations.id))
+        .where(eq(schema.rsvps.weddingId, wedding.id))
+        .all();
+
+      // Calculate statistics
+      const totalInvitations = invitations.length;
+      const respondedCount = rsvps.length;
+      const pendingCount = totalInvitations - respondedCount;
+      const attendingCount = rsvps.filter(r => r.rsvps && (r.rsvps.attendingCeremony || r.rsvps.attendingReception)).length;
+      const totalGuests = rsvps.reduce((sum, r) => sum + (r.rsvps?.numberOfGuests || 1), 0);
+      const responseRate = totalInvitations > 0 ? Math.round((respondedCount / totalInvitations) * 100) : 0;
+
+      // Prepare CSV data
+      const csvData = rsvps.map(r => ({
+        guestName: r.rsvps?.guestName || '',
+        guestEmail: r.rsvps?.guestEmail || '',
+        guestPhone: r.rsvps?.guestPhone || '',
+        attendingCeremony: r.rsvps?.attendingCeremony ? 'Yes' : 'No',
+        attendingReception: r.rsvps?.attendingReception ? 'Yes' : 'No',
+        numberOfGuests: r.rsvps?.numberOfGuests || 1,
+        message: r.rsvps?.message || '',
+        submittedAt: r.rsvps?.createdAt || ''
+      }));
+
+      // Format rsvp responses for the frontend
+      const formattedRsvps = rsvps.map(r => ({
+        id: r.rsvps?.id,
+        guestName: r.rsvps?.guestName || '',
+        guestEmail: r.rsvps?.guestEmail || '',
+        guestPhone: r.rsvps?.guestPhone || '',
+        attendingCeremony: r.rsvps?.attendingCeremony || false,
+        attendingReception: r.rsvps?.attendingReception || false,
+        numberOfGuests: r.rsvps?.numberOfGuests || 1,
+        message: r.rsvps?.message || '',
+        createdAt: r.rsvps?.createdAt || ''
+      }));
+
+      return new Response(JSON.stringify({
+        wedding,
+        statistics: {
+          totalInvitations,
+          respondedCount,
+          pendingCount,
+          attendingCount,
+          totalGuests,
+          responseRate
+        },
+        invitations,
+        rsvpResponses: formattedRsvps,
+        csvData
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
     
     // Handle GET /api/rsvp/invitation/:code
     const invitationMatch = path.match(/\/invitation\/([^/]+)$/);

@@ -110,6 +110,13 @@ export const weddings = sqliteTable("weddings", {
   contactEmail: text("contact_email").notNull(),
   contactPhone: text("contact_phone"),
   createdAt: integer("created_at", { mode: "timestamp" }),
+  // Added separate ceremony and reception venues
+  ceremonyVenue: text("ceremony_venue"),
+  ceremonyVenueAddress: text("ceremony_venue_address"),
+  receptionVenue: text("reception_venue"),
+  receptionVenueAddress: text("reception_venue_address"),
+  // Secret link for admin dashboard access
+  adminSecretLink: text("admin_secret_link").unique(),
 });
 
 export const rsvps = sqliteTable("rsvps", {
@@ -177,6 +184,15 @@ export const weddingEvents = sqliteTable("wedding_events", {
   order: integer("order").default(0),
 });
 
+// Add RSVP templates table
+export const rsvpTemplates = sqliteTable("rsvp_templates", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'Hindu' | 'Christian' | 'Islamic'
+  config: text("config").notNull(), // JSON string
+  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+});
+
 // Insert schemas
 export const insertVendorSchema = createInsertSchema(vendors).omit({
   id: true,
@@ -238,6 +254,12 @@ export const insertWeddingEventSchema = createInsertSchema(weddingEvents).omit({
   id: true,
 });
 
+// Add RSVP template insert schema
+export const insertRsvpTemplateSchema = createInsertSchema(rsvpTemplates).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type Vendor = typeof vendors.$inferSelect;
 export type InsertVendor = z.infer<typeof insertVendorSchema>;
@@ -263,3 +285,7 @@ export type RsvpResponse = typeof rsvpResponses.$inferSelect;
 export type InsertRsvpResponse = z.infer<typeof insertRsvpResponseSchema>;
 export type WeddingEvent = typeof weddingEvents.$inferSelect;
 export type InsertWeddingEvent = z.infer<typeof insertWeddingEventSchema>;
+
+// Add RSVP template types
+export type RsvpTemplate = typeof rsvpTemplates.$inferSelect;
+export type InsertRsvpTemplate = z.infer<typeof insertRsvpTemplateSchema>;

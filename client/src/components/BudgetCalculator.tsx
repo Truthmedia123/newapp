@@ -140,7 +140,10 @@ export default function BudgetCalculator({ onBudgetChange, initialBudget = 50000
   // Update line item
   const updateLineItem = (id: string, field: keyof BudgetItem, value: string | number) => {
     setLineItems(lineItems.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
+      item.id === id ? { 
+        ...item, 
+        [field]: field === 'amount' ? Number(value) || 0 : value 
+      } : item
     ));
   };
 
@@ -178,8 +181,8 @@ export default function BudgetCalculator({ onBudgetChange, initialBudget = 50000
               <Input
                 id="totalBudget"
                 type="number"
-                value={totalBudget}
-                onChange={(e) => setTotalBudget(Number(e.target.value))}
+                value={totalBudget || ''}
+                onChange={(e) => setTotalBudget(e.target.value === '' ? 0 : Number(e.target.value))}
                 className="text-2xl font-bold"
               />
             </div>

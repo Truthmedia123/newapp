@@ -62,6 +62,12 @@ export default {
           ring: "var(--sidebar-ring)",
         },
       },
+      fontFamily: {
+        'wedding': ['Playfair Display', 'Georgia', 'serif'],
+        'elegant': ['Dancing Script', 'cursive'],
+        'script': ['Great Vibes', 'cursive'],
+        'serif': ['Crimson Text', 'Georgia', 'serif'],
+      },
       keyframes: {
         "accordion-down": {
           from: {

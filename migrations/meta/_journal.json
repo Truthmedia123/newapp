@@ -22,6 +22,20 @@
       "when": 1749732131060,
       "tag": "0002_tense_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1749732131061,
+      "tag": "0003_rsvp_enhancement",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1749732131062,
+      "tag": "0004_rsvp_templates",
+      "breakpoints": true
     }
   ]
 }

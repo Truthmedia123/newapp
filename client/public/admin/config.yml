@@ -42,8 +42,6 @@ collections:
             value: "budget-management"
           - label: "Timeline Planning"
             value: "timeline-planning"
-          - label: "Guest Management"
-            value: "guest-management"
           - label: "Venue Selection"
             value: "venue-selection"
           - label: "Photography & Video"

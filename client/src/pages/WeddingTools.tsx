@@ -5,13 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BudgetCalculator from '@/components/BudgetCalculator';
 import SeatingPlanner from '@/components/SeatingPlanner';
 import CoupleSiteGenerator from '@/components/CoupleSiteGenerator';
-import GuestDashboard from '@/components/GuestDashboard';
 import EnhancedVendorSearchFilters from '@/components/EnhancedVendorSearchFilters';
 import VendorSpotlightCarousel from '@/components/VendorSpotlightCarousel';
 import VendorSubscriptionManager from '@/components/vendor/VendorSubscriptionManager';
 import VendorChatSystem from '@/components/communication/VendorChatSystem';
 import GoanWeddingTimelinePlanner from '@/components/cultural/GoanWeddingTimelinePlanner';
-import { Calculator, Users, Globe, UserCheck, Search, Sparkles, Smartphone, CreditCard, MessageSquare, Calendar } from 'lucide-react';
+import { Calculator, Users, Globe, Search, Sparkles, Smartphone, CreditCard, MessageSquare, Calendar } from 'lucide-react';
 
 export default function WeddingTools() {
   const [activeTab, setActiveTab] = useState('budget');
@@ -26,70 +25,12 @@ export default function WeddingTools() {
       color: 'from-blue-500 to-blue-600'
     },
     {
-      id: 'seating',
-      title: 'Seating Planner',
-      description: 'Arrange your guests with drag-and-drop seating charts',
-      icon: Users,
-      component: SeatingPlanner,
-      color: 'from-green-500 to-green-600'
-    },
-    {
-      id: 'website',
-      title: 'Wedding Website',
-      description: 'Create a beautiful website for your special day',
-      icon: Globe,
-      component: CoupleSiteGenerator,
-      color: 'from-purple-500 to-purple-600'
-    },
-    {
-      id: 'guests',
-      title: 'Guest Management',
-      description: 'Manage your guest list and track RSVPs efficiently',
-      icon: UserCheck,
-      component: GuestDashboard,
-      color: 'from-red-500 to-red-600'
-    },
-    {
-      id: 'search',
-      title: 'Advanced Search',
-      description: 'Enhanced vendor search with powerful filters',
-      icon: Search,
-      component: () => (
-        <div className="max-w-4xl mx-auto p-6">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-slate-800 mb-2">Enhanced Vendor Search</h2>
-            <p className="text-gray-600">Advanced filtering system for finding the perfect vendors</p>
-          </div>
-          <EnhancedVendorSearchFilters
-            onFiltersChange={(filters) => console.log('Filters changed:', filters)}
-          />
-        </div>
-      ),
-      color: 'from-teal-500 to-teal-600'
-    },
-    {
       id: 'timeline',
       title: 'Cultural Timeline',
       description: 'Plan authentic Goan wedding ceremonies and traditions',
       icon: Calendar,
       component: GoanWeddingTimelinePlanner,
       color: 'from-orange-500 to-orange-600'
-    },
-    {
-      id: 'subscription',
-      title: 'Vendor Subscription',
-      description: 'Manage vendor listings and subscription plans',
-      icon: CreditCard,
-      component: VendorSubscriptionManager,
-      color: 'from-indigo-500 to-indigo-600'
-    },
-    {
-      id: 'chat',
-      title: 'Vendor Chat',
-      description: 'Real-time communication with wedding vendors',
-      icon: MessageSquare,
-      component: VendorChatSystem,
-      color: 'from-cyan-500 to-cyan-600'
     }
   ];
 
@@ -112,7 +53,7 @@ export default function WeddingTools() {
 
         {/* Tool Navigation Cards */}
         <div className="px-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {tools.map((tool) => {
               const Icon = tool.icon;
               return (
@@ -171,7 +112,7 @@ export default function WeddingTools() {
                   </div>
                   <h3 className="font-semibold text-lg mb-2">Comprehensive Planning</h3>
                   <p className="text-gray-600">
-                    All-in-one suite covering budget, guests, seating, and more
+                    All-in-one suite covering budget, timeline, and more
                   </p>
                 </div>
                 <div className="text-center">
