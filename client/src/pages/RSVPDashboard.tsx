@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Users, CheckCircle, Clock, Download, Search } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface RSVPDashboardData {
   wedding: any;
@@ -24,23 +25,36 @@ interface RSVPDashboardData {
 }
 
 export default function RSVPDashboard() {
-  const [weddingId, setWeddingId] = useState<string>("");
+  const [secretLink, setSecretLink] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
   const [shouldFetch, setShouldFetch] = useState(false);
+  const [, setLocation] = useLocation();
+
+  // Check if secret link is in URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const secret = urlParams.get('secret');
+    if (secret) {
+      setSecretLink(secret);
+      setShouldFetch(true);
+    }
+  }, []);
 
   const { data: dashboardData, isLoading, error } = useQuery<RSVPDashboardData>({
-    queryKey: [`/api/rsvp/manage/${weddingId}`],
-    enabled: shouldFetch && !!weddingId,
+    queryKey: [`/api/rsvp/manage/secret/${secretLink}`],
+    enabled: shouldFetch && !!secretLink,
     retry: false,
   });
 
   const handleLoadDashboard = () => {
-    if (weddingId.trim()) {
+    if (secretLink.trim()) {
       setShouldFetch(true);
+      // Update URL to include the secret link
+      setLocation(`/rsvp/dashboard?secret=${secretLink}`);
     } else {
       toast({
-        title: "Wedding ID Required",
-        description: "Please enter a valid wedding ID",
+        title: "Secret Link Required",
+        description: "Please enter a valid secret link",
         variant: "destructive"
       });
     }
@@ -50,14 +64,14 @@ export default function RSVPDashboard() {
     if (!dashboardData?.csvData) return;
 
     const csvContent = [
-      ['Guest Name', 'Email', 'Attending Ceremony', 'Attending Reception', 'Number of Guests', 'Dietary Restrictions', 'Message', 'Submitted At'],
+      ['Guest Name', 'Email', 'Phone', 'Attending Ceremony', 'Attending Reception', 'Number of Guests', 'Message', 'Submitted At'],
       ...dashboardData.csvData.map(row => [
         row.guestName,
         row.guestEmail,
+        row.guestPhone,
         row.attendingCeremony,
         row.attendingReception,
         row.numberOfGuests,
-        row.dietaryRestrictions,
         row.message,
         new Date(row.submittedAt).toLocaleDateString()
       ])
@@ -88,13 +102,12 @@ export default function RSVPDashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="weddingId">Wedding ID</Label>
+              <Label htmlFor="secretLink">Secret Link</Label>
               <Input
-                id="weddingId"
-                value={weddingId}
-                onChange={(e) => setWeddingId(e.target.value)}
-                placeholder="Enter wedding ID"
-                type="number"
+                id="secretLink"
+                value={secretLink}
+                onChange={(e) => setSecretLink(e.target.value)}
+                placeholder="Enter your secret link"
               />
             </div>
             <Button onClick={handleLoadDashboard} className="w-full">
@@ -127,7 +140,7 @@ export default function RSVPDashboard() {
         <Card>
           <CardContent className="py-8">
             <div className="text-center text-red-600">
-              <p>Failed to load dashboard. Please check the wedding ID and try again.</p>
+              <p>Failed to load dashboard. Please check your secret link and try again.</p>
               <Button 
                 onClick={() => setShouldFetch(false)} 
                 variant="outline" 
@@ -270,12 +283,7 @@ export default function RSVPDashboard() {
                     </Badge>
                   </div>
 
-                  {response.dietaryRestrictions && (
-                    <div className="mb-2">
-                      <span className="text-sm font-medium">Dietary: </span>
-                      <span className="text-sm text-gray-600">{response.dietaryRestrictions}</span>
-                    </div>
-                  )}
+
 
                   {response.message && (
                     <div className="bg-gray-50 p-3 rounded italic text-sm">

@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,22 +14,26 @@ import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Couples from "@/pages/Couples";
 import Search from "@/pages/Search";
-import AdminDashboard from "@/pages/AdminDashboard";
+import AdminDashboard from "@/components/admin/AdminDashboard";
 import WeddingTools from "@/pages/WeddingTools";
 import VendorSubscription from "@/pages/VendorSubscription";
 import VendorChat from "@/pages/VendorChat";
 import GoanWeddingTimeline from "@/pages/GoanWeddingTimeline";
 import MobileAnalytics from "@/pages/MobileAnalytics";
 
-// import RSVPGenerator from "@/pages/RSVPGenerator";
-// import RSVPDashboard from "@/pages/RSVPDashboard";
-// import RSVPForm from "@/pages/RSVPForm";
+import RSVPGenerator from "@/pages/RSVPGenerator";
+import RSVPDashboard from "@/pages/RSVPDashboard";
+import RSVPForm from "@/pages/RSVPForm";
+import RSVPGuestPage from "@/pages/RSVPGuestPage";
 import NotFound from "@/pages/not-found";
 
 console.log("App module loaded");
 
 function Router() {
   console.log("Router component rendering");
+  const [location] = useLocation();
+  console.log("Current location:", location);
+  
   try {
     return (
       <Layout>
@@ -50,9 +54,9 @@ function Router() {
           <Route path="/timeline" component={GoanWeddingTimeline} />
           <Route path="/mobile-analytics" component={MobileAnalytics} />
 
-          {/* <Route path="/rsvp/generate" component={RSVPGenerator} />
+          <Route path="/rsvp/generate" component={RSVPGenerator} />
           <Route path="/rsvp/dashboard" component={RSVPDashboard} />
-          <Route path="/rsvp/:code" component={RSVPForm} /> */}
+          <Route path="/rsvp/:code" component={RSVPGuestPage} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route component={NotFound} />
         </Switch>

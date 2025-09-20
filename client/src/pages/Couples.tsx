@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { RSVPHeader } from "@/components/RSVPHeader";
+import { convertTo12HourFormat } from "@/lib/timeUtils";
 import type { Wedding, Rsvp } from "@shared/schema";
 
 export default function Couples() {
@@ -97,6 +98,24 @@ export default function Couples() {
 
   const weddingDate = new Date(wedding.weddingDate);
   const isRsvpOpen = !wedding.rsvpDeadline || new Date() < new Date(wedding.rsvpDeadline);
+  
+  // Function to get ceremony icon based on ceremony type
+  const getCeremonyIcon = (ceremonyType?: string) => {
+    const type = ceremonyType?.toLowerCase() || '';
+    if (type.includes('nikah')) return '🕌';
+    if (type.includes('church') || type.includes('catholic')) return '⛪';
+    if (type.includes('lagna') || type.includes('kazaar') || type.includes('hindu')) return '🕉️';
+    if (type.includes('nuptials')) return '💍';
+    return '💒'; // default
+  };
+
+  // Function to get ceremony name with fallback to prevent duplication
+  const getCeremonyName = (weddingData: any) => {
+    return weddingData.ceremonyDetails || 
+           weddingData.ceremonyType || 
+           weddingData.ceremony || 
+           'Wedding Ceremony';
+  };
 
   return (
     <div className="min-h-screen">
@@ -113,38 +132,75 @@ export default function Couples() {
         <div className="absolute inset-0 bg-black/40"></div>
         
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <p className="wedding-script text-3xl mb-4 text-yellow-300">
+          <p className="font-script text-3xl mb-4 text-yellow-300">
             You're Invited to Celebrate
           </p>
           
-          <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
+          <h1 className="font-elegant text-6xl md:text-8xl font-bold mb-8 leading-tight">
             <span className="block">{wedding.brideName}</span>
-            <span className="wedding-script text-yellow-400 text-4xl md:text-5xl mx-8">&</span>
+            <span className="font-script text-yellow-400 text-4xl md:text-5xl mx-8">&</span>
             <span className="block">{wedding.groomName}</span>
           </h1>
           
-          <div className="bg-white/90 backdrop-blur-sm text-gray-800 rounded-2xl p-8 inline-block">
-            <div className="flex items-center justify-center gap-8 text-lg">
-              <div className="text-center">
-                <i className="fas fa-calendar-alt text-red-500 text-2xl mb-2"></i>
-                <p className="font-semibold">{weddingDate.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</p>
+          {/* Header Info Bar with Enhanced Typography and Better Contrast */}
+          <div className="bg-white bg-opacity-95 backdrop-blur-md rounded-lg shadow-lg p-4 mx-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm md:text-base">
+              
+              {/* Date */}
+              <div className="flex items-center space-x-2">
+                <span className="text-red-500 text-lg">📅</span>
+                <span className="font-serif text-gray-800 font-medium">
+                  {weddingDate.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </span>
               </div>
               
-              <div className="text-center">
-                <i className="fas fa-clock text-teal-500 text-2xl mb-2"></i>
-                <p className="font-semibold">{wedding.ceremonyTime}</p>
+              {/* Ceremony */}
+              <div className="flex items-center space-x-2">
+                <span className="text-lg">{getCeremonyIcon(wedding.ceremonyDetails)}</span>
+                <span className="font-elegant text-purple-700 font-medium">
+                  {getCeremonyName(wedding)} - {convertTo12HourFormat(wedding.ceremonyTime)}
+                </span>
               </div>
               
-              <div className="text-center">
-                <i className="fas fa-map-marker-alt text-red-500 text-2xl mb-2"></i>
-                <p className="font-semibold">{wedding.venue}</p>
+              {/* Ceremony Venue */}
+              <div className="flex items-center space-x-2">
+                <span className="text-red-500 text-lg">⛪</span>
+                <span className="font-serif text-gray-800 font-medium">
+                  {wedding.ceremonyVenue || wedding.venue}
+                </span>
               </div>
             </div>
+            
+            {/* Reception Info - Second Row */}
+            {(wedding.receptionTime || wedding.receptionVenue) && (
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm md:text-base mt-3 pt-3 border-t border-gray-200">
+                
+                {/* Reception Time */}
+                {wedding.receptionTime && (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-yellow-500 text-lg">🥂</span>
+                    <span className="font-serif text-gray-800 font-medium">
+                      Reception - {convertTo12HourFormat(wedding.receptionTime)}
+                    </span>
+                  </div>
+                )}
+                
+                {/* Reception Venue */}
+                {(wedding.receptionVenue || wedding.venue) && (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-yellow-500 text-lg">🏛️</span>
+                    <span className="font-serif text-gray-800 font-medium">
+                      {wedding.receptionVenue || wedding.venue}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           
           {isRsvpOpen && (
@@ -164,7 +220,7 @@ export default function Couples() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-12">
-            {/* RSVP Header */}
+            {/* RSVP Header - Updated to hide analytics and pass venue props */}
             <RSVPHeader
               brideName={wedding.brideName}
               groomName={wedding.groomName}
@@ -172,21 +228,24 @@ export default function Couples() {
               ceremonyTime={wedding.ceremonyTime}
               venue={wedding.venue}
               isRsvpOpen={isRsvpOpen}
-              totalGuests={rsvps?.reduce((sum, rsvp) => sum + (rsvp.numberOfGuests || 1), 0) || 0}
-              totalResponses={rsvps?.length || 0}
               onRsvpClick={() => setShowRsvpForm(true)}
+              ceremonyDetails={wedding.ceremonyDetails}
+              ceremonyVenue={wedding.ceremonyVenue}
+              ceremonyVenueAddress={wedding.ceremonyVenueAddress}
+              receptionVenue={wedding.receptionVenue}
+              receptionVenueAddress={wedding.receptionVenueAddress}
             />
 
             {/* Our Story */}
             {wedding.story && (
               <Card className="border-0 shadow-2xl">
                 <CardHeader>
-                  <CardTitle className="text-3xl font-bold text-center wedding-script text-red-600">
+                  <CardTitle className="text-3xl font-bold text-center font-elegant text-red-600">
                     Our Love Story
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700 leading-relaxed text-lg">{wedding.story}</p>
+                  <p className="text-gray-700 leading-relaxed text-lg font-serif">{wedding.story}</p>
                 </CardContent>
               </Card>
             )}
@@ -195,7 +254,7 @@ export default function Couples() {
             {wedding.galleryImages && Array.isArray(wedding.galleryImages) && wedding.galleryImages.length > 0 && (
               <Card className="border-0 shadow-2xl">
                 <CardHeader>
-                  <CardTitle className="text-3xl font-bold text-center wedding-script text-teal-600">
+                  <CardTitle className="text-3xl font-bold text-center font-elegant text-teal-600">
                     Our Journey Together
                   </CardTitle>
                 </CardHeader>
@@ -219,52 +278,25 @@ export default function Couples() {
               </Card>
             )}
 
-            {/* RSVP List */}
-            <Card className="border-0 shadow-2xl">
-              <CardHeader>
-                <CardTitle className="text-3xl font-bold text-center wedding-script text-red-600">
-                  Who's Coming?
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {rsvps?.map((rsvp) => (
-                    <div key={rsvp.id} className="bg-gradient-to-r from-red-50 to-teal-50 p-4 rounded-xl border">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-800">{rsvp.guestName}</h4>
-                        <Badge variant="secondary">{rsvp.numberOfGuests || 1} guest{(rsvp.numberOfGuests || 1) > 1 ? 's' : ''}</Badge>
-                      </div>
-                      {rsvp.message && (
-                        <p className="text-sm text-gray-600 italic">"{rsvp.message}"</p>
-                      )}
-                    </div>
-                  ))}
-                  
-                  {!rsvps?.length && (
-                    <p className="text-gray-500 text-center col-span-2 py-8">
-                      Be the first to RSVP!
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            {/* RSVP List - REMOVED as per user request */}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-8">
-            {/* Wedding Details */}
+            {/* Wedding Details with Enhanced Typography */}
             <Card className="border-0 shadow-2xl">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold wedding-script text-red-600">
+                <CardTitle className="text-2xl font-bold font-elegant text-red-600">
                   Wedding Details
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <i className="fas fa-calendar-alt text-red-500 mt-1"></i>
+              <CardContent className="space-y-4 wedding-details-sidebar">
+                {/* Date */}
+                <div className="detail-item">
+                  <span className="text-2xl text-red-500">📅</span>
                   <div>
-                    <p className="font-semibold">Date</p>
-                    <p className="text-gray-600">{weddingDate.toLocaleDateString('en-US', { 
+                    <strong className="font-wedding text-gray-800 text-base tracking-wide">Date</strong>
+                    <p className="font-serif text-gray-600 text-sm">{weddingDate.toLocaleDateString('en-US', { 
                       weekday: 'long', 
                       year: 'numeric', 
                       month: 'long', 
@@ -273,39 +305,67 @@ export default function Couples() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <i className="fas fa-clock text-teal-500 mt-1"></i>
+                {/* Ceremony */}
+                <div className="detail-item">
+                  <span className="text-2xl">{getCeremonyIcon(wedding.ceremonyDetails)}</span>
                   <div>
-                    <p className="font-semibold">Ceremony</p>
-                    <p className="text-gray-600">{wedding.ceremonyTime}</p>
+                    <strong className="font-wedding text-gray-800 text-base tracking-wide">Ceremony</strong>
+                    <p className="font-elegant text-purple-700 text-base font-medium">
+                      {getCeremonyName(wedding)}
+                    </p>
+                    <p className="font-serif text-gray-600 text-sm">
+                      {convertTo12HourFormat(wedding.ceremonyTime)}
+                    </p>
                   </div>
                 </div>
 
                 {wedding.receptionTime && (
-                  <div className="flex items-start gap-3">
-                    <i className="fas fa-glass-cheers text-yellow-500 mt-1"></i>
+                  <div className="detail-item">
+                    <span className="text-2xl text-yellow-500">🥂</span>
                     <div>
-                      <p className="font-semibold">Reception</p>
-                      <p className="text-gray-600">{wedding.receptionTime}</p>
+                      <strong className="font-wedding text-gray-800 text-base tracking-wide">Reception</strong>
+                      <p className="font-serif text-gray-600 text-sm">{convertTo12HourFormat(wedding.receptionTime)}</p>
                     </div>
                   </div>
                 )}
 
-                <div className="flex items-start gap-3">
-                  <i className="fas fa-map-marker-alt text-red-500 mt-1"></i>
+                {/* Ceremony Venue */}
+                <div className="detail-item">
+                  <span className="text-2xl text-red-500">⛪</span>
                   <div>
-                    <p className="font-semibold">Venue</p>
-                    <p className="text-gray-600">{wedding.venue}</p>
-                    <p className="text-sm text-gray-500">{wedding.venueAddress}</p>
+                    <strong className="font-wedding text-gray-800 text-base tracking-wide">Ceremony Venue</strong>
+                    <p className="font-serif text-gray-700 text-sm font-medium">
+                      {wedding.ceremonyVenue || wedding.venue}
+                    </p>
+                    <p className="font-sans text-gray-500 text-xs leading-relaxed">
+                      {wedding.ceremonyVenueAddress || wedding.venueAddress}
+                    </p>
                   </div>
                 </div>
 
-                {wedding.rsvpDeadline && (
-                  <div className="flex items-start gap-3">
-                    <i className="fas fa-exclamation-circle text-yellow-500 mt-1"></i>
+                {/* Reception Venue (if different) */}
+                {wedding.receptionVenue && wedding.receptionVenue !== (wedding.ceremonyVenue || wedding.venue) && (
+                  <div className="detail-item">
+                    <span className="text-2xl text-yellow-600">🏛️</span>
                     <div>
-                      <p className="font-semibold">RSVP Deadline</p>
-                      <p className="text-gray-600">
+                      <strong className="font-wedding text-gray-800 text-base tracking-wide">Reception Venue</strong>
+                      <p className="font-serif text-gray-700 text-sm font-medium">
+                        {wedding.receptionVenue}
+                      </p>
+                      <p className="font-sans text-gray-500 text-xs leading-relaxed">
+                        {wedding.receptionVenueAddress}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* RSVP Deadline */}
+                {wedding.rsvpDeadline && (
+                  <div className="detail-item">
+                    <span className="text-2xl text-amber-500">⏰</span>
+                    <div>
+                      <strong className="font-wedding text-gray-800 text-base tracking-wide">RSVP Deadline</strong>
+                      <p className="font-serif text-gray-600 text-sm">
                         {new Date(wedding.rsvpDeadline).toLocaleDateString()}
                       </p>
                     </div>
@@ -317,14 +377,14 @@ export default function Couples() {
             {/* Contact */}
             <Card className="border-0 shadow-2xl">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold wedding-script text-teal-600">
+                <CardTitle className="text-2xl font-bold font-elegant text-teal-600">
                   Questions?
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3">
                   <i className="fas fa-envelope text-red-500"></i>
-                  <a href={`mailto:${wedding.contactEmail}`} className="text-gray-600 hover:text-red-500">
+                  <a href={`mailto:${wedding.contactEmail}`} className="text-gray-600 hover:text-red-500 font-serif">
                     {wedding.contactEmail}
                   </a>
                 </div>
@@ -332,7 +392,7 @@ export default function Couples() {
                 {wedding.contactPhone && (
                   <div className="flex items-center gap-3">
                     <i className="fas fa-phone text-teal-500"></i>
-                    <a href={`tel:${wedding.contactPhone}`} className="text-gray-600 hover:text-teal-500">
+                    <a href={`tel:${wedding.contactPhone}`} className="text-gray-600 hover:text-teal-500 font-serif">
                       {wedding.contactPhone}
                     </a>
                   </div>
@@ -349,7 +409,7 @@ export default function Couples() {
           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold wedding-script text-red-600">
+                <CardTitle className="text-2xl font-bold font-elegant text-red-600">
                   RSVP for {wedding.brideName} & {wedding.groomName}
                 </CardTitle>
                 <Button 
@@ -365,38 +425,41 @@ export default function Couples() {
               <form onSubmit={handleSubmitRsvp} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="guestName">Full Name *</Label>
+                    <Label htmlFor="guestName" className="font-wedding">Full Name *</Label>
                     <Input
                       id="guestName"
                       value={rsvpForm.guestName}
                       onChange={(e) => setRsvpForm({...rsvpForm, guestName: e.target.value})}
                       required
+                      className="font-serif"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="guestEmail">Email *</Label>
+                    <Label htmlFor="guestEmail" className="font-wedding">Email *</Label>
                     <Input
                       id="guestEmail"
                       type="email"
                       value={rsvpForm.guestEmail}
                       onChange={(e) => setRsvpForm({...rsvpForm, guestEmail: e.target.value})}
                       required
+                      className="font-serif"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="guestPhone">Phone Number</Label>
+                    <Label htmlFor="guestPhone" className="font-wedding">Phone Number</Label>
                     <Input
                       id="guestPhone"
                       type="tel"
                       value={rsvpForm.guestPhone}
                       onChange={(e) => setRsvpForm({...rsvpForm, guestPhone: e.target.value})}
+                      className="font-serif"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="numberOfGuests">Number of Guests</Label>
+                    <Label htmlFor="numberOfGuests" className="font-wedding">Number of Guests</Label>
                     <Input
                       id="numberOfGuests"
                       type="number"
@@ -404,12 +467,13 @@ export default function Couples() {
                       max="10"
                       value={rsvpForm.numberOfGuests}
                       onChange={(e) => setRsvpForm({...rsvpForm, numberOfGuests: parseInt(e.target.value)})}
+                      className="font-serif"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <Label>Attendance</Label>
+                  <Label className="font-wedding">Attendance</Label>
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="attendingCeremony"
@@ -418,7 +482,7 @@ export default function Couples() {
                         setRsvpForm({...rsvpForm, attendingCeremony: checked as boolean})
                       }
                     />
-                    <Label htmlFor="attendingCeremony">I will attend the wedding ceremony</Label>
+                    <Label htmlFor="attendingCeremony" className="font-serif">I will attend the wedding ceremony</Label>
                   </div>
                   
                   {wedding.receptionTime && (
@@ -430,29 +494,31 @@ export default function Couples() {
                           setRsvpForm({...rsvpForm, attendingReception: checked as boolean})
                         }
                       />
-                      <Label htmlFor="attendingReception">I will attend the reception</Label>
+                      <Label htmlFor="attendingReception" className="font-serif">I will attend the reception</Label>
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="dietaryRestrictions">Dietary Restrictions</Label>
+                  <Label htmlFor="dietaryRestrictions" className="font-wedding">Dietary Restrictions</Label>
                   <Input
                     id="dietaryRestrictions"
                     value={rsvpForm.dietaryRestrictions}
                     onChange={(e) => setRsvpForm({...rsvpForm, dietaryRestrictions: e.target.value})}
                     placeholder="Any allergies or dietary requirements"
+                    className="font-serif"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="message">Message for the Couple</Label>
+                  <Label htmlFor="message" className="font-wedding">Message for the Couple</Label>
                   <Textarea
                     id="message"
                     value={rsvpForm.message}
                     onChange={(e) => setRsvpForm({...rsvpForm, message: e.target.value})}
                     placeholder="Send your best wishes to the happy couple"
                     rows={3}
+                    className="font-serif"
                   />
                 </div>
 
@@ -460,7 +526,7 @@ export default function Couples() {
                   <Button 
                     type="submit" 
                     disabled={createRsvpMutation.isPending}
-                    className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+                    className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 font-wedding"
                   >
                     {createRsvpMutation.isPending ? (
                       <>
@@ -478,7 +544,7 @@ export default function Couples() {
                     type="button" 
                     variant="outline" 
                     onClick={() => setShowRsvpForm(false)}
-                    className="flex-1"
+                    className="flex-1 font-wedding"
                   >
                     Cancel
                   </Button>

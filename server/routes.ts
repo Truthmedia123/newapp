@@ -1,5 +1,6 @@
 import type { Hono } from "hono";
 import { getDb, type Env } from "./db";
+import { authenticateAdmin } from "./auth";
 import { 
   insertReviewSchema, 
   insertBusinessSubmissionSchema, 
@@ -8,6 +9,7 @@ import {
   insertRsvpQuestionSchema,
   insertRsvpResponseSchema,
   insertWeddingEventSchema,
+  insertRsvpTemplateSchema,
   vendors,
   reviews,
   categories,
@@ -19,7 +21,8 @@ import {
   rsvpInvitations,
   rsvpQuestions,
   rsvpResponses,
-  weddingEvents
+  weddingEvents,
+  rsvpTemplates
 } from "@shared/schema";
 
 import { eq, like, or } from "drizzle-orm";  
@@ -77,6 +80,49 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
       return c.json(vendor);
     } catch (error) {
       return c.json({ message: "Failed to fetch vendor" }, 500);
+    }
+  });
+
+  // Admin Vendor CRUD Operations
+  app.post("/api/vendors", authenticateAdmin('vendors'), async (c) => {
+    try {
+      const body = await c.req.json();
+      const db = getDb(c.env);
+      const vendor = await db.insert(vendors).values(body).returning().get();
+      return c.json(vendor, 201);
+    } catch (error) {
+      return c.json({ message: "Failed to create vendor", error: error.message }, 500);
+    }
+  });
+
+  app.put("/api/vendors/:id", authenticateAdmin('vendors'), async (c) => {
+    try {
+      const id = parseInt(c.req.param("id"));
+      const body = await c.req.json();
+      const db = getDb(c.env);
+      const vendor = await db.update(vendors).set(body).where(eq(vendors.id, id)).returning().get();
+      
+      if (!vendor) {
+        return c.json({ message: "Vendor not found" }, 404);
+      }
+      return c.json(vendor);
+    } catch (error) {
+      return c.json({ message: "Failed to update vendor", error: error.message }, 500);
+    }
+  });
+
+  app.delete("/api/vendors/:id", authenticateAdmin('vendors'), async (c) => {
+    try {
+      const id = parseInt(c.req.param("id"));
+      const db = getDb(c.env);
+      const result = await db.delete(vendors).where(eq(vendors.id, id)).returning().get();
+      
+      if (!result) {
+        return c.json({ message: "Vendor not found" }, 404);
+      }
+      return c.json({ message: "Vendor deleted successfully" });
+    } catch (error) {
+      return c.json({ message: "Failed to delete vendor", error: error.message }, 500);
     }
   });
 
@@ -162,6 +208,49 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     }
   });
 
+  // Admin Blog Post CRUD Operations
+  app.post("/api/blog", authenticateAdmin('blog'), async (c) => {
+    try {
+      const body = await c.req.json();
+      const db = getDb(c.env);
+      const post = await db.insert(blogPosts).values(body).returning().get();
+      return c.json(post, 201);
+    } catch (error) {
+      return c.json({ message: "Failed to create blog post", error: error.message }, 500);
+    }
+  });
+
+  app.put("/api/blog/:id", authenticateAdmin('blog'), async (c) => {
+    try {
+      const id = parseInt(c.req.param("id"));
+      const body = await c.req.json();
+      const db = getDb(c.env);
+      const post = await db.update(blogPosts).set(body).where(eq(blogPosts.id, id)).returning().get();
+      
+      if (!post) {
+        return c.json({ message: "Blog post not found" }, 404);
+      }
+      return c.json(post);
+    } catch (error) {
+      return c.json({ message: "Failed to update blog post", error: error.message }, 500);
+    }
+  });
+
+  app.delete("/api/blog/:id", authenticateAdmin('blog'), async (c) => {
+    try {
+      const id = parseInt(c.req.param("id"));
+      const db = getDb(c.env);
+      const result = await db.delete(blogPosts).where(eq(blogPosts.id, id)).returning().get();
+      
+      if (!result) {
+        return c.json({ message: "Blog post not found" }, 404);
+      }
+      return c.json({ message: "Blog post deleted successfully" });
+    } catch (error) {
+      return c.json({ message: "Failed to delete blog post", error: error.message }, 500);
+    }
+  });
+
   // Business Submissions - DISABLED (Admin-only management)
   // app.post("/api/business-submissions", async (c) => {
   //   try {
@@ -218,7 +307,8 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
       if (!wedding) {
         return c.json({ error: "Wedding not found" }, 404);
       }
-      return c.json(wedding);
+      // Add ceremonyDetails to the response (even though it's not in the database)
+      return c.json({ ...wedding, ceremonyDetails: (wedding as any).ceremonyDetails || '' });
     } catch (error) {
       return c.json({ error: "Failed to fetch wedding" }, 500);
     }
@@ -229,9 +319,14 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
       const body = await c.req.json();
       console.log('Creating wedding with data:', body);
       const db = getDb(c.env);
-      const wedding = await db.insert(weddings).values(body).returning().get();
+      
+      // Extract ceremonyDetails from body but don't include it in the database insert
+      // since it's not part of the schema
+      const { ceremonyDetails, ...weddingData } = body;
+      
+      const wedding = await db.insert(weddings).values(weddingData).returning().get();
       console.log('Wedding created successfully:', wedding);
-      return c.json(wedding);
+      return c.json({ ...wedding, ceremonyDetails });
     } catch (error) {
       console.error('Error creating wedding:', error);
       return c.json({ error: "Failed to create wedding", details: error.message }, 500);
@@ -437,7 +532,77 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     }
   });
 
-  // RSVP Dashboard (admin only)
+  // RSVP Dashboard (admin only) - Secret Link Version
+  app.get("/api/rsvp/manage/secret/:secret_link", async (c) => {
+    try {
+      const secretLink = c.req.param("secret_link");
+      const db = getDb(c.env);
+
+      if (!secretLink) {
+        return c.json({ error: "Secret link is required" }, 400);
+      }
+
+      // Get wedding details by secret link
+      const wedding = await db.select()
+        .from(weddings)
+        .where(eq(weddings.adminSecretLink, secretLink))
+        .get();
+
+      if (!wedding) {
+        return c.json({ error: "Invalid secret link" }, 404);
+      }
+
+      // Get all invitations for this wedding
+      const invitations = await db.select()
+        .from(rsvpInvitations)
+        .where(eq(rsvpInvitations.weddingId, wedding.id))
+        .all();
+
+      // Get all RSVP responses
+      const rsvpResponses = await db.select()
+        .from(rsvps)
+        .where(eq(rsvps.weddingId, wedding.id))
+        .all();
+
+      // Calculate statistics
+      const totalInvitations = invitations.length;
+      const respondedCount = rsvpResponses.length;
+      const attendingCount = rsvpResponses.filter((r: any) => r.attendingCeremony || r.attendingReception).length;
+      const totalGuests = rsvpResponses.reduce((sum: number, r: any) => sum + (r.numberOfGuests || 1), 0);
+
+      // Generate CSV data
+      const csvData = rsvpResponses.map((rsvp: any) => ({
+        guestName: rsvp.guestName,
+        guestEmail: rsvp.guestEmail,
+        attendingCeremony: rsvp.attendingCeremony ? 'Yes' : 'No',
+        attendingReception: rsvp.attendingReception ? 'Yes' : 'No',
+        numberOfGuests: rsvp.numberOfGuests,
+        dietaryRestrictions: rsvp.dietaryRestrictions || '',
+        message: rsvp.message || '',
+        submittedAt: rsvp.createdAt
+      }));
+
+      return c.json({
+        wedding,
+        statistics: {
+          totalInvitations,
+          respondedCount,
+          pendingCount: totalInvitations - respondedCount,
+          attendingCount,
+          totalGuests,
+          responseRate: totalInvitations > 0 ? Math.round((respondedCount / totalInvitations) * 100) : 0
+        },
+        invitations,
+        rsvpResponses,
+        csvData
+      });
+    } catch (error) {
+      console.error('Error fetching RSVP dashboard:', error);
+      return c.json({ error: "Failed to fetch RSVP dashboard" }, 500);
+    }
+  });
+
+  // RSVP Dashboard (admin only) - Original Wedding ID Version (kept for backward compatibility)
   app.get("/api/rsvp/manage/:wedding_id", async (c) => {
     try {
       const weddingId = parseInt(c.req.param("wedding_id"));
@@ -504,6 +669,81 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     } catch (error) {
       console.error('Error fetching RSVP dashboard:', error);
       return c.json({ error: "Failed to fetch RSVP dashboard" }, 500);
+    }
+  });
+
+  // Admin RSVP Template CRUD Operations
+  app.post("/api/rsvptemplates", authenticateAdmin('templates'), async (c) => {
+    try {
+      const body = await c.req.json();
+      // Ensure config is stored as JSON string
+      const templateData = {
+        ...body,
+        config: typeof body.config === 'object' ? JSON.stringify(body.config) : body.config
+      };
+      const db = getDb(c.env);
+      const template = await db.insert(rsvpTemplates).values(templateData).returning().get();
+      // Return with parsed config
+      return c.json({
+        ...template,
+        config: typeof template.config === 'string' ? JSON.parse(template.config) : template.config
+      }, 201);
+    } catch (error) {
+      return c.json({ message: "Failed to create RSVP template", error: error.message }, 500);
+    }
+  });
+
+  app.get("/api/rsvptemplates", async (c) => {
+    try {
+      const db = getDb(c.env);
+      const templates = await db.select().from(rsvpTemplates).all();
+      // Parse config JSON strings
+      return c.json(templates.map(template => ({
+        ...template,
+        config: typeof template.config === 'string' ? JSON.parse(template.config) : template.config
+      })));
+    } catch (error) {
+      return c.json({ message: "Failed to fetch RSVP templates", error: error.message }, 500);
+    }
+  });
+
+  app.put("/api/rsvptemplates/:id", authenticateAdmin('templates'), async (c) => {
+    try {
+      const id = parseInt(c.req.param("id"));
+      const body = await c.req.json();
+      // Ensure config is stored as JSON string
+      const templateData = {
+        ...body,
+        config: typeof body.config === 'object' ? JSON.stringify(body.config) : body.config
+      };
+      const db = getDb(c.env);
+      const template = await db.update(rsvpTemplates).set(templateData).where(eq(rsvpTemplates.id, id)).returning().get();
+      
+      if (!template) {
+        return c.json({ message: "RSVP template not found" }, 404);
+      }
+      // Return with parsed config
+      return c.json({
+        ...template,
+        config: typeof template.config === 'string' ? JSON.parse(template.config) : template.config
+      });
+    } catch (error) {
+      return c.json({ message: "Failed to update RSVP template", error: error.message }, 500);
+    }
+  });
+
+  app.delete("/api/rsvptemplates/:id", authenticateAdmin('templates'), async (c) => {
+    try {
+      const id = parseInt(c.req.param("id"));
+      const db = getDb(c.env);
+      const result = await db.delete(rsvpTemplates).where(eq(rsvpTemplates.id, id)).returning().get();
+      
+      if (!result) {
+        return c.json({ message: "RSVP template not found" }, 404);
+      }
+      return c.json({ message: "RSVP template deleted successfully" });
+    } catch (error) {
+      return c.json({ message: "Failed to delete RSVP template", error: error.message }, 500);
     }
   });
 

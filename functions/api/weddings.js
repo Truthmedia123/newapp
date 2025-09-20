@@ -1,6 +1,12 @@
 import { drizzle } from 'drizzle-orm/d1';
 import * as schema from '../../shared/schema.ts';
 
+// Helper function to generate a secret link
+function generateSecretLink() {
+  return 'admin_' + Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15);
+}
+
 export async function onRequestGet({ env, request }) {
   try {
     const db = drizzle(env.DB, { schema });
@@ -29,7 +35,13 @@ export async function onRequestPost({ env, request }) {
     const body = await request.json();
     console.log('Creating wedding with data:', body);
     
-    const wedding = await db.insert(schema.weddings).values(body).returning().get();
+    // Generate a secret link if one wasn't provided
+    const weddingData = {
+      ...body,
+      adminSecretLink: body.adminSecretLink || generateSecretLink()
+    };
+    
+    const wedding = await db.insert(schema.weddings).values(weddingData).returning().get();
     console.log('Wedding created successfully:', wedding);
     
     return new Response(JSON.stringify(wedding), {

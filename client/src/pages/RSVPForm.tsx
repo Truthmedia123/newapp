@@ -12,6 +12,92 @@ import { toast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calendar, MapPin, Clock, Heart, CheckCircle, AlertCircle, Users, Mail, Phone, MessageSquare } from "lucide-react";
+import { convertTo12HourFormat } from "@/lib/timeUtils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Ceremony Types Constant
+const goanCeremonyTypes = {
+  hindu: {
+    primary: 'Lagna Ceremony',
+    alternatives: ['Kazaar', 'Hindu Wedding', 'Marriage Ceremony']
+  },
+  christian: {
+    primary: 'Church Wedding',
+    alternatives: ['Catholic Wedding', 'Holy Matrimony', 'Wedding Ceremony']
+  },
+  muslim: {
+    primary: 'Nikah Ceremony',
+    alternatives: ['Nikah', 'Islamic Wedding']
+  }
+};
+const commonOptions = ['Nuptials'];
+
+// Error Boundary Component
+const ErrorFallback = ({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) => (
+  <div className='p-4 text-red-600'>
+    <h2>Something went wrong:</h2>
+    <pre>{error.message}</pre>
+    <button 
+      onClick={resetErrorBoundary}
+      className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+    >
+      Refresh Page
+    </button>
+  </div>
+);
+
+// TimeSelect component
+const TimeSelect = ({ name, value, onChange }: { name: string; value: any; onChange: (value: any) => void }) => (
+  <div className="flex space-x-2">
+    <Select 
+      value={value.hour || ''} 
+      onValueChange={(hour) => onChange({ ...value, hour })}
+    >
+      <SelectTrigger className="w-20">
+        <SelectValue placeholder="HH" />
+      </SelectTrigger>
+      <SelectContent>
+        {Array.from({ length: 12 }, (_, i) => (
+          <SelectItem key={i+1} value={String(i+1).padStart(2, '0')}>
+            {String(i+1).padStart(2, '0')}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    :
+    <Select 
+      value={value.minute || ''} 
+      onValueChange={(minute) => onChange({ ...value, minute })}
+    >
+      <SelectTrigger className="w-20">
+        <SelectValue placeholder="MM" />
+      </SelectTrigger>
+      <SelectContent>
+        {['00','15','30','45'].map(m => (
+          <SelectItem key={m} value={m}>{m}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    <Select 
+      value={value.ampm || ''} 
+      onValueChange={(ampm) => onChange({ ...value, ampm })}
+    >
+      <SelectTrigger className="w-20">
+        <SelectValue placeholder="AM/PM" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="AM">AM</SelectItem>
+        <SelectItem value="PM">PM</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+);
 
 interface InvitationData {
   invitation: any;
@@ -35,17 +121,51 @@ export default function RSVPForm() {
     responses: {} as Record<string, any>
   });
   
+  // New state for ceremony details and time selectors
+  const [ceremonyDetails, setCeremonyDetails] = useState("");
+  const [ceremonyTime, setCeremonyTime] = useState({ hour: "", minute: "", ampm: "" });
+  const [receptionTime, setReceptionTime] = useState({ hour: "", minute: "", ampm: "" });
+  
   const [currentStep, setCurrentStep] = useState(1);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const totalSteps = 4;
 
+  // Add comprehensive error logging
+  useEffect(() => {
+    console.log("RSVPForm component mounted");
+    console.log("Invitation code:", code);
+  }, [code]);
+
   const { data: invitationData, isLoading, error } = useQuery<InvitationData>({
     queryKey: [`/api/rsvp/invitation/${code}`],
     enabled: !!code,
     retry: false,
   });
+
+  // Add error logging
+  useEffect(() => {
+    if (error) {
+      console.error("RSVP Form Error:", error);
+      console.error("Error type:", typeof error);
+      console.error("Error keys:", error ? Object.keys(error) : 'null');
+    }
+  }, [error]);
+
+  // Add data logging
+  useEffect(() => {
+    if (invitationData) {
+      console.log("Invitation data received:", invitationData);
+      if (invitationData.wedding) {
+        console.log("Wedding data:", invitationData.wedding);
+        console.log("Ceremony time (raw):", invitationData.wedding.ceremonyTime);
+        console.log("Reception time (raw):", invitationData.wedding.receptionTime);
+        console.log("Ceremony time (converted):", convertTo12HourFormat(invitationData.wedding.ceremonyTime));
+        console.log("Reception time (converted):", convertTo12HourFormat(invitationData.wedding.receptionTime));
+      }
+    }
+  }, [invitationData]);
 
   useEffect(() => {
     if (invitationData?.invitation) {
@@ -76,6 +196,18 @@ export default function RSVPForm() {
       }
     }
     
+    // Validate ceremony details and time in step 3
+    if (step === 3) {
+      if (!ceremonyDetails.trim()) errors.ceremonyDetails = "Ceremony details are required";
+      if (!ceremonyTime.hour || !ceremonyTime.minute || !ceremonyTime.ampm) {
+        errors.ceremonyTime = "Please select a complete ceremony time";
+      }
+      if ((receptionTime.hour || receptionTime.minute || receptionTime.ampm) && 
+          (!receptionTime.hour || !receptionTime.minute || !receptionTime.ampm)) {
+        errors.receptionTime = "Please select a complete reception time or leave all fields empty";
+      }
+    }
+    
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -90,6 +222,7 @@ export default function RSVPForm() {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
+  // Wrap form submission in try-catch
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -98,12 +231,24 @@ export default function RSVPForm() {
     setIsSubmitting(true);
 
     try {
+      // Combine time fields into HH:MM format
+      const ceremonyTimeFormatted = ceremonyTime.hour && ceremonyTime.minute && ceremonyTime.ampm 
+        ? `${ceremonyTime.hour}:${ceremonyTime.minute} ${ceremonyTime.ampm}` 
+        : "";
+      
+      const receptionTimeFormatted = receptionTime.hour && receptionTime.minute && receptionTime.ampm 
+        ? `${receptionTime.hour}:${receptionTime.minute} ${receptionTime.ampm}` 
+        : "";
+
       const response = await fetch('/api/rsvp/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           invitationCode: code,
-          ...formData
+          ...formData,
+          ceremonyDetails,
+          ceremonyTime: ceremonyTimeFormatted,
+          receptionTime: receptionTimeFormatted
         }),
       });
 
@@ -120,6 +265,7 @@ export default function RSVPForm() {
       });
 
     } catch (error) {
+      console.error('RSVP form error:', error);
       toast({
         title: "Submission Failed",
         description: error instanceof Error ? error.message : "Unknown error occurred",
@@ -156,16 +302,51 @@ export default function RSVPForm() {
     );
   }
 
-  if (error || !invitationData) {
+  // Enhanced error handling
+  if (error) {
+    console.error("RSVP Form Error Details:", error);
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-teal-50 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="py-8">
             <div className="text-center text-red-600">
-              <p className="mb-4">Invalid or expired invitation link</p>
-              <p className="text-sm text-gray-600">
-                Please check the link or contact the couple for assistance.
-              </p>
+              <AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-500" />
+              <h2 className="text-xl font-bold mb-2">Error Loading Invitation</h2>
+              <p className="mb-4">We couldn't load your invitation. Please check the link or contact the couple for assistance.</p>
+              <details className="text-left bg-red-50 p-4 rounded-lg mb-4">
+                <summary className="cursor-pointer font-medium">Technical Details</summary>
+                <pre className="mt-2 text-xs overflow-auto">
+                  {error instanceof Error ? error.message : String(error)}
+                </pre>
+              </details>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="bg-red-500 hover:bg-red-600"
+              >
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!invitationData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-teal-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="py-8">
+            <div className="text-center text-red-600">
+              <AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-500" />
+              <h2 className="text-xl font-bold mb-2">Invitation Not Found</h2>
+              <p className="mb-4">This invitation link may be invalid or expired. Please check the link or contact the couple for assistance.</p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="bg-red-500 hover:bg-red-600"
+              >
+                Retry
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -223,11 +404,24 @@ export default function RSVPForm() {
   }
 
   const { invitation, wedding, events, questions } = invitationData;
+  
+  // Add debugging for time conversion
+  useEffect(() => {
+    console.log("Wedding data:", wedding);
+    if (wedding?.ceremonyTime) {
+      console.log("Ceremony time (24h):", wedding.ceremonyTime);
+      console.log("Ceremony time (12h):", convertTo12HourFormat(wedding.ceremonyTime));
+    }
+    if (wedding?.receptionTime) {
+      console.log("Reception time (24h):", wedding.receptionTime);
+      console.log("Reception time (12h):", convertTo12HourFormat(wedding.receptionTime));
+    }
+  }, [wedding]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-teal-50 py-8">
       <div className="container mx-auto px-4 max-w-2xl">
-        {/* Wedding Header */}
+        {/* Wedding Header with Improved Contrast */}
         <Card className="mb-8 border-0 shadow-2xl">
           <CardContent className="py-8">
             <div className="text-center">
@@ -239,25 +433,65 @@ export default function RSVPForm() {
                 You're Invited to Our Wedding!
               </p>
               
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="flex items-center justify-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  {new Date(wedding.weddingDate).toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
+              {/* Header Info Bar with Better Contrast */}
+              <div className="bg-white bg-opacity-95 backdrop-blur-md rounded-lg shadow-lg p-4 mx-4">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm md:text-base">
+                  
+                  {/* Date */}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-red-500 text-lg">📅</span>
+                    <span className="font-serif text-gray-800 font-medium">
+                      {new Date(wedding.weddingDate).toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </span>
+                  </div>
+                  
+                  {/* Ceremony */}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg">{getCeremonyIcon(wedding.ceremonyDetails)}</span>
+                    <span className="font-elegant text-purple-700 font-medium">
+                      {wedding.ceremonyDetails} - {convertTo12HourFormat(wedding.ceremonyTime)}
+                    </span>
+                  </div>
+                  
+                  {/* Ceremony Venue */}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-red-500 text-lg">⛪</span>
+                    <span className="font-serif text-gray-800 font-medium">
+                      {wedding.ceremonyVenue || wedding.venue}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Ceremony at {wedding.ceremonyTime}
-                  {wedding.receptionTime && ` • Reception at ${wedding.receptionTime}`}
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  {wedding.venue}
-                </div>
+                
+                {/* Reception Info - Second Row */}
+                {(wedding.receptionTime || wedding.receptionVenue) && (
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm md:text-base mt-3 pt-3 border-t border-gray-200">
+                    
+                    {/* Reception Time */}
+                    {wedding.receptionTime && (
+                      <div className="flex items-center space-x-2">
+                        <span className="text-yellow-500 text-lg">🥂</span>
+                        <span className="font-serif text-gray-800 font-medium">
+                          Reception - {convertTo12HourFormat(wedding.receptionTime)}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Reception Venue */}
+                    {(wedding.receptionVenue || wedding.venue) && (
+                      <div className="flex items-center space-x-2">
+                        <span className="text-yellow-500 text-lg">🏛️</span>
+                        <span className="font-serif text-gray-800 font-medium">
+                          {wedding.receptionVenue || wedding.venue}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -271,12 +505,12 @@ export default function RSVPForm() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {events.map((event) => (
+                {events.map((event: any) => (
                   <div key={event.id} className="border-l-4 border-red-200 pl-4">
                     <h3 className="font-semibold">{event.name}</h3>
                     <p className="text-sm text-gray-600">
-                      {new Date(event.date).toLocaleDateString()} at {event.startTime}
-                      {event.endTime && ` - ${event.endTime}`}
+                      {new Date(event.date).toLocaleDateString()} at {convertTo12HourFormat(event.startTime)}
+                      {event.endTime && ` - ${convertTo12HourFormat(event.endTime)}`}
                     </p>
                     <p className="text-sm text-gray-600">{event.venue}</p>
                     {event.description && (
@@ -423,16 +657,81 @@ export default function RSVPForm() {
                 </div>
               )}
               
-              {/* Step 3: Attendance */}
+              {/* Step 3: Attendance and Ceremony Details */}
               {currentStep === 3 && (
                 <div className="space-y-6">
                   <div className="text-center">
                     <Heart className="h-8 w-8 text-red-500 mx-auto mb-2" />
-                    <h3 className="text-xl font-semibold text-gray-800">Attendance</h3>
-                    <p className="text-sm text-gray-600 mt-1">Which events will you attend?</p>
+                    <h3 className="text-xl font-semibold text-gray-800">Attendance & Ceremony Details</h3>
+                    <p className="text-sm text-gray-600 mt-1">Which events will you attend and ceremony information?</p>
                   </div>
                   
                   <div className="space-y-4">
+                    {/* Ceremony Details */}
+                    <div>
+                      <Label htmlFor="ceremonyDetails" className="flex items-center gap-2">
+                        <Heart className="h-4 w-4" />
+                        Ceremony Details *
+                      </Label>
+                      <Select value={ceremonyDetails} onValueChange={setCeremonyDetails}>
+                        <SelectTrigger id="ceremonyDetails" className="w-full">
+                          <SelectValue placeholder="Select Ceremony" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {commonOptions.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                          {Object.values(goanCeremonyTypes).flatMap(group => 
+                            [group.primary, ...group.alternatives].map(opt =>
+                              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
+                      {formErrors.ceremonyDetails && (
+                        <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          {formErrors.ceremonyDetails}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Ceremony Time */}
+                    <div>
+                      <Label htmlFor="ceremonyTime" className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Ceremony Time *
+                      </Label>
+                      <TimeSelect 
+                        name="ceremonyTime" 
+                        value={ceremonyTime} 
+                        onChange={setCeremonyTime} 
+                      />
+                      {formErrors.ceremonyTime && (
+                        <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          {formErrors.ceremonyTime}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Reception Time */}
+                    <div>
+                      <Label htmlFor="receptionTime" className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Reception Time
+                      </Label>
+                      <TimeSelect 
+                        name="receptionTime" 
+                        value={receptionTime} 
+                        onChange={setReceptionTime} 
+                      />
+                      {formErrors.receptionTime && (
+                        <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          {formErrors.receptionTime}
+                        </p>
+                      )}
+                    </div>
+
                     <div className="p-4 border-2 border-red-100 rounded-lg hover:border-red-200 transition-colors">
                       <div className="flex items-center space-x-3">
                         <Checkbox
@@ -448,7 +747,7 @@ export default function RSVPForm() {
                             Wedding Ceremony
                           </Label>
                           <p className="text-sm text-gray-600">
-                            {new Date(wedding.weddingDate).toLocaleDateString()} at {wedding.ceremonyTime}
+                            {new Date(wedding.weddingDate).toLocaleDateString()} at {convertTo12HourFormat(wedding.ceremonyTime)}
                           </p>
                         </div>
                       </div>
@@ -470,7 +769,7 @@ export default function RSVPForm() {
                               Reception
                             </Label>
                             <p className="text-sm text-gray-600">
-                              {new Date(wedding.weddingDate).toLocaleDateString()} at {wedding.receptionTime}
+                              {new Date(wedding.weddingDate).toLocaleDateString()} at {convertTo12HourFormat(wedding.receptionTime)}
                             </p>
                           </div>
                         </div>
@@ -513,7 +812,7 @@ export default function RSVPForm() {
                     </div>
 
                     {/* Custom Questions */}
-                    {questions.map((question) => (
+                    {questions.map((question: any) => (
                       <div key={question.id} className="p-4 border rounded-lg">
                         <Label className="font-medium">
                           {question.question}

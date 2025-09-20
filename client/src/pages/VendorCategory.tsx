@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import VendorCard from "@/components/VendorCard";
+import SimplifiedVendorCard from "@/components/SimplifiedVendorCard";
 import type { Vendor } from "@shared/schema";
 
 export default function VendorCategory() {
@@ -115,19 +115,14 @@ export default function VendorCategory() {
         </div>
       </section>
 
-      {/* Vendors Grid */}
+      {/* Vendors Grid - Simplified Layout */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-gray-300 h-64 rounded-t-lg"></div>
-                  <div className="bg-white p-6 rounded-b-lg">
-                    <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-300 rounded mb-4"></div>
-                    <div className="h-8 bg-gray-300 rounded"></div>
-                  </div>
+                  <div className="aspect-square bg-gray-300 rounded-xl"></div>
                 </div>
               ))}
             </div>
@@ -139,9 +134,9 @@ export default function VendorCategory() {
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {sortedVendors.map((vendor) => (
-                  <VendorCard key={vendor.id} vendor={vendor} />
+                  <SimplifiedVendorCard key={vendor.id} vendor={vendor} />
                 ))}
               </div>
             </>

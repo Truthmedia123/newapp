@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Crimson+Text:wght@400;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -76,6 +76,22 @@
 }
 
 @layer components {
+  .detail-item {
+    @apply flex items-start space-x-4 p-3 hover:bg-white hover:bg-opacity-50 rounded-lg transition-all duration-200;
+  }
+
+  .detail-item span {
+    @apply flex-shrink-0 mt-1;
+  }
+
+  .detail-item strong {
+    @apply block mb-1 tracking-wide;
+  }
+
+  .wedding-gradient-bg {
+    background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 50%, #ecfdf5 100%);
+  }
+
   .cultural-pattern {
     background-image: 
       radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 2px, transparent 2px),
