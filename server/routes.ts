@@ -13,6 +13,8 @@ import {
 } from '@shared/schema';
 import { authenticateAdmin } from './auth';
 import type { Env } from './db';
+import { rateLimit } from './middleware/rateLimit';
+import { cache } from './middleware/cache';
 
 export function registerRoutes(app: Hono<{ Bindings: Env }>) {
   // Health check
@@ -20,8 +22,8 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     return c.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  // Vendors API
-  app.get("/api/vendors", async (c) => {
+  // Vendors API with caching and rate limiting
+  app.get("/api/vendors", cache(900000), rateLimit(100), async (c) => {
     try {
       const db = getDb(c.env);
       const allVendors = await db.select().from(vendors).all();
@@ -32,7 +34,7 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     }
   });
 
-  app.get("/api/vendors/:id", async (c) => {
+  app.get("/api/vendors/:id", cache(900000), rateLimit(100), async (c) => {
     try {
       const id = parseInt(c.req.param("id"));
       const db = getDb(c.env);
@@ -49,7 +51,7 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     }
   });
 
-  app.get("/api/vendors/category/:category", async (c) => {
+  app.get("/api/vendors/category/:category", cache(900000), rateLimit(100), async (c) => {
     try {
       const category = c.req.param("category");
       const db = getDb(c.env);
@@ -175,8 +177,8 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     }
   });
 
-  // Categories API
-  app.get("/api/categories", async (c) => {
+  // Categories API with caching and rate limiting
+  app.get("/api/categories", cache(900000), rateLimit(100), async (c) => {
     try {
       const db = getDb(c.env);
       const allCategories = await db.select().from(categories).all();
@@ -187,8 +189,8 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     }
   });
 
-  // Blog API
-  app.get("/api/blog", async (c) => {
+  // Blog API with caching and rate limiting
+  app.get("/api/blog", cache(900000), rateLimit(100), async (c) => {
     try {
       const db = getDb(c.env);
       const posts = await db.select().from(blogPosts).all();
@@ -199,7 +201,7 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
     }
   });
 
-  app.get("/api/blog/:slug", async (c) => {
+  app.get("/api/blog/:slug", cache(900000), rateLimit(100), async (c) => {
     try {
       const slug = c.req.param("slug");
       const db = getDb(c.env);
@@ -285,7 +287,7 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
   });
 
   // Weddings API
-  app.get("/api/weddings/:slug", async (c) => {
+  app.get("/api/weddings/:slug", cache(900000), rateLimit(100), async (c) => {
     try {
       const slug = c.req.param("slug");
       const db = getDb(c.env);
@@ -352,7 +354,7 @@ export function registerRoutes(app: Hono<{ Bindings: Env }>) {
   });
 
   // Wedding Events API
-  app.get("/api/weddings/:id/events", async (c) => {
+  app.get("/api/weddings/:id/events", cache(900000), rateLimit(100), async (c) => {
     try {
       const weddingId = parseInt(c.req.param("id"));
       const db = getDb(c.env);

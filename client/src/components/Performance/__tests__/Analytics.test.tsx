@@ -43,9 +43,3 @@ describe('Analytics', () => {
     });
   });
 });
-
-
-
-
-
-

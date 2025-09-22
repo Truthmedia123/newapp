@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import SimplifiedVendorCard from "@/components/SimplifiedVendorCard";
+import SimplifiedVendorCard from "@/components/vendor/SimplifiedVendorCard";
 import type { Vendor } from "@shared/schema";
+import NewsletterSignup from "@/components/engagement/NewsletterSignup";
 
 export default function VendorCategory() {
   const { category } = useParams();
@@ -35,7 +36,7 @@ export default function VendorCategory() {
     },
   });
 
-  const sortedVendors = vendors?.sort((a, b) => {
+  const sortedVendors = vendors?.sort((a: Vendor, b: Vendor) => {
     switch (sortBy) {
       case 'rating':
         return Number(b.rating) - Number(a.rating);
@@ -135,7 +136,7 @@ export default function VendorCategory() {
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {sortedVendors.map((vendor) => (
+                {sortedVendors.map((vendor: Vendor) => (
                   <SimplifiedVendorCard key={vendor.id} vendor={vendor} />
                 ))}
               </div>
@@ -156,6 +157,13 @@ export default function VendorCategory() {
               </Button>
             </div>
           )}
+        </div>
+      </section>
+      
+      {/* Newsletter Signup */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <NewsletterSignup />
         </div>
       </section>
     </div>

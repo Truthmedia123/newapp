@@ -20,23 +20,24 @@ This wedding platform is configured for admin-only vendor management to maintain
 ### Option 1: Netlify CMS (Recommended)
 1. Go to `/admin` to access Netlify CMS
 2. Navigate to "Vendors" collection
-3. Create new vendor profiles with all required fields
+3. Create new vendor profiles with all required fields including social media links
 4. Use draft mode to review before publishing
 5. All changes are version controlled in Git
 
 ### Option 2: CSV Import
-1. Prepare CSV file using the template in `scripts/vendor-template.csv`
+1. Prepare CSV file using the template in `scripts/vendor-template.csv` (now includes social media fields)
 2. Use the admin dashboard import feature, or
 3. Run command line import: `npm run import:vendors path/to/vendors.csv`
 
-### Option 3: Direct Database (Advanced)
-1. Use the database seeding script: `npm run db:seed`
-2. Modify `scripts/seed-database.js` for custom data
+### Option 3: Manual Entry
+1. Use the admin dashboard form to add vendors manually
+2. Includes fields for social media URLs and embedded content
+3. Real-time validation and preview
 
-## CSV Format
+## CSV Format (Updated)
 ```csv
-name,category,description,phone,email,whatsapp,location,address,website,instagram,facebook,services,price_range,featured,verified
-"Vendor Name","photographers","Description","+91 9876543210","email@example.com","+91 9876543210","Location","Address","https://website.com","@instagram","facebook","Service1;Service2","₹25,000 - ₹50,000",true,true
+name,category,description,phone,email,whatsapp,location,address,website,instagram,facebook,services,price_range,featured,verified,facebookUrl,instagramUrl,linkedinUrl,twitterUrl,embedCode
+"Vendor Name","photographers","Description","+91 9876543210","email@example.com","+91 9876543210","Location","Address","https://website.com","@instagram","facebook","Service1;Service2","₹25,000 - ₹50,000",true,true,"https://facebook.com/vendor","https://instagram.com/vendor","https://linkedin.com/vendor","https://twitter.com/vendor","<blockquote class='instagram-media'>...</blockquote>"
 ```
 
 ## Security Features
@@ -54,6 +55,11 @@ name,category,description,phone,email,whatsapp,location,address,website,instagra
 - Token-based access to admin dashboard
 - Netlify Identity for CMS access
 - All changes tracked in Git
+
+### API Protection
+- Rate limiting on all endpoints (100 requests per IP per hour)
+- Caching for read-heavy endpoints (15-minute cache)
+- Authentication required for write operations
 
 ## Deployment Workflow
 
@@ -79,8 +85,9 @@ wrangler d1 migrations apply wedding_platform_db          # Production
 
 ### Adding Vendors
 1. **CMS Method**: Use Netlify CMS interface
-2. **CSV Method**: Import via admin dashboard
-3. **Script Method**: Modify seed script and run
+2. **CSV Method**: Import via admin dashboard (supports social media fields)
+3. **Manual Method**: Use admin dashboard form with social media and embed fields
+4. **Script Method**: Modify seed script and run
 
 ### Updating Vendors
 1. Edit through Netlify CMS
@@ -99,11 +106,19 @@ wrangler d1 migrations apply wedding_platform_db          # Production
 - Database status monitoring
 - System health checks
 - Quick action buttons
+- Analytics dashboard with user engagement metrics
 
 ### Analytics
 - Google Analytics integration
 - Performance monitoring
 - Error tracking
+- User engagement metrics (wishlist, recently viewed, comparisons)
+
+### Testing & Quality Assurance
+- Automated testing pipeline
+- Code coverage reporting (>70% coverage)
+- Accessibility audits
+- Performance benchmarks
 
 ## Best Practices
 
@@ -112,32 +127,38 @@ wrangler d1 migrations apply wedding_platform_db          # Production
 - Check social media links
 - Ensure high-quality images
 - Review service descriptions
+- Validate embedded content
 
 ### Content Guidelines
 - Use consistent formatting
 - Optimize images for web
 - Write SEO-friendly descriptions
 - Maintain brand consistency
+- Include social media handles
 
 ### Security
 - Change admin token regularly
 - Use strong passwords for CMS
 - Monitor for unauthorized access
 - Keep dependencies updated
+- Review access logs regularly
 
 ## Troubleshooting
 
 ### Common Issues
 1. **CMS Access**: Check Netlify Identity settings
-2. **Import Errors**: Verify CSV format matches template
+2. **Import Errors**: Verify CSV format matches template (including new social media fields)
 3. **Deployment Issues**: Check Cloudflare Workers logs
 4. **Database Errors**: Verify migration status
+5. **Rate Limiting**: Check API usage patterns
+6. **Caching Issues**: Clear cache or wait for expiration
 
 ### Support
 - Check Cloudflare Workers dashboard for logs
 - Review Git history for content changes
 - Use admin dashboard for system status
 - Monitor performance metrics
+- Check testing reports for failures
 
 ## Future Enhancements
 - Automated vendor verification
@@ -145,3 +166,29 @@ wrangler d1 migrations apply wedding_platform_db          # Production
 - Advanced analytics dashboard
 - Automated content moderation
 - Multi-admin support with role-based access
+- Enhanced social media integration
+- AI-powered vendor recommendations
+
+## Testing Procedures
+
+### Running Tests
+```bash
+npm test                          # Run all tests
+npm test -- --coverage            # Run tests with coverage report
+npm test -- client/src/components # Run specific component tests
+npm test -- server/__tests__      # Run server tests
+```
+
+### CI/CD Pipeline
+- Automated testing on every push
+- Code quality checks
+- Security scanning
+- Performance auditing
+- Accessibility compliance checking
+
+### Test Coverage Requirements
+- Minimum 70% coverage for branches, functions, lines, and statements
+- Component testing for all UI elements
+- API endpoint testing
+- Database integration testing
+- Accessibility compliance testing
