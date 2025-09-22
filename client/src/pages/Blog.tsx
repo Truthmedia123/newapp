@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import type { BlogPost } from "@shared/schema";
+import NewsletterSignup from "@/components/engagement/NewsletterSignup";
 
 export default function Blog() {
   const [search, setSearch] = useState("");
@@ -12,7 +13,7 @@ export default function Blog() {
     queryKey: ["/api/blog"],
   });
 
-  const filteredPosts = blogPosts?.filter(post => 
+  const filteredPosts = blogPosts?.filter((post: BlogPost) => 
     post.title.toLowerCase().includes(search.toLowerCase()) ||
     post.excerpt.toLowerCase().includes(search.toLowerCase())
   );
@@ -65,7 +66,7 @@ export default function Blog() {
               </div>
             ) : filteredPosts?.length ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {filteredPosts.map((post) => (
+                {filteredPosts.map((post: BlogPost) => (
                   <Link key={post.id} href={`/blog/${post.slug}`}>
                     <Card className="group cursor-pointer hover:shadow-2xl transition-all transform hover:-translate-y-2 overflow-hidden">
                       <img 
@@ -129,7 +130,7 @@ export default function Blog() {
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Recent Posts</h3>
                 <div className="space-y-4">
-                  {blogPosts?.slice(0, 3).map((post) => (
+                  {blogPosts?.slice(0, 3).map((post: BlogPost) => (
                     <Link key={post.id} href={`/blog/${post.slug}`}>
                       <div className="flex gap-3 group cursor-pointer">
                         <img 
@@ -154,6 +155,13 @@ export default function Blog() {
           </div>
         </div>
       </div>
+      
+      {/* Newsletter Signup */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <NewsletterSignup />
+        </div>
+      </section>
     </div>
   );
 }

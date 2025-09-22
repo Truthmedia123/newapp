@@ -10,6 +10,8 @@ A beautiful, modern wedding vendor directory platform specifically designed for 
 - **Location Filtering**: North Goa & South Goa regions
 - **Advanced Search**: Price range, ratings, and multi-select filters
 - **Vendor Profiles**: Detailed profiles with photos, reviews, and contact info
+- **Social Media Integration**: Facebook, Instagram, LinkedIn, Twitter links
+- **Embedded Content**: Instagram posts, YouTube videos, and more
 
 ### 🎨 Modern UI/UX
 - **Responsive Design**: Mobile-first approach
@@ -17,12 +19,30 @@ A beautiful, modern wedding vendor directory platform specifically designed for 
 - **PWA Support**: Install as mobile app
 - **Performance Optimized**: Fast loading and smooth interactions
 - **SEO Optimized**: Meta tags, structured data, sitemaps
+- **Accessibility**: WCAG 2.1 AA compliant
+- **Dark Mode**: Automatic theme switching
 
 ### 🔧 Admin Features
 - **CMS Integration**: Netlify CMS for content management
-- **Vendor Management**: Import/export vendor data
+- **Vendor Management**: Import/export vendor data with social media fields
 - **Analytics Dashboard**: Performance metrics and user insights
 - **Security Features**: Anti-copy protection, security headers
+- **Bulk Import**: CSV import with template support
+- **Rate Limiting**: API protection against abuse
+- **Caching**: Improved performance with intelligent caching
+
+### 📱 User Engagement
+- **Wishlist**: Save favorite vendors
+- **Recently Viewed**: Quick access to recently viewed vendors
+- **Vendor Comparison**: Compare multiple vendors side-by-side
+- **Social Sharing**: Share vendors on social media
+- **Newsletter Signup**: Stay updated with wedding tips
+- **Reviews & Ratings**: Customer feedback system
+
+### 💰 Monetization
+- **Google AdSense**: Responsive ad placement
+- **Sponsored Listings**: Premium vendor placement
+- **Affiliate Links**: Revenue sharing opportunities
 
 ## 🚀 Quick Start
 
@@ -77,14 +97,29 @@ weddingreplit/
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
 │   │   │   ├── PWA/        # Progressive Web App features
-│   │   │   └── ui/         # Base UI components
+│   │   │   ├── admin/      # Admin dashboard components
+│   │   │   ├── ads/        # AdSense components
+│   │   │   ├── blog/       # Blog components
+│   │   │   ├── communication/ # Chat system
+│   │   │   ├── couples/    # Couple tools
+│   │   │   ├── cultural/   # Cultural content
+│   │   │   ├── engagement/ # User engagement features
+│   │   │   ├── layout/     # Layout components
+│   │   │   ├── performance/ # Performance monitoring
+│   │   │   ├── protection/ # Content protection
+│   │   │   ├── search/     # Search components
+│   │   │   ├── seo/        # SEO components
+│   │   │   ├── ui/         # Base UI components
+│   │   │   └── vendor/     # Vendor components
 │   │   ├── pages/          # Page components
+│   │   ├── hooks/          # Custom React hooks
 │   │   ├── utils/          # Utility functions
 │   │   └── App.tsx         # Main app component
 │   └── public/             # Static assets
 ├── server/                 # Backend server
 │   ├── worker.ts           # Cloudflare Worker
 │   ├── routes.ts           # API routes
+│   ├── middleware/         # Rate limiting and caching
 │   └── dev-server.ts       # Express dev server
 ├── functions/              # Cloudflare Pages Functions
 │   └── api/                # API endpoints
@@ -111,6 +146,13 @@ npm run db:seed          # Seed database with initial data
 npm run db:migrate       # Run database migrations
 ```
 
+### Testing
+```bash
+npm test                 # Run test suite
+npm test -- --coverage   # Run tests with coverage report
+npm run test:watch       # Run tests in watch mode
+```
+
 ### Deployment
 ```bash
 npm run deploy:staging   # Deploy to staging environment
@@ -121,7 +163,7 @@ npm run deploy:production # Deploy to production
 ```bash
 npm run import:vendors   # Import vendor data from CSV
 npm run optimize:images  # Optimize and compress images
-npm test                 # Run test suite
+npm run audit            # Run accessibility and performance audits
 ```
 
 ## 🏖️ Goan Wedding Features
@@ -146,7 +188,7 @@ The platform uses a Goan wedding color scheme:
 
 ### Adding New Vendors
 1. Use the admin dashboard: `/admin/dashboard?token=admin-secret-2024`
-2. Import CSV file with vendor data
+2. Import CSV file with vendor data (including social media fields)
 3. Or use Netlify CMS for content management
 
 ## 🔧 Configuration
@@ -154,9 +196,10 @@ The platform uses a Goan wedding color scheme:
 ### Environment Variables
 ```bash
 DATABASE_URL=your_cloudflare_d1_database_url
-SITE_URL=https://your-domain.com
+SITE_URL=https://thegoanwedding.com
 NODE_ENV=production
 CF_API_TOKEN=your_cloudflare_api_token
+GOOGLE_ADSENSE_ID=ca-pub-xxxxxxxxxxxxxxxx # For AdSense integration
 ```
 
 ### Cloudflare Setup
@@ -195,95 +238,69 @@ CF_API_TOKEN=your_cloudflare_api_token
 - Anti-copy protection
 - Right-click disabled on sensitive content
 - Developer tools shortcuts disabled
+- Rate limiting on API endpoints
+- Cache control for sensitive data
 
 ## 📊 Analytics & Monitoring
 
 ### Performance
-- Core Web Vitals tracking
-- Page load time monitoring
-- Error rate tracking
-- Real-time performance dashboard
-
-### User Analytics
 - Google Analytics integration
-- User interaction tracking
-- Conversion tracking
-- Custom event tracking
+- Core Web Vitals monitoring
+- Page load time tracking
+- User engagement metrics
+
+### Testing
+- Unit tests with Jest and React Testing Library
+- Integration tests for API endpoints
+- Accessibility audits with axe-core
+- Performance audits with Lighthouse
+
+### CI/CD
+- GitHub Actions for automated testing
+- Code coverage reporting
+- Security scanning with Snyk
+- Automated deployments to staging and production
 
 ## 🧪 Testing
 
-### Running Tests
-```bash
-npm test                 # Run all tests
-npm run test:watch      # Watch mode
-npm run test:coverage   # Coverage report
-```
+The platform includes comprehensive testing:
 
-### Test Coverage
-- Component tests: 80%+ coverage
-- API endpoint tests
-- E2E tests for critical flows
-- PWA functionality tests
+### Unit Tests
+- Component testing with React Testing Library
+- API endpoint testing with Jest
+- Database query testing
 
-## 🚀 Deployment
+### Integration Tests
+- End-to-end workflow testing
+- API integration testing
+- Database integration testing
 
-### Cloudflare Pages
-1. Connect GitHub repository
-2. Configure build settings:
-   - Build command: `npm run build:production`
-   - Output directory: `dist/public`
-3. Set environment variables
-4. Deploy automatically on push
+### Accessibility Testing
+- WCAG 2.1 AA compliance
+- Screen reader compatibility
+- Keyboard navigation support
 
-### Manual Deployment
-```bash
-npm run build:production
-npm run deploy:production
-```
+### Performance Testing
+- Page load time monitoring
+- Core Web Vitals tracking
+- Mobile performance optimization
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 🙏 Acknowledgments
 
-### Common Issues
-
-**Server not starting:**
-- Check if port 8787 is available
-- Kill existing processes: `taskkill /F /PID <process_id>`
-- Try different port in `wrangler.toml`
-
-**Database errors:**
-- Run migrations: `npm run db:migrate`
-- Check D1 database connection
-- Verify environment variables
-
-**Build failures:**
-- Clear node_modules: `rm -rf node_modules && npm install`
-- Check Node.js version (18+)
-- Update dependencies: `npm update`
-
-### Getting Help
-- Check the issues section
-- Create a new issue with detailed description
-- Include error logs and system information
-
-## 🎉 Acknowledgments
-
-- Built with React, TypeScript, and Tailwind CSS
-- Powered by Cloudflare Workers and D1
-- Designed specifically for Goan wedding traditions
-- Inspired by the beautiful wedding culture of Goa
-
----
-
-**Made with ❤️ for Goan Weddings** 🏖️💒
+- Built with React, TypeScript, and Cloudflare Workers
+- UI components powered by Tailwind CSS and Radix UI
+- Data management with Drizzle ORM
+- Testing with Jest and React Testing Library
+- CI/CD with GitHub Actions

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { Hono } from 'hono';
 import { registerRoutes } from '../routes';
+import type { Env } from '../db';
 
 // Mock the database
 const mockDb = {
@@ -23,10 +24,10 @@ jest.mock('../db', () => ({
 }));
 
 describe('API Routes', () => {
-  let app: Hono;
+  let app: Hono<{ Bindings: Env }>;
 
   beforeEach(() => {
-    app = new Hono();
+    app = new Hono<{ Bindings: Env }>();
     registerRoutes(app);
     jest.clearAllMocks();
   });
@@ -37,7 +38,7 @@ describe('API Routes', () => {
         { id: 1, name: 'Test Vendor', location: 'Goa' },
         { id: 2, name: 'Another Vendor', location: 'Mumbai' },
       ];
-      mockDb.all.mockResolvedValue(mockVendors);
+      (mockDb.all as jest.Mock).mockResolvedValue(mockVendors);
 
       const res = await app.request('/api/vendors');
       const data = await res.json();
@@ -54,7 +55,7 @@ describe('API Routes', () => {
     });
 
     it('should handle database errors', async () => {
-      mockDb.all.mockRejectedValue(new Error('Database error'));
+      (mockDb.all as jest.Mock).mockRejectedValue(new Error('Database error'));
 
       const res = await app.request('/api/vendors');
       const data = await res.json();
@@ -67,7 +68,7 @@ describe('API Routes', () => {
   describe('POST /api/vendors/:id/reviews', () => {
     it('should create a new review', async () => {
       const mockReview = { id: 1, vendorId: 1, rating: 5, comment: 'Great service!' };
-      mockDb.get.mockResolvedValue(mockReview);
+      (mockDb.get as jest.Mock).mockResolvedValue(mockReview);
 
       const reviewData = {
         rating: 5,
@@ -110,7 +111,7 @@ describe('API Routes', () => {
         { id: 1, name: 'Photography', slug: 'photography' },
         { id: 2, name: 'Catering', slug: 'catering' },
       ];
-      mockDb.all.mockResolvedValue(mockCategories);
+      (mockDb.all as jest.Mock).mockResolvedValue(mockCategories);
 
       const res = await app.request('/api/categories');
       const data = await res.json();
@@ -120,9 +121,3 @@ describe('API Routes', () => {
     });
   });
 });
-
-
-
-
-
-

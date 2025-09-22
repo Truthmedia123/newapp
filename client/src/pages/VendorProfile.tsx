@@ -9,6 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { FavoriteButton } from "@/components/engagement/FavoriteButton";
+import { SocialShare } from "@/components/engagement/SocialShare";
+import NewsletterSignup from "@/components/engagement/NewsletterSignup";
 
 // Extend window interface for social media SDKs
 declare global {
@@ -25,6 +28,9 @@ declare global {
     };
   }
 }
+
+type Service = string;
+type GalleryImage = string;
 
 import type { Vendor, Review } from "@shared/schema";
 
@@ -48,6 +54,42 @@ export default function VendorProfile() {
     queryKey: [`/api/vendors/${id}/reviews`],
   });
 
+  // Add structured data for SEO
+  useEffect(() => {
+    if (vendor) {
+      const vendorStructuredData = {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": vendor.name,
+        "image": vendor.profileImage,
+        "telephone": vendor.phone,
+        "email": vendor.email,
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": vendor.address,
+          "addressLocality": vendor.location,
+          "addressCountry": "IN"
+        },
+        "description": vendor.description,
+        "priceRange": vendor.priceRange,
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": vendor.rating,
+          "reviewCount": vendor.reviewCount
+        }
+      };
+
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify(vendorStructuredData);
+      document.head.appendChild(script);
+
+      return () => {
+        document.head.removeChild(script);
+      };
+    }
+  }, [vendor]);
+
   // Initialize social media embeds
   useEffect(() => {
     if (vendor?.embedCode) {
@@ -62,6 +104,30 @@ export default function VendorProfile() {
       }
     }
   }, [vendor?.embedCode]);
+
+  // Add to recently viewed when component mounts
+  useEffect(() => {
+    if (vendor) {
+      // Add to recently viewed
+      const recentlyViewedHook = {
+        addViewedVendor: (vendor: any) => {
+          const item = {
+            id: vendor.id.toString(),
+            name: vendor.name,
+            category: vendor.category,
+            location: vendor.location,
+            rating: vendor.rating,
+            profileImage: vendor.profileImage
+          };
+          localStorage.setItem('recentlyViewedVendors', JSON.stringify([
+            {...item, viewedAt: Date.now()},
+            ...JSON.parse(localStorage.getItem('recentlyViewedVendors') || '[]').slice(0, 9)
+          ]));
+        }
+      };
+      recentlyViewedHook.addViewedVendor(vendor);
+    }
+  }, [vendor]);
 
   const createReviewMutation = useMutation({
     mutationFn: async (reviewData: typeof reviewForm) => {
@@ -123,10 +189,6 @@ export default function VendorProfile() {
     );
   }
 
-  // Type definitions for vendor data
-  type Service = string;
-  type GalleryImage = string;
-
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
@@ -153,7 +215,19 @@ export default function VendorProfile() {
             {/* About */}
             <Card>
               <CardHeader>
-                <CardTitle>About {vendor.name}</CardTitle>
+                <div className="flex justify-between items-start">
+                  <CardTitle>About {vendor.name}</CardTitle>
+                  <FavoriteButton 
+                    vendor={{
+                      id: vendor.id.toString(),
+                      name: vendor.name,
+                      category: vendor.category,
+                      location: vendor.location,
+                      rating: vendor.rating,
+                      profileImage: vendor.profileImage
+                    }} 
+                  />
+                </div>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-700 leading-relaxed">{vendor.description}</p>
@@ -454,6 +528,15 @@ export default function VendorProfile() {
                   )}
                 </div>
 
+                <div className="pt-4 border-t">
+                  <h4 className="font-semibold mb-3">Share this Vendor</h4>
+                  <SocialShare 
+                    url={window.location.href}
+                    title={vendor.name}
+                    description={vendor.description}
+                  />
+                </div>
+
                 {(vendor.website || vendor.instagram || vendor.youtube || vendor.facebook) && (
                   <div className="pt-4 border-t">
                     <h4 className="font-semibold mb-3">Follow Us</h4>
@@ -515,6 +598,13 @@ export default function VendorProfile() {
           </div>
         </div>
       </div>
+      
+      {/* Newsletter Signup */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <NewsletterSignup />
+        </div>
+      </section>
     </div>
   );
 }

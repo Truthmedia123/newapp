@@ -2,11 +2,33 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import SearchBar from "@/components/SearchBar";
-import CategoryGrid from "@/components/CategoryGrid";
-import SimplifiedVendorCard from "@/components/SimplifiedVendorCard";
-import TestimonialSlider from "@/components/TestimonialSlider";
+import SearchBar from "@/components/search/SearchBar";
+import CategoryGrid from "@/components/vendor/CategoryGrid";
+import SimplifiedVendorCard from "@/components/vendor/SimplifiedVendorCard";
+import TestimonialSlider from "@/components/vendor/TestimonialSlider";
+import NewsletterSignup from "@/components/engagement/NewsletterSignup";
 import type { Vendor, BlogPost } from "@shared/schema";
+import { useEffect } from "react";
+
+// Structured data for SEO
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "TheGoanWedding.com",
+  "url": "https://thegoanwedding.com",
+  "logo": "https://thegoanwedding.com/assets/logo.png",
+  "description": "Premium wedding vendor directory in Goa offering photographers, caterers, venues, decorators and more for your perfect Goan wedding celebration.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Goa",
+    "addressCountry": "IN"
+  },
+  "sameAs": [
+    "https://www.facebook.com/thegoanwedding",
+    "https://www.instagram.com/thegoanwedding",
+    "https://twitter.com/thegoanwedding"
+  ]
+};
 
 console.log("Home module loaded");
 
@@ -20,6 +42,18 @@ export default function Home() {
   const { data: blogPosts, error: blogError, isLoading: blogLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
   });
+
+  // Add structured data to head
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   // Log any errors
   if (vendorsError) {
@@ -159,6 +193,13 @@ export default function Home() {
 
       {/* Testimonials */}
       <TestimonialSlider />
+
+      {/* Newsletter Signup */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <NewsletterSignup />
+        </div>
+      </section>
 
       {/* Call to Action */}
       <section className="py-20 bg-gradient-to-r from-red-500 to-red-600 text-white">
