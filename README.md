@@ -166,6 +166,19 @@ npm run optimize:images  # Optimize and compress images
 npm run audit            # Run accessibility and performance audits
 ```
 
+### Maintenance
+```bash
+npm run update-deps      # Update dependencies and check for vulnerabilities
+```
+
+## 📚 Documentation
+
+For more detailed information about the project, please refer to the following documentation:
+
+- [Dependency Updates and Security Fixes](DEPENDENCY_UPDATES.md) - Details about security updates and dependency management
+- [Project Improvements Summary](IMPROVEMENTS_SUMMARY.md) - Summary of all improvements made to the project
+- [Quick Start Guide](QUICK_START.md) - Simplified guide for getting started with the project
+
 ## 🏖️ Goan Wedding Features
 
 ### Traditional Elements
@@ -198,109 +211,4 @@ The platform uses a Goan wedding color scheme:
 DATABASE_URL=your_cloudflare_d1_database_url
 SITE_URL=https://thegoanwedding.com
 NODE_ENV=production
-CF_API_TOKEN=your_cloudflare_api_token
-GOOGLE_ADSENSE_ID=ca-pub-xxxxxxxxxxxxxxxx # For AdSense integration
 ```
-
-### Cloudflare Setup
-1. Create a Cloudflare account
-2. Set up D1 database
-3. Configure Pages project
-4. Add environment variables
-5. Deploy using `npm run deploy:production`
-
-### Netlify CMS
-1. Access CMS at `/admin`
-2. Configure collections in `public/admin/config.yml`
-3. Set up Git-based workflow for content management
-
-## 📱 PWA Features
-
-### Installation
-- **Mobile**: Add to home screen from browser
-- **Desktop**: Install prompt in supported browsers
-- **Offline**: Basic functionality when offline
-
-### Service Worker
-- Caches static assets
-- Provides offline fallbacks
-- Updates automatically
-
-## 🔒 Security Features
-
-### Headers
-- X-Frame-Options: DENY
-- X-Content-Type-Options: nosniff
-- X-XSS-Protection: 1; mode=block
-- Content-Security-Policy: Strict policies
-
-### Protection
-- Anti-copy protection
-- Right-click disabled on sensitive content
-- Developer tools shortcuts disabled
-- Rate limiting on API endpoints
-- Cache control for sensitive data
-
-## 📊 Analytics & Monitoring
-
-### Performance
-- Google Analytics integration
-- Core Web Vitals monitoring
-- Page load time tracking
-- User engagement metrics
-
-### Testing
-- Unit tests with Jest and React Testing Library
-- Integration tests for API endpoints
-- Accessibility audits with axe-core
-- Performance audits with Lighthouse
-
-### CI/CD
-- GitHub Actions for automated testing
-- Code coverage reporting
-- Security scanning with Snyk
-- Automated deployments to staging and production
-
-## 🧪 Testing
-
-The platform includes comprehensive testing:
-
-### Unit Tests
-- Component testing with React Testing Library
-- API endpoint testing with Jest
-- Database query testing
-
-### Integration Tests
-- End-to-end workflow testing
-- API integration testing
-- Database integration testing
-
-### Accessibility Testing
-- WCAG 2.1 AA compliance
-- Screen reader compatibility
-- Keyboard navigation support
-
-### Performance Testing
-- Page load time monitoring
-- Core Web Vitals tracking
-- Mobile performance optimization
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built with React, TypeScript, and Cloudflare Workers
-- UI components powered by Tailwind CSS and Radix UI
-- Data management with Drizzle ORM
-- Testing with Jest and React Testing Library
-- CI/CD with GitHub Actions
