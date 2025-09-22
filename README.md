@@ -157,6 +157,7 @@ npm run test:watch       # Run tests in watch mode
 ```bash
 npm run deploy:staging   # Deploy to staging environment
 npm run deploy:production # Deploy to production
+npm run deploy:pages      # Deploy static assets to Cloudflare Pages
 ```
 
 ### Utilities
@@ -178,6 +179,7 @@ For more detailed information about the project, please refer to the following d
 - [Dependency Updates and Security Fixes](DEPENDENCY_UPDATES.md) - Details about security updates and dependency management
 - [Project Improvements Summary](IMPROVEMENTS_SUMMARY.md) - Summary of all improvements made to the project
 - [Quick Start Guide](QUICK_START.md) - Simplified guide for getting started with the project
+- [Cloudflare Deployment Fixes](CLOUDFLARE_DEPLOYMENT_FIXES.md) - Information about fixing Cloudflare deployment issues
 
 ## 🏖️ Goan Wedding Features
 
@@ -212,3 +214,25 @@ DATABASE_URL=your_cloudflare_d1_database_url
 SITE_URL=https://thegoanwedding.com
 NODE_ENV=production
 ```
+
+## 🌐 Deployment Information
+
+### Cloudflare Pages Deployment
+The frontend is deployed to Cloudflare Pages using:
+```bash
+npm run deploy:pages
+```
+
+### Cloudflare Workers Deployment
+The backend API is deployed to Cloudflare Workers using:
+```bash
+npm run deploy:production
+```
+
+### Custom Domain Setup
+To connect your custom domain:
+1. Go to the Cloudflare dashboard
+2. Navigate to your Pages project
+3. Go to "Custom domains"
+4. Add your domain (thegoanwedding.com)
+5. Follow the DNS configuration instructions

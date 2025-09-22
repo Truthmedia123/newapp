@@ -36,9 +36,12 @@ app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOStri
 // Register API routes
 registerRoutes(app);
 
-// 404 for everything else (frontend will be served by Cloudflare Pages)
-app.all('*', () => new Response('Not Found', { status: 404 }));
+// For all other routes, let Cloudflare Pages handle the static assets
+// This is a placeholder - in production, Cloudflare Pages will serve the frontend
+app.notFound((c) => {
+  // Return a simple response indicating this should be handled by Pages
+  return c.text('Not Found - This should be handled by Cloudflare Pages', 404);
+});
 
 // Export for Cloudflare Workers
 export default app;
-
