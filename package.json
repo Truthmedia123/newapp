@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "set NODE_ENV=development&& tsx server/dev-server.ts",
     "build": "vite build && esbuild server/worker.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "build:production": "vite build && esbuild server/worker.ts --platform=node --packages=external --external:zod --bundle --format=esm --outdir=dist",
+    "build:production": "vite build && esbuild server/worker.ts --platform=neutral --packages=external --external:zod --external:better-sqlite3 --bundle --format=esm --outdir=dist",
     "pages:dev": "wrangler pages dev dist/public --port 8787",
     "pages:deploy": "wrangler pages deploy dist/public --project-name=weddingreplit",
     "build:optimize": "npm run optimize-images && npm run build:production",

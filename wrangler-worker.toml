@@ -1,0 +1,13 @@
+name = "weddingreplit-worker"
+main = "dist/worker.js"
+compatibility_date = "2025-09-03"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "wedding_platform_db"
+database_id = "eb586981-d322-4e17-a982-6397604e3fc4"
+
+[vars]
+NODE_ENV = "production"
+SITE_URL = "https://weddingreplit.pages.dev"

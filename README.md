@@ -180,6 +180,7 @@ For more detailed information about the project, please refer to the following d
 - [Project Improvements Summary](IMPROVEMENTS_SUMMARY.md) - Summary of all improvements made to the project
 - [Quick Start Guide](QUICK_START.md) - Simplified guide for getting started with the project
 - [Cloudflare Deployment Fixes](CLOUDFLARE_DEPLOYMENT_FIXES.md) - Information about fixing Cloudflare deployment issues
+- [Netlify Setup Guide](NETLIFY_SETUP.md) - Instructions for setting up Netlify CMS
 
 ## 🏖️ Goan Wedding Features
 
@@ -228,6 +229,13 @@ The backend API is deployed to Cloudflare Workers using:
 ```bash
 npm run deploy:production
 ```
+
+### Netlify CMS Deployment
+The content management system is configured for Netlify deployment:
+1. Set up a Netlify site connected to your repository
+2. Enable Identity and Git Gateway in the Netlify dashboard
+3. Access the CMS at `/admin` on your deployed site
+4. Refer to [NETLIFY_SETUP.md](NETLIFY_SETUP.md) for detailed instructions
 
 ### Custom Domain Setup
 To connect your custom domain:

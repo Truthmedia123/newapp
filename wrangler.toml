@@ -1,6 +1,7 @@
+# Configuration for Cloudflare Pages (frontend)
 name = "weddingreplit"
-compatibility_date = "2025-09-03"
 pages_build_output_dir = "dist/public"
+compatibility_date = "2025-09-03"
 
 [[d1_databases]]
 binding = "DB"
@@ -11,14 +12,13 @@ database_id = "eb586981-d322-4e17-a982-6397604e3fc4"
 NODE_ENV = "production"
 SITE_URL = "https://weddingreplit.pages.dev"
 
+# Preview environment for Pages
 [env.preview]
 name = "weddingreplit-preview"
 
+# Production environment for Pages
 [env.production]
 name = "weddingreplit"
-main = "dist/worker.js"
-format = "modules"
-compatibility_date = "2025-09-03"
 
 [[env.production.d1_databases]]
 binding = "DB"
