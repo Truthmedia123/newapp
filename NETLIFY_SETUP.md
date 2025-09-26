@@ -4,6 +4,8 @@ This guide will help you set up your wedding website with Netlify CMS for conten
 
 **For a more detailed deployment guide, please see [NETLIFY_DEPLOYMENT_GUIDE.md](NETLIFY_DEPLOYMENT_GUIDE.md)**
 
+**For manual deployment instructions, please see [MANUAL_NETLIFY_DEPLOYMENT.md](MANUAL_NETLIFY_DEPLOYMENT.md)**
+
 ## Prerequisites
 
 1. A GitHub account
