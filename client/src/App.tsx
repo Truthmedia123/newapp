@@ -14,7 +14,7 @@ import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Couples from "@/pages/Couples";
 import Search from "@/pages/Search";
-import AdminDashboard from "@/components/admin/AdminDashboard";
+import AdminDashboard from "@/pages/AdminDashboard";
 import WeddingTools from "@/pages/WeddingTools";
 import VendorSubscription from "@/pages/VendorSubscription";
 import VendorChat from "@/pages/VendorChat";
@@ -49,6 +49,7 @@ function Router() {
           <Route path="/vendor/chat" component={VendorChat} />
           <Route path="/timeline" component={GoanWeddingTimeline} />
           <Route path="/mobile-analytics" component={MobileAnalytics} />
+          <Route path="/admin" component={() => <div className="p-8"><h1 className="text-2xl">Admin Dashboard</h1><p>Token: admin-secret-2024</p></div>} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/favorites" component={FavoritesPage} />
           <Route component={NotFound} />
