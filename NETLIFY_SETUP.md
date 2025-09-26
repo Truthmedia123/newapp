@@ -2,6 +2,8 @@
 
 This guide will help you set up your wedding website with Netlify CMS for content management.
 
+**For a more detailed deployment guide, please see [NETLIFY_DEPLOYMENT_GUIDE.md](NETLIFY_DEPLOYMENT_GUIDE.md)**
+
 ## Prerequisites
 
 1. A GitHub account
@@ -102,6 +104,7 @@ Preview styles are located at `client/public/admin/preview-styles.css`. Update t
    - Ensure Git Gateway is enabled
    - Check that your email is added to the Identity service
    - Verify your site is deployed via Netlify (localhost won't work for authentication)
+   - Make sure you're accessing the CMS at your actual deployed URL
 
 2. **Content not appearing**:
    - Check that you clicked "Publish" after creating content
