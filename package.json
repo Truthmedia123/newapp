@@ -21,7 +21,8 @@
     "db:seed": "node scripts/seed-database.js",
     "import:vendors": "node scripts/import-vendors.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "update-deps": "node scripts/update-dependencies.js"
+    "update-deps": "node scripts/update-dependencies.js",
+    "index:vendors": "node scripts/index-vendors-meilisearch.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -74,6 +75,7 @@
     "hono": "^4.9.6",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.453.0",
+    "meilisearch": "^0.53.0",
     "memorystore": "^1.6.7",
     "next-themes": "^0.4.6",
     "passport": "^0.7.0",

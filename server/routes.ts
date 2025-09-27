@@ -15,11 +15,35 @@ import { authenticateAdmin } from './auth';
 import type { Env } from './db';
 import { rateLimit } from './middleware/rateLimit';
 import { cache } from './middleware/cache';
+import { MeiliSearch } from 'meilisearch';
 
 export function registerRoutes(app: Hono<{ Bindings: Env }>) {
   // Health check
   app.get("/api/health", (c) => {
     return c.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // Initialize MeiliSearch client
+  const client = new MeiliSearch({ 
+    host: process.env.MEILI_HOST || 'http://localhost:7700', 
+    apiKey: process.env.MEILI_KEY || 'masterKey'
+  });
+
+  // Search API with MeiliSearch
+  app.get("/api/search/vendors", async (c) => {
+    try {
+      const q = c.req.query('q') as string;
+      if (!q) {
+        return c.json({ hits: [] });
+      }
+      
+      const index = client.index('vendors');
+      const search = await index.search(q, { limit: 10 });
+      return c.json(search.hits);
+    } catch (error) {
+      console.error('Error searching vendors:', error);
+      return c.json({ error: "Failed to search vendors" }, 500);
+    }
   });
 
   // Vendors API with caching and rate limiting
