@@ -8,8 +8,8 @@
   port = 8888
   targetPort = 3000
 
-[functions]
-  node_version = "18"
+[functions.node_version]
+  version = "18"
 
 [[redirects]]
   from = "/api/*"
