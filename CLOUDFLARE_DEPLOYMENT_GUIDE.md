@@ -58,7 +58,7 @@ npm run pages:deploy
 Or directly with Wrangler:
 
 ```bash
-npx wrangler pages publish dist/public --project-name=thegoanwedding
+npx wrangler pages deploy dist/public --project-name=thegoanwedding
 ```
 
 ## Troubleshooting
@@ -90,3 +90,32 @@ If you continue to experience issues:
 1. Check Cloudflare's documentation
 2. Review the project's DEPLOYMENT.md file
 3. Contact Cloudflare support for platform-specific issues
+
+## Recent Updates
+
+Your Cloudflare setup has been successfully restored! Here's the current status:
+
+### Database
+- ✅ D1 Database `wedding_platform_db` exists with UUID `eb586981-d322-4e17-a982-6397604e3fc4`
+- ✅ Database schema has been initialized with all required tables
+
+### Frontend
+- ✅ Cloudflare Pages project `weddingreplit` created
+- ✅ Frontend deployed to https://weddingreplit.pages.dev
+
+### Backend
+- ✅ Pages Functions deployed for API endpoints
+- ✅ Health check and database test endpoints available
+
+### Next Steps
+1. Bind the D1 database to your Pages project in the Cloudflare dashboard
+2. Set environment variables in the Cloudflare dashboard
+3. Configure your custom domain (thegoanwedding.com) if needed
+4. Test all functionality
+
+For detailed instructions on completing these steps, refer to:
+- `CLOUDFLARE_RESTORE_GUIDE.md` - Step-by-step restoration guide
+- `CLOUDFLARE_RESTORATION_SUMMARY.md` - Complete summary of work done
+- `CLOUDFLARE_COMPLETE_SETUP.md` - Full architecture overview
+
+Your site is almost ready! Complete the manual steps in the Cloudflare dashboard and your wedding vendor directory website will be fully functional.

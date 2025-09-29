@@ -4,7 +4,7 @@ import App from './App';
 import './index.css';
 
 // Hotjar Integration
-import { hotjar } from '@hotjar/browser';
+import hotjar from '@hotjar/browser';
 
 // Initialize Hotjar with your site ID and version
 // Replace YOUR_HOTJAR_ID with your actual Hotjar site ID
