@@ -12,6 +12,8 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { FavoriteButton } from "@/components/engagement/FavoriteButton";
 import { SocialShare } from "@/components/engagement/SocialShare";
 import NewsletterSignup from "@/components/engagement/NewsletterSignup";
+import { vendorJSONLD } from "@/utils/seoStructuredData";
+import { Helmet } from "react-helmet";
 
 // Extend window interface for social media SDKs
 declare global {
@@ -34,6 +36,26 @@ type GalleryImage = string;
 
 import type { Vendor, Review } from "@shared/schema";
 
+// Helper function to convert vendor data for JSON-LD
+const convertVendorForJSONLD = (vendor: Vendor): any => {
+  return {
+    id: vendor.id,
+    name: vendor.name || "",
+    description: vendor.description || "",
+    category: vendor.category,
+    phone: vendor.phone || "",
+    email: vendor.email || "",
+    website: vendor.website || undefined, // Convert null to undefined
+    location: vendor.location || "",
+    address: vendor.address || undefined, // Convert null to undefined
+    profileImage: vendor.profileImage || undefined, // Convert null to undefined
+    coverImage: vendor.coverImage || undefined, // Convert null to undefined
+    rating: vendor.rating || 0,
+    reviewCount: vendor.reviewCount || 0,
+    priceRange: vendor.priceRange || undefined, // Convert null to undefined
+  };
+};
+
 export default function VendorProfile() {
   const { id } = useParams();
   const { toast } = useToast();
@@ -53,42 +75,6 @@ export default function VendorProfile() {
   const { data: reviews } = useQuery<Review[]>({
     queryKey: [`/api/vendors/${id}/reviews`],
   });
-
-  // Add structured data for SEO
-  useEffect(() => {
-    if (vendor) {
-      const vendorStructuredData = {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": vendor.name,
-        "image": vendor.profileImage,
-        "telephone": vendor.phone,
-        "email": vendor.email,
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": vendor.address,
-          "addressLocality": vendor.location,
-          "addressCountry": "IN"
-        },
-        "description": vendor.description,
-        "priceRange": vendor.priceRange,
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": vendor.rating,
-          "reviewCount": vendor.reviewCount
-        }
-      };
-
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.textContent = JSON.stringify(vendorStructuredData);
-      document.head.appendChild(script);
-
-      return () => {
-        document.head.removeChild(script);
-      };
-    }
-  }, [vendor]);
 
   // Initialize social media embeds
   useEffect(() => {
@@ -112,12 +98,12 @@ export default function VendorProfile() {
       const recentlyViewedHook = {
         addViewedVendor: (vendor: any) => {
           const item = {
-            id: vendor.id.toString(),
-            name: vendor.name,
-            category: vendor.category,
-            location: vendor.location,
-            rating: vendor.rating,
-            profileImage: vendor.profileImage
+            id: vendor.id?.toString() || "",
+            name: vendor.name || "",
+            category: vendor.category || "",
+            location: vendor.location || "",
+            rating: vendor.rating || 0,
+            profileImage: vendor.profileImage || ""
           };
           localStorage.setItem('recentlyViewedVendors', JSON.stringify([
             {...item, viewedAt: Date.now()},
@@ -189,13 +175,24 @@ export default function VendorProfile() {
     );
   }
 
+  // Convert vendor for JSON-LD
+  const vendorForJSONLD = convertVendorForJSONLD(vendor);
+
   return (
     <div className="min-h-screen bg-slate-50">
+      <Helmet>
+        <title>{vendor.name || "Vendor"} - Wedding Vendor in Goa | TheGoanWedding</title>
+        <meta name="description" content={vendor.description || ""} />
+        <script type="application/ld+json">
+          {JSON.stringify(vendorJSONLD(vendorForJSONLD))}
+        </script>
+      </Helmet>
+      
       {/* Hero Section */}
       <section className="relative h-96">
         <img 
           src={vendor.coverImage || vendor.profileImage || "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&h=800"} 
-          alt={vendor.name}
+          alt={vendor.name || "Vendor"}
           className="w-full h-full object-cover" 
         />
         <div className="absolute inset-0 bg-black/50"></div>
@@ -203,8 +200,8 @@ export default function VendorProfile() {
           <div className="flex items-center gap-4 mb-4">
             {vendor.featured && <Badge className="bg-red-500"><i className="fas fa-star mr-1"></i>Featured</Badge>}
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-2">{vendor.name}</h1>
-          <p className="text-xl capitalize">{vendor.category.replace('-', ' ')}</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-2">{vendor.name || "Vendor"}</h1>
+          <p className="text-xl capitalize">{vendor.category?.replace('-', ' ') || ""}</p>
         </div>
       </section>
 
@@ -216,21 +213,21 @@ export default function VendorProfile() {
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <CardTitle>About {vendor.name}</CardTitle>
+                  <CardTitle>About {vendor.name || "Vendor"}</CardTitle>
                   <FavoriteButton 
                     vendor={{
-                      id: vendor.id.toString(),
-                      name: vendor.name,
-                      category: vendor.category,
-                      location: vendor.location,
-                      rating: vendor.rating,
-                      profileImage: vendor.profileImage
+                      id: vendor.id?.toString() || "",
+                      name: vendor.name || "",
+                      category: vendor.category || "",
+                      location: vendor.location || "",
+                      rating: vendor.rating || 0,
+                      profileImage: vendor.profileImage || ""
                     }} 
                   />
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed">{vendor.description}</p>
+                <p className="text-gray-700 leading-relaxed">{vendor.description || ""}</p>
                 
                 {vendor.services && (vendor.services as unknown as Service[]).length > 0 && (
                   <div className="mt-6">
@@ -258,7 +255,7 @@ export default function VendorProfile() {
                         <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                           <img 
                             src={image} 
-                            alt={`${vendor.name} gallery ${index + 1}`}
+                            alt={`${vendor.name || "Vendor"} gallery ${index + 1}`}
                             className="w-full h-64 object-cover rounded-lg" 
                           />
                         </CarouselItem>
@@ -443,18 +440,18 @@ export default function VendorProfile() {
                     <div key={review.id} className="border-b pb-4 last:border-b-0">
                       <div className="flex items-center justify-between mb-2">
                         <div>
-                          <h4 className="font-semibold">{review.customerName}</h4>
+                          <h4 className="font-semibold">{review.customerName || "Anonymous"}</h4>
                           <div className="flex text-yellow-500">
-                            {[...Array(review.rating)].map((_, i) => (
+                            {[...Array(review.rating || 0)].map((_, i) => (
                               <i key={i} className="fas fa-star text-sm"></i>
                             ))}
                           </div>
                         </div>
                         <span className="text-sm text-gray-500">
-                          {new Date(review.createdAt!).toLocaleDateString()}
+                          {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ""}
                         </span>
                       </div>
-                      <p className="text-gray-700">{review.comment}</p>
+                      <p className="text-gray-700">{review.comment || ""}</p>
                     </div>
                   ))}
                 </div>
@@ -475,18 +472,18 @@ export default function VendorProfile() {
                     {[...Array(5)].map((_, i) => (
                       <i 
                         key={i} 
-                        className={`fas fa-star ${i < Math.floor(Number(vendor.rating)) ? '' : 'text-gray-300'}`}
+                        className={`fas fa-star ${i < Math.floor(Number(vendor.rating || 0)) ? '' : 'text-gray-300'}`}
                       ></i>
                     ))}
                   </div>
                   <span className="text-sm text-gray-600">
-                    {vendor.rating} ({vendor.reviewCount} reviews)
+                    {vendor.rating || 0} ({vendor.reviewCount || 0} reviews)
                   </span>
                 </div>
 
                 <div className="flex items-center text-gray-600">
                   <i className="fas fa-map-marker-alt mr-3 text-red-500"></i>
-                  <span>{vendor.location}</span>
+                  <span>{vendor.location || ""}</span>
                 </div>
 
                 {vendor.address && (
@@ -510,6 +507,18 @@ export default function VendorProfile() {
                   >
                     <i className="fab fa-whatsapp mr-2"></i>WhatsApp
                   </Button>
+                  
+                  {/* WhatsApp Quote Button */}
+                  <Button 
+                    onClick={() => {
+                      const message = encodeURIComponent(`Hello, I'd like a quote for ${vendor.name || "your services"}`);
+                      window.open(`https://wa.me/${vendor.phone}?text=${message}`, '_blank');
+                    }}
+                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded px-4 py-2"
+                  >
+                    Request Quote
+                  </Button>
+                  
                   <Button 
                     onClick={handleCall}
                     className="w-full bg-red-500 hover:bg-red-600 text-white"
@@ -532,8 +541,8 @@ export default function VendorProfile() {
                   <h4 className="font-semibold mb-3">Share this Vendor</h4>
                   <SocialShare 
                     url={window.location.href}
-                    title={vendor.name}
-                    description={vendor.description}
+                    title={vendor.name || ""}
+                    description={vendor.description || ""}
                   />
                 </div>
 
@@ -543,7 +552,7 @@ export default function VendorProfile() {
                     <div className="flex gap-2">
                       {vendor.website && (
                         <Button 
-                          onClick={() => window.open(vendor.website!, '_blank')}
+                          onClick={() => window.open(vendor.website || '', '_blank')}
                           size="sm" 
                           variant="outline"
                         >
@@ -553,9 +562,9 @@ export default function VendorProfile() {
                       {vendor.instagram && (
                         <Button 
                           onClick={() => window.open(
-                            vendor.instagram!.startsWith('http') 
-                              ? vendor.instagram! 
-                              : `https://instagram.com/${vendor.instagram}`, 
+                            (vendor.instagram && vendor.instagram.startsWith('http')) 
+                              ? vendor.instagram 
+                              : `https://instagram.com/${vendor.instagram || ''}`, 
                             '_blank'
                           )}
                           size="sm" 
@@ -568,9 +577,9 @@ export default function VendorProfile() {
                       {vendor.youtube && (
                         <Button 
                           onClick={() => window.open(
-                            vendor.youtube!.startsWith('http') 
-                              ? vendor.youtube! 
-                              : `https://youtube.com/${vendor.youtube}`, 
+                            (vendor.youtube && vendor.youtube.startsWith('http')) 
+                              ? vendor.youtube 
+                              : `https://youtube.com/${vendor.youtube || ''}`,  
                             '_blank'
                           )}
                           size="sm" 
@@ -582,7 +591,7 @@ export default function VendorProfile() {
                       )}
                       {vendor.facebook && (
                         <Button 
-                          onClick={() => window.open(vendor.facebook!, '_blank')}
+                          onClick={() => window.open(vendor.facebook || '', '_blank')}
                           size="sm" 
                           variant="outline"
                           className="text-blue-600 border-blue-300 hover:bg-blue-50"

@@ -1,0 +1,4 @@
+# Netlify Identity routes - must come BEFORE the SPA fallback
+/.netlify/identity/*  /.netlify/identity/:splat  200
+/admin/*             /admin/index.html          200
+/*                   /index.html                200

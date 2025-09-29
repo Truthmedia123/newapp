@@ -1,121 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Test Guest Page</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .status {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
 </head>
 <body>
-    <div class="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 py-12 px-4">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-12">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-100 text-rose-500 mb-6">
-                    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                </div>
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                    Wedding Invitation
-                </h1>
-                <p class="text-xl text-gray-600">
-                    You're invited to celebrate the love of
-                </p>
-            </div>
-
-            <div class="text-center mb-12">
-                <h2 class="text-5xl md:text-6xl font-serif text-rose-600 mb-6">
-                    Sophia
-                </h2>
-                <div class="flex items-center justify-center my-4">
-                    <div class="w-16 h-px bg-rose-200"></div>
-                    <span class="mx-4 text-2xl text-rose-400">&</span>
-                    <div class="w-16 h-px bg-rose-200"></div>
-                </div>
-                <h2 class="text-5xl md:text-6xl font-serif text-rose-600">
-                    Alexander
-                </h2>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
-                <div class="bg-gradient-to-r from-rose-500 to-pink-500 p-6 text-white text-center">
-                    <h3 class="text-2xl font-bold">Wedding Details</h3>
-                </div>
-                
-                <div class="p-8">
-                    <div class="flex items-center mb-6 pb-6 border-b border-gray-100">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-lg text-gray-800">Date</h4>
-                            <p class="text-gray-600">Saturday, June 15, 2024</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center mb-6 pb-6 border-b border-gray-100">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center mr-4">
-                            <span class="text-xl">⛪</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-lg text-gray-800">Ceremony</h4>
-                            <p class="text-gray-600">Church Wedding</p>
-                            <p class="text-gray-600">3:00 PM</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center mb-6 pb-6 border-b border-gray-100">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center mr-4">
-                            <span class="text-xl">🥂</span>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-lg text-gray-800">Reception</h4>
-                            <p class="text-gray-600">6:30 PM</p>
-                            <p class="text-gray-600">Grand Palace Hotel</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center mb-6 pb-6 border-b border-gray-100">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-lg text-gray-800">Venue</h4>
-                            <p class="text-gray-600">St. Mary's Cathedral</p>
-                            <p class="text-gray-600">123 Cathedral Road, Goa</p>
-                        </div>
-                    </div>
-                    
-                    
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-lg text-gray-800">Contact Info</h4>
-                            <p class="text-gray-600 flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </svg>
-                                +91 9876543210
-                            </p>
-                            <p class="text-gray-600 flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                contact@thegoanwedding.com
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+    <div class="container">
+        <h1>Wedding Website Test</h1>
+        <div id="status" class="status info">
+            Checking server status...
+        </div>
+        <div id="instructions" style="margin-top: 1rem; display: none;">
+            <p>If the main site is still not loading, try:</p>
+            <ol style="text-align: left;">
+                <li>Refreshing the page</li>
+                <li>Clearing your browser cache</li>
+                <li>Checking browser console for errors (F12)</li>
+            </ol>
         </div>
     </div>
+
+    <script>
+        // Check if the API is responding
+        fetch('/api/health')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    document.getElementById('status').innerHTML = '✅ Server is running successfully!';
+                    document.getElementById('status').className = 'status success';
+                } else {
+                    throw new Error('Unexpected response');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('status').innerHTML = '❌ Server connection failed. Make sure the development server is running.';
+                document.getElementById('status').className = 'status error';
+                document.getElementById('instructions').style.display = 'block';
+            });
+    </script>
 </body>
 </html>

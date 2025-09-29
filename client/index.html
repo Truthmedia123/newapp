@@ -50,6 +50,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
+    
+    <!-- Netlify Identity Widget -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
     <div id="root"></div>
@@ -60,6 +63,27 @@
     <script async defer crossorigin="anonymous"
       src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v16.0">
     </script>
+    
+    <!-- Netlify Identity Widget Script -->
+    <script>
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on('init', user => {
+          if (!user) {
+            // Check if this is an invite or recovery link
+            if (window.location.hash.includes('invite_token') || 
+                window.location.hash.includes('recovery_token')) {
+              window.netlifyIdentity.open();
+            }
+          }
+        });
+        
+        window.netlifyIdentity.on('login', user => {
+          // Redirect to admin after login
+          window.location.href = '/admin/';
+        });
+      }
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

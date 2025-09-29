@@ -3,6 +3,16 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
+// Hotjar Integration
+import { hotjar } from '@hotjar/browser';
+
+// Initialize Hotjar with your site ID and version
+// Replace YOUR_HOTJAR_ID with your actual Hotjar site ID
+const HOTJAR_ID = process.env.HOTJAR_ID ? parseInt(process.env.HOTJAR_ID) : 0;
+if (HOTJAR_ID) {
+  hotjar.initialize(HOTJAR_ID, 6);
+}
+
 // Register service worker for PWA functionality
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
