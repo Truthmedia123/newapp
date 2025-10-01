@@ -11,6 +11,9 @@ database_id = "eb586981-d322-4e17-a982-6397604e3fc4"
 [vars]
 NODE_ENV = "production"
 SITE_URL = "https://weddingreplit.pages.dev"
+DIRECTUS_URL = "https://your-directus-instance.railway.app"
+DIRECTUS_TOKEN = "your-admin-token"
+USE_DIRECTUS = "true"
 
 # Preview environment for Pages
 [env.preview]
@@ -28,3 +31,11 @@ database_id = "eb586981-d322-4e17-a982-6397604e3fc4"
 [env.production.vars]
 NODE_ENV = "production"
 SITE_URL = "https://weddingreplit.pages.dev"
+USE_DIRECTUS = "true"
+DIRECTUS_URL = "https://your-directus-instance.railway.app"
+DIRECTUS_TOKEN = "your-admin-token"
+
+[env.development.vars]  
+USE_DIRECTUS = "true"
+DIRECTUS_URL = "http://localhost:8055"
+DIRECTUS_TOKEN = "dev-token"

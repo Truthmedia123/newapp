@@ -1,0 +1,1346 @@
+{
+  "version": 1,
+  "directus": "9.0.0",
+  "collections": [
+    {
+      "collection": "blog_posts",
+      "meta": {
+        "icon": "article",
+        "color": "green",
+        "note": "Wedding blog posts and articles",
+        "sort_field": "published_date",
+        "archive_field": "status",
+        "archive_value": "archived",
+        "unarchive_value": "published",
+        "archive_app_filter": true
+      },
+      "schema": {
+        "name": "blog_posts",
+        "comment": "Blog Posts"
+      }
+    },
+    {
+      "collection": "categories",
+      "meta": {
+        "icon": "category",
+        "color": "pink",
+        "note": "Types of wedding vendors",
+        "sort_field": "sort",
+        "archive_field": "status",
+        "archive_value": "archived",
+        "unarchive_value": "published",
+        "archive_app_filter": true
+      },
+      "schema": {
+        "name": "categories",
+        "comment": "Vendor Categories"
+      }
+    },
+    {
+      "collection": "invitation_templates",
+      "meta": {
+        "icon": "card_giftcard",
+        "color": "purple",
+        "note": "Wedding invitation templates",
+        "sort_field": "sort",
+        "archive_field": "status",
+        "archive_value": "archived",
+        "unarchive_value": "published",
+        "archive_app_filter": true
+      },
+      "schema": {
+        "name": "invitation_templates",
+        "comment": "Invitation Templates"
+      }
+    },
+    {
+      "collection": "reviews",
+      "meta": {
+        "icon": "star",
+        "color": "yellow",
+        "note": "Customer reviews for vendors",
+        "sort_field": "date_created",
+        "archive_field": "status",
+        "archive_value": "archived",
+        "unarchive_value": "published",
+        "archive_app_filter": true
+      },
+      "schema": {
+        "name": "reviews",
+        "comment": "Vendor Reviews"
+      }
+    },
+    {
+      "collection": "site_settings",
+      "meta": {
+        "icon": "settings",
+        "color": "gray",
+        "note": "Global site settings and configuration",
+        "singleton": true
+      },
+      "schema": {
+        "name": "site_settings",
+        "comment": "Site Settings"
+      }
+    },
+    {
+      "collection": "vendors",
+      "meta": {
+        "icon": "store",
+        "color": "blue",
+        "note": "Wedding vendor listings",
+        "sort_field": "sort",
+        "archive_field": "status",
+        "archive_value": "inactive",
+        "unarchive_value": "active",
+        "archive_app_filter": true
+      },
+      "schema": {
+        "name": "vendors",
+        "comment": "Wedding Vendors"
+      }
+    }
+  ],
+  "fields": [
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": [
+          "uuid"
+        ]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "title",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "title"
+        },
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "slug",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "link"
+        },
+        "width": "half",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false,
+        "is_unique": true
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "content",
+      "type": "text",
+      "meta": {
+        "interface": "input-rich-text-html",
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "excerpt",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full"
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "featured_image",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "author",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "half"
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "published_date",
+      "type": "date",
+      "meta": {
+        "interface": "datetime",
+        "width": "half"
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "seo_title",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "full"
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "seo_description",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full"
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "tags",
+      "type": "json",
+      "meta": {
+        "interface": "tags",
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "[]"
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Published",
+              "value": "published"
+            },
+            {
+              "text": "Draft",
+              "value": "draft"
+            },
+            {
+              "text": "Archived",
+              "value": "archived"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": "draft"
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "created_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-created"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-updated"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "blog_posts"
+    },
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": [
+          "uuid"
+        ]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "name",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "title"
+        },
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false,
+        "is_unique": true
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "slug",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "link"
+        },
+        "width": "half"
+      },
+      "schema": {
+        "is_nullable": false,
+        "is_unique": true
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "description",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full"
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "icon",
+      "type": "string",
+      "meta": {
+        "interface": "select-icon",
+        "width": "half"
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "color",
+      "type": "string",
+      "meta": {
+        "interface": "select-color",
+        "width": "half"
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "sort",
+      "type": "integer",
+      "meta": {
+        "interface": "input",
+        "hidden": true
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Published",
+              "value": "published"
+            },
+            {
+              "text": "Draft",
+              "value": "draft"
+            },
+            {
+              "text": "Archived",
+              "value": "archived"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": "draft"
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "created_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-created"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-updated"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "categories"
+    },
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": [
+          "uuid"
+        ]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "name",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "title"
+        },
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "description",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full"
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "preview_image",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "template_file",
+      "type": "json",
+      "meta": {
+        "interface": "input-code",
+        "options": {
+          "language": "json"
+        },
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "{}"
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "category",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Traditional",
+              "value": "traditional"
+            },
+            {
+              "text": "Modern",
+              "value": "modern"
+            },
+            {
+              "text": "Beach",
+              "value": "beach"
+            },
+            {
+              "text": "Destination",
+              "value": "destination"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "tags",
+      "type": "json",
+      "meta": {
+        "interface": "tags",
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "[]"
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "featured",
+      "type": "boolean",
+      "meta": {
+        "interface": "boolean",
+        "options": {
+          "label": "Feature this template"
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": false
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Published",
+              "value": "published"
+            },
+            {
+              "text": "Draft",
+              "value": "draft"
+            },
+            {
+              "text": "Archived",
+              "value": "archived"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": "draft"
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "created_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-created"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-updated"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "invitation_templates"
+    },
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": [
+          "uuid"
+        ]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "vendor",
+      "type": "integer",
+      "meta": {
+        "interface": "select-dropdown-m2o",
+        "options": {
+          "template": "{{name}}"
+        },
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "foreign_key_table": "vendors",
+        "foreign_key_column": "id",
+        "is_nullable": false
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "customer_name",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "customer_email",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "email"
+        },
+        "width": "full"
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "rating",
+      "type": "integer",
+      "meta": {
+        "interface": "rating",
+        "width": "half",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "review",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "approved",
+      "type": "boolean",
+      "meta": {
+        "interface": "boolean",
+        "options": {
+          "label": "Approved for display"
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": false
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Published",
+              "value": "published"
+            },
+            {
+              "text": "Draft",
+              "value": "draft"
+            },
+            {
+              "text": "Archived",
+              "value": "archived"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": "draft"
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "created_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-created"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-updated"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "reviews"
+    },
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": [
+          "uuid"
+        ]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "site_name",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "title"
+        },
+        "width": "full"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "logo",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "favicon",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "email",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "email"
+        },
+        "width": "full",
+        "group": "contact_info"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "phone",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "phone"
+        },
+        "width": "half",
+        "group": "contact_info"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "address",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full",
+        "group": "contact_info"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "contact_info",
+      "type": "json",
+      "meta": {
+        "interface": "group-detail",
+        "options": {
+          "fields": [
+            "email",
+            "phone",
+            "address"
+          ]
+        },
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "{}"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "facebook",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "facebook"
+        },
+        "width": "half",
+        "group": "social_links"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "instagram",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "instagram"
+        },
+        "width": "half",
+        "group": "social_links"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "twitter",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "twitter"
+        },
+        "width": "half",
+        "group": "social_links"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "linkedin",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "linkedin"
+        },
+        "width": "half",
+        "group": "social_links"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "social_links",
+      "type": "json",
+      "meta": {
+        "interface": "group-detail",
+        "options": {
+          "fields": [
+            "facebook",
+            "instagram",
+            "twitter",
+            "linkedin"
+          ]
+        },
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "{}"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "google_analytics_id",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "half"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "google_ads_id",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "half"
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-updated"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "site_settings"
+    },
+    {
+      "field": "id",
+      "type": "uuid",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": [
+          "uuid"
+        ]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": false,
+        "is_nullable": false,
+        "is_unique": true
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "name",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "title"
+        },
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "category",
+      "type": "integer",
+      "meta": {
+        "interface": "select-dropdown-m2o",
+        "options": {
+          "template": "{{name}}"
+        },
+        "width": "half"
+      },
+      "schema": {
+        "foreign_key_table": "categories",
+        "foreign_key_column": "id"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "description",
+      "type": "text",
+      "meta": {
+        "interface": "input-rich-text-html",
+        "width": "full"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "price_range",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "$",
+              "value": "$"
+            },
+            {
+              "text": "$$",
+              "value": "$$"
+            },
+            {
+              "text": "$$$",
+              "value": "$$$"
+            },
+            {
+              "text": "$$$$",
+              "value": "$$$$"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "location",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "North Goa",
+              "value": "North Goa"
+            },
+            {
+              "text": "South Goa",
+              "value": "South Goa"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "phone",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "phone"
+        },
+        "width": "half"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "email",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "email"
+        },
+        "width": "half"
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "website",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "link"
+        },
+        "width": "full"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "facebook",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "facebook"
+        },
+        "width": "half",
+        "group": "social_media"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "instagram",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "instagram"
+        },
+        "width": "half",
+        "group": "social_media"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "linkedin",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "linkedin"
+        },
+        "width": "half",
+        "group": "social_media"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "twitter",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "twitter"
+        },
+        "width": "half",
+        "group": "social_media"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "social_media",
+      "type": "json",
+      "meta": {
+        "interface": "group-detail",
+        "options": {
+          "fields": [
+            "facebook",
+            "instagram",
+            "linkedin",
+            "twitter"
+          ]
+        },
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "{}"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "images",
+      "type": "alias",
+      "meta": {
+        "interface": "files",
+        "options": {
+          "folder": null
+        },
+        "width": "full",
+        "special": [
+          "files"
+        ]
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "featured_image",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "rating",
+      "type": "decimal",
+      "meta": {
+        "interface": "rating",
+        "width": "half"
+      },
+      "schema": {
+        "numeric_precision": 3,
+        "numeric_scale": 2
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "reviews_count",
+      "type": "integer",
+      "meta": {
+        "interface": "input",
+        "readonly": true,
+        "width": "half"
+      },
+      "schema": {
+        "default_value": 0
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "availability_calendar",
+      "type": "json",
+      "meta": {
+        "interface": "input-code",
+        "options": {
+          "language": "json"
+        },
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "{}"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Active",
+              "value": "active"
+            },
+            {
+              "text": "Inactive",
+              "value": "inactive"
+            },
+            {
+              "text": "Pending",
+              "value": "pending"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": "pending"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "created_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-created"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": [
+          "date-updated"
+        ]
+      },
+      "schema": {
+        "is_nullable": true
+      },
+      "collection": "vendors"
+    }
+  ]
+}

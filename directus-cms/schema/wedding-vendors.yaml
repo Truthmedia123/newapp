@@ -1,0 +1,639 @@
+# Wedding Vendor Management Schema
+# This file defines the collections and fields for the wedding vendor directory
+
+name: Wedding Vendor Management
+version: 1.0
+collections:
+  - collection: vendor_categories
+    meta:
+      icon: category
+      color: pink
+      note: Types of wedding vendors
+      sort_field: sort
+      archive_field: status
+      archive_value: archived
+      unarchive_value: draft
+      archive_app_filter: true
+    schema:
+      name: vendor_categories
+      comment: Vendor Categories
+
+  - collection: vendors
+    meta:
+      icon: store
+      color: blue
+      note: Wedding vendor listings
+      sort_field: sort
+      archive_field: status
+      archive_value: archived
+      unarchive_value: draft
+      archive_app_filter: true
+    schema:
+      name: vendors
+      comment: Wedding Vendors
+
+  - collection: vendor_packages
+    meta:
+      icon: local_offer
+      color: green
+      note: Service packages offered by vendors
+      sort_field: sort
+    schema:
+      name: vendor_packages
+      comment: Vendor Packages
+
+  - collection: vendor_reviews
+    meta:
+      icon: star
+      color: yellow
+      note: Customer reviews for vendors
+      sort_field: date_created
+    schema:
+      name: vendor_reviews
+      comment: Vendor Reviews
+
+  - collection: vendor_bookings
+    meta:
+      icon: event
+      color: purple
+      note: Booking requests for vendor services
+      sort_field: event_date
+    schema:
+      name: vendor_bookings
+      comment: Vendor Bookings
+
+  - collection: wedding_events
+    meta:
+      icon: celebration
+      color: red
+      note: Wedding events and schedules
+      sort_field: date
+    schema:
+      name: wedding_events
+      comment: Wedding Events
+
+fields:
+  # Vendor Categories Fields
+  - collection: vendor_categories
+    field: name
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: title
+      width: full
+    schema:
+      is_nullable: false
+      is_unique: true
+
+  - collection: vendor_categories
+    field: slug
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: link
+      width: half
+    schema:
+      is_nullable: false
+      is_unique: true
+
+  - collection: vendor_categories
+    field: description
+    type: text
+    meta:
+      interface: input-multiline
+      width: full
+
+  - collection: vendor_categories
+    field: icon
+    type: string
+    meta:
+      interface: select-icon
+      width: half
+
+  - collection: vendor_categories
+    field: color
+    type: string
+    meta:
+      interface: select-color
+      width: half
+
+  - collection: vendor_categories
+    field: sort
+    type: integer
+    meta:
+      interface: input
+      hidden: true
+
+  - collection: vendor_categories
+    field: status
+    type: string
+    meta:
+      interface: select-dropdown
+      options:
+        choices:
+          - text: Published
+            value: published
+          - text: Draft
+            value: draft
+          - text: Archived
+            value: archived
+      width: half
+    schema:
+      default_value: draft
+
+  # Vendors Fields
+  - collection: vendors
+    field: name
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: title
+      width: full
+    schema:
+      is_nullable: false
+
+  - collection: vendors
+    field: slug
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: link
+      width: half
+    schema:
+      is_nullable: false
+      is_unique: true
+
+  - collection: vendors
+    field: category
+    type: integer
+    meta:
+      interface: select-dropdown-m2o
+      options:
+        template: "{{name}}"
+      width: half
+    schema:
+      foreign_key_table: vendor_categories
+      foreign_key_column: id
+
+  - collection: vendors
+    field: description
+    type: text
+    meta:
+      interface: input-rich-text-html
+      width: full
+
+  - collection: vendors
+    field: featured
+    type: boolean
+    meta:
+      interface: boolean
+      options:
+        label: Feature this vendor
+      width: half
+    schema:
+      default_value: false
+
+  - collection: vendors
+    field: verified
+    type: boolean
+    meta:
+      interface: boolean
+      options:
+        label: Verified vendor
+      width: half
+    schema:
+      default_value: false
+
+  - collection: vendors
+    field: rating
+    type: decimal
+    meta:
+      interface: rating
+      width: half
+    schema:
+      numeric_precision: 3
+      numeric_scale: 2
+
+  - collection: vendors
+    field: review_count
+    type: integer
+    meta:
+      interface: input
+      readonly: true
+      width: half
+    schema:
+      default_value: 0
+
+  - collection: vendors
+    field: contact_person
+    type: string
+    meta:
+      interface: input
+      width: full
+
+  - collection: vendors
+    field: phone
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: phone
+      width: half
+
+  - collection: vendors
+    field: email
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: email
+      width: half
+
+  - collection: vendors
+    field: website
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: link
+      width: half
+
+  - collection: vendors
+    field: address
+    type: text
+    meta:
+      interface: input-multiline
+      width: full
+
+  - collection: vendors
+    field: location
+    type: string
+    meta:
+      interface: input
+      width: full
+
+  - collection: vendors
+    field: latitude
+    type: decimal
+    meta:
+      interface: input
+      width: half
+    schema:
+      numeric_precision: 10
+      numeric_scale: 8
+
+  - collection: vendors
+    field: longitude
+    type: decimal
+    meta:
+      interface: input
+      width: half
+    schema:
+      numeric_precision: 11
+      numeric_scale: 8
+
+  - collection: vendors
+    field: price_range
+    type: string
+    meta:
+      interface: select-dropdown
+      options:
+        choices:
+          - text: Budget
+            value: budget
+          - text: Mid-Range
+            value: mid-range
+          - text: Luxury
+            value: luxury
+          - text: Premium
+            value: premium
+      width: half
+
+  - collection: vendors
+    field: services
+    type: json
+    meta:
+      interface: tags
+      width: full
+
+  - collection: vendors
+    field: profile_image
+    type: uuid
+    meta:
+      interface: file-image
+      width: half
+
+  - collection: vendors
+    field: gallery
+    type: json
+    meta:
+      interface: files
+      width: full
+
+  - collection: vendors
+    field: sort
+    type: integer
+    meta:
+      interface: input
+      hidden: true
+
+  - collection: vendors
+    field: status
+    type: string
+    meta:
+      interface: select-dropdown
+      options:
+        choices:
+          - text: Published
+            value: published
+          - text: Draft
+            value: draft
+          - text: Archived
+            value: archived
+      width: half
+    schema:
+      default_value: draft
+
+  # Vendor Packages Fields
+  - collection: vendor_packages
+    field: vendor
+    type: integer
+    meta:
+      interface: select-dropdown-m2o
+      options:
+        template: "{{name}}"
+      width: full
+    schema:
+      foreign_key_table: vendors
+      foreign_key_column: id
+
+  - collection: vendor_packages
+    field: name
+    type: string
+    meta:
+      interface: input
+      width: full
+    schema:
+      is_nullable: false
+
+  - collection: vendor_packages
+    field: description
+    type: text
+    meta:
+      interface: input-multiline
+      width: full
+
+  - collection: vendor_packages
+    field: price
+    type: decimal
+    meta:
+      interface: input
+      options:
+        prefix: ₹
+      width: half
+    schema:
+      numeric_precision: 10
+      numeric_scale: 2
+
+  - collection: vendor_packages
+    field: currency
+    type: string
+    meta:
+      interface: input
+      width: half
+    schema:
+      default_value: INR
+
+  - collection: vendor_packages
+    field: inclusions
+    type: json
+    meta:
+      interface: tags
+      width: full
+
+  - collection: vendor_packages
+    field: sort
+    type: integer
+    meta:
+      interface: input
+      hidden: true
+
+  # Vendor Reviews Fields
+  - collection: vendor_reviews
+    field: vendor
+    type: integer
+    meta:
+      interface: select-dropdown-m2o
+      options:
+        template: "{{name}}"
+      width: full
+    schema:
+      foreign_key_table: vendors
+      foreign_key_column: id
+
+  - collection: vendor_reviews
+    field: customer_name
+    type: string
+    meta:
+      interface: input
+      width: full
+    schema:
+      is_nullable: false
+
+  - collection: vendor_reviews
+    field: customer_email
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: email
+      width: full
+
+  - collection: vendor_reviews
+    field: rating
+    type: integer
+    meta:
+      interface: rating
+      width: half
+    schema:
+      is_nullable: false
+
+  - collection: vendor_reviews
+    field: review
+    type: text
+    meta:
+      interface: input-multiline
+      width: full
+    schema:
+      is_nullable: false
+
+  - collection: vendor_reviews
+    field: approved
+    type: boolean
+    meta:
+      interface: boolean
+      options:
+        label: Approved for display
+      width: half
+    schema:
+      default_value: false
+
+  # Vendor Bookings Fields
+  - collection: vendor_bookings
+    field: vendor
+    type: integer
+    meta:
+      interface: select-dropdown-m2o
+      options:
+        template: "{{name}}"
+      width: full
+    schema:
+      foreign_key_table: vendors
+      foreign_key_column: id
+
+  - collection: vendor_bookings
+    field: customer_name
+    type: string
+    meta:
+      interface: input
+      width: full
+    schema:
+      is_nullable: false
+
+  - collection: vendor_bookings
+    field: customer_email
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: email
+      width: half
+
+  - collection: vendor_bookings
+    field: customer_phone
+    type: string
+    meta:
+      interface: input
+      options:
+        iconLeft: phone
+      width: half
+
+  - collection: vendor_bookings
+    field: event_date
+    type: date
+    meta:
+      interface: datetime
+      width: half
+
+  - collection: vendor_bookings
+    field: event_type
+    type: string
+    meta:
+      interface: input
+      width: half
+
+  - collection: vendor_bookings
+    field: guest_count
+    type: integer
+    meta:
+      interface: input
+      width: half
+
+  - collection: vendor_bookings
+    field: package
+    type: integer
+    meta:
+      interface: select-dropdown-m2o
+      options:
+        template: "{{name}}"
+      width: half
+    schema:
+      foreign_key_table: vendor_packages
+      foreign_key_column: id
+
+  - collection: vendor_bookings
+    field: message
+    type: text
+    meta:
+      interface: input-multiline
+      width: full
+
+  - collection: vendor_bookings
+    field: status
+    type: string
+    meta:
+      interface: select-dropdown
+      options:
+        choices:
+          - text: Pending
+            value: pending
+          - text: Confirmed
+            value: confirmed
+          - text: Cancelled
+            value: cancelled
+      width: half
+    schema:
+      default_value: pending
+
+  # Wedding Events Fields
+  - collection: wedding_events
+    field: name
+    type: string
+    meta:
+      interface: input
+      width: full
+    schema:
+      is_nullable: false
+
+  - collection: wedding_events
+    field: description
+    type: text
+    meta:
+      interface: input-multiline
+      width: full
+
+  - collection: wedding_events
+    field: date
+    type: date
+    meta:
+      interface: datetime
+      width: half
+
+  - collection: wedding_events
+    field: start_time
+    type: time
+    meta:
+      interface: datetime
+      width: half
+
+  - collection: wedding_events
+    field: end_time
+    type: time
+    meta:
+      interface: datetime
+      width: half
+
+  - collection: wedding_events
+    field: venue
+    type: string
+    meta:
+      interface: input
+      width: full
+
+  - collection: wedding_events
+    field: address
+    type: text
+    meta:
+      interface: input-multiline
+      width: full
+
+  - collection: wedding_events
+    field: sort
+    type: integer
+    meta:
+      interface: input
+      hidden: true

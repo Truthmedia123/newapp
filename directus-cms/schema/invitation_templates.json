@@ -1,0 +1,185 @@
+{
+  "collection": "invitation_templates",
+  "meta": {
+    "icon": "card_giftcard",
+    "color": "purple",
+    "note": "Wedding invitation templates",
+    "sort_field": "sort",
+    "archive_field": "status",
+    "archive_value": "archived",
+    "unarchive_value": "published",
+    "archive_app_filter": true
+  },
+  "schema": {
+    "name": "invitation_templates",
+    "comment": "Invitation Templates"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": ["uuid"]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "name",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "title"
+        },
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "description",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full"
+      }
+    },
+    {
+      "field": "preview_image",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      }
+    },
+    {
+      "field": "template_file",
+      "type": "json",
+      "meta": {
+        "interface": "input-code",
+        "options": {
+          "language": "json"
+        },
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "{}"
+      }
+    },
+    {
+      "field": "category",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Traditional",
+              "value": "traditional"
+            },
+            {
+              "text": "Modern",
+              "value": "modern"
+            },
+            {
+              "text": "Beach",
+              "value": "beach"
+            },
+            {
+              "text": "Destination",
+              "value": "destination"
+            }
+          ]
+        },
+        "width": "half"
+      }
+    },
+    {
+      "field": "tags",
+      "type": "json",
+      "meta": {
+        "interface": "tags",
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "[]"
+      }
+    },
+    {
+      "field": "featured",
+      "type": "boolean",
+      "meta": {
+        "interface": "boolean",
+        "options": {
+          "label": "Feature this template"
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": false
+      }
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Published",
+              "value": "published"
+            },
+            {
+              "text": "Draft",
+              "value": "draft"
+            },
+            {
+              "text": "Archived",
+              "value": "archived"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": "draft"
+      }
+    },
+    {
+      "field": "created_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": ["date-created"]
+      },
+      "schema": {
+        "is_nullable": true
+      }
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": ["date-updated"]
+      },
+      "schema": {
+        "is_nullable": true
+      }
+    }
+  ]
+}

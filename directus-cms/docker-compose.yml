@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  directus:
+    build: .
+    ports:
+      - "8055:8055"
+    volumes:
+      - ./database:/directus/database
+      - ./uploads:/directus/uploads
+      - ./extensions:/directus/extensions
+    environment:
+      KEY: ${KEY}
+      SECRET: ${SECRET}
+      DB_CLIENT: ${DB_CLIENT}
+      DB_FILENAME: ${DB_FILENAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      PUBLIC_URL: ${PUBLIC_URL}
+    env_file:
+      - .env

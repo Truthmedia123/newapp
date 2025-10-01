@@ -1,0 +1,29 @@
+{
+  "name": "directus-extension-wedding-vendor-dashboard",
+  "version": "1.0.0",
+  "description": "Custom dashboard module for wedding vendor management in Directus",
+  "icon": "celebration",
+  "type": "module",
+  "directus:extension": {
+    "type": "module",
+    "path": "module.vue",
+    "source": "module.vue",
+    "host": "^9.0.0"
+  },
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "module",
+    "wedding",
+    "vendors"
+  ],
+  "author": "TheGoanWedding Team",
+  "license": "MIT",
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "latest"
+  }
+}

@@ -21,6 +21,9 @@ export default function Layout({ children }: LayoutProps) {
     { name: "Tools", href: "/tools" },
     { name: "Blog", href: "/blog" },
     { name: "Search", href: "/search" },
+    // Add links to new features
+    { name: "Invitations", href: "/invitations" },
+    { name: "Availability", href: "/vendor-availability" },
   ];
 
   console.log("Layout rendering navigation menu");

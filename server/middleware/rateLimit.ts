@@ -19,7 +19,7 @@ const defaultOptions: RateLimitOptions = {
 // In-memory store for rate limiting (in production, you might want to use Redis or D1)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-export const rateLimit = (options: RateLimitOptions = {}) => {
+export const apiRateLimit = (options: RateLimitOptions = {}) => {
   const config = { ...defaultOptions, ...options };
   
   return async (c: Context, next: () => Promise<void>) => {

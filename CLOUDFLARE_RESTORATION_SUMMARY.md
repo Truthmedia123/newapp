@@ -28,13 +28,23 @@ This document summarizes all the work completed to restore your Cloudflare setup
 - ✅ Updated `wrangler-worker.toml` with production environment
 - ✅ Created comprehensive documentation files
 - ✅ Created deployment and verification scripts
+- ✅ Added Cloudflare Pages configuration files for Git integration
 
 ### 5. Documentation
 - ✅ Created `CLOUDFLARE_RESTORE_GUIDE.md` with step-by-step instructions
 - ✅ Created `CLOUDFLARE_COMPLETE_SETUP.md` with full architecture overview
 - ✅ Updated `CLOUDFLARE_DEPLOYMENT_GUIDE.md` with current status
 - ✅ Created `CLOUDFLARE_RESTORE_COMPLETE.md` with completion summary
+- ✅ Created `GIT_DEPLOYMENT_ACTIVATION.md` with Git activation guide
 - ✅ Created verification and deployment scripts
+
+### 6. Git Integration
+- ✅ Committed all changes to git with descriptive commit messages
+- ✅ Pushed changes to GitHub repository
+- ✅ Deployed new build using latest git commit (c760bb3)
+- ✅ Latest deployment (0ca730b5) successfully created from new commit
+- ✅ Added configuration files for automatic Git deployments
+- ⚠️ **Automatic Git deployment NOT YET ACTIVE** (requires manual setup)
 
 ## Manual Steps Required
 
@@ -52,7 +62,17 @@ In the Cloudflare dashboard:
    - `NODE_ENV` = `production`
    - `SITE_URL` = `https://weddingreplit.pages.dev`
 
-### 3. Custom Domain (Optional)
+### 3. Git Integration for Automatic Deployments
+In the Cloudflare dashboard:
+1. Go to Pages > weddingreplit > Settings > Build & deploy
+2. Under "Git repository", click "Connect to Git"
+3. Connect your GitHub account and select the `Truthmedia123/newapp` repository
+4. Set the production branch to `main`
+5. Configure the build settings:
+   - Build command: `npm run build:production`
+   - Build output directory: `dist/public`
+
+### 4. Custom Domain (Optional)
 In the Cloudflare dashboard:
 1. Go to Pages > weddingreplit > Custom Domains
 2. Click "Add custom domain"
@@ -71,13 +91,14 @@ After completing the manual steps, verify:
 - [ ] Admin panel accessible (if configured)
 - [ ] All redirects working properly
 - [ ] Custom domain resolves correctly (if configured)
+- [ ] Git integration triggers automatic deployments
 
 ## Useful Commands
 
 For future maintenance:
 
 ```bash
-# Deploy frontend updates
+# Deploy frontend updates (manual deployment until Git integration is active)
 npm run build:production
 npx wrangler pages deploy dist/public --project-name=weddingreplit
 
@@ -101,7 +122,11 @@ npx wrangler pages deployment list --project-name=weddingreplit
 - `CLOUDFLARE_RESTORE_GUIDE.md` - Step-by-step restoration guide
 - `CLOUDFLARE_COMPLETE_SETUP.md` - Complete setup documentation
 - `CLOUDFLARE_RESTORE_COMPLETE.md` - Completion summary
+- `GIT_DEPLOYMENT_ACTIVATION.md` - Git activation guide
 - `functions/api/test-db.js` - Database test endpoint
+- `wrangler.json` - Cloudflare Pages configuration
+- `cloudflare.json` - Cloudflare configuration
+- `build.sh` - Build script for Cloudflare Pages
 
 ### Files Modified:
 - `client/src/main.tsx` - Fixed Hotjar integration
@@ -113,6 +138,8 @@ npx wrangler pages deployment list --project-name=weddingreplit
 
 Your Cloudflare setup has been successfully restored with the exception of the manual dashboard configuration steps. The frontend is deployed, the database is initialized with all required tables, and the API functions are in place. 
 
-Once you complete the database binding and environment variable configuration in the Cloudflare dashboard, your site should be fully functional at https://weddingreplit.pages.dev.
+The latest deployment (0ca730b5) has been created from your new git commit (c760bb3), and you've now set up the configuration files needed for automatic Git deployments. However, **automatic Git deployment is NOT YET ACTIVE** and requires manual setup through the Cloudflare dashboard.
+
+Once you complete all the manual steps in the Cloudflare dashboard, including the Git integration, your site should be fully functional at https://weddingreplit.pages.dev with automatic deployments enabled. Until then, you'll need to manually deploy using the `wrangler pages deploy` command.
 
 If you encounter any issues after completing the manual steps, refer to the troubleshooting sections in the documentation files or contact Cloudflare support for platform-specific issues.

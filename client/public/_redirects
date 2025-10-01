@@ -1,4 +1,7 @@
-# Netlify Identity routes - must come BEFORE the SPA fallback
-/.netlify/identity/*  /.netlify/identity/:splat  200
-/admin/*             /admin/index.html          200
-/*                   /index.html                200
+# Redirects for Cloudflare Pages
+
+# Admin redirect to Directus
+/admin  https://your-directus-instance.railway.app/admin  302
+
+# SPA fallback - must be last
+/*                    /index.html                200

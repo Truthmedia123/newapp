@@ -1,22 +1,19 @@
 {
-  "pages": {
-    "name": "weddingreplit",
-    "compatibility_date": "2025-09-03",
-    "build": {
-      "command": "npm run build:production",
-      "cwd": ".",
-      "output_dir": "dist/public"
-    },
-    "d1_databases": [
-      {
-        "binding": "DB",
-        "database_name": "wedding_platform_db",
-        "database_id": "eb586981-d322-4e17-a982-6397604e3fc4"
-      }
-    ],
-    "vars": {
-      "NODE_ENV": "production",
-      "SITE_URL": "https://weddingreplit.pages.dev"
+  "name": "weddingreplit",
+  "pages_build_output_dir": "dist/public",
+  "compatibility_date": "2025-09-17",
+  "vars": {
+    "NODE_ENV": "production",
+    "SITE_URL": "https://weddingreplit.pages.dev",
+    "USE_DIRECTUS": "true",
+    "DIRECTUS_URL": "https://your-directus-instance.railway.app",
+    "DIRECTUS_TOKEN": "your-admin-token"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wedding_platform_db",
+      "database_id": "eb586981-d322-4e17-a982-6397604e3fc4"
     }
-  }
+  ]
 }

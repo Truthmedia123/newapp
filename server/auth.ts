@@ -6,7 +6,7 @@ const ADMIN_TOKENS: Record<string, string> = {
   'content-editor': 'blog-only',
 };
 
-export function authenticateAdmin(action: 'vendors' | 'blog' | 'templates' | 'analytics') {
+export function authenticateAdmin(action: 'vendors' | 'blog' | 'templates' | 'analytics' | 'business' | 'contacts' | 'weddings') {
   return async (c: Context, next: () => Promise<void>) => {
     const token = c.req.header('x-admin-token') || '';
     const permissions = ADMIN_TOKENS[token];
@@ -17,7 +17,7 @@ export function authenticateAdmin(action: 'vendors' | 'blog' | 'templates' | 'an
     
     if (
       permissions === 'full-access' ||
-      (permissions === 'vendor-only' && action === 'vendors') ||
+      (permissions === 'vendor-only' && (action === 'vendors' || action === 'business' || action === 'contacts' || action === 'weddings')) ||
       (permissions === 'blog-only' && action === 'blog') ||
       (permissions === 'full-access' && (action === 'templates' || action === 'analytics'))
     ) {

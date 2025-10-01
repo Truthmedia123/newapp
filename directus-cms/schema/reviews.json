@@ -1,0 +1,168 @@
+{
+  "collection": "reviews",
+  "meta": {
+    "icon": "star",
+    "color": "yellow",
+    "note": "Customer reviews for vendors",
+    "sort_field": "date_created",
+    "archive_field": "status",
+    "archive_value": "archived",
+    "unarchive_value": "published",
+    "archive_app_filter": true
+  },
+  "schema": {
+    "name": "reviews",
+    "comment": "Vendor Reviews"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": ["uuid"]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "vendor",
+      "type": "integer",
+      "meta": {
+        "interface": "select-dropdown-m2o",
+        "options": {
+          "template": "{{name}}"
+        },
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "foreign_key_table": "vendors",
+        "foreign_key_column": "id",
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "customer_name",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "customer_email",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "email"
+        },
+        "width": "full"
+      },
+      "schema": {
+        "is_nullable": true
+      }
+    },
+    {
+      "field": "rating",
+      "type": "integer",
+      "meta": {
+        "interface": "rating",
+        "width": "half",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "review",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "approved",
+      "type": "boolean",
+      "meta": {
+        "interface": "boolean",
+        "options": {
+          "label": "Approved for display"
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": false
+      }
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Published",
+              "value": "published"
+            },
+            {
+              "text": "Draft",
+              "value": "draft"
+            },
+            {
+              "text": "Archived",
+              "value": "archived"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": "draft"
+      }
+    },
+    {
+      "field": "created_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": ["date-created"]
+      },
+      "schema": {
+        "is_nullable": true
+      }
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": ["date-updated"]
+      },
+      "schema": {
+        "is_nullable": true
+      }
+    }
+  ]
+}

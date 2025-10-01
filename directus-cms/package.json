@@ -1,0 +1,14 @@
+{
+  "name": "thegoanwedding-directus",
+  "scripts": {
+    "start": "directus start",
+    "bootstrap": "directus bootstrap",
+    "setup": "node setup.js",
+    "test-setup": "node test-setup.js",
+    "import-collections": "node import-collections.js"
+  },
+  "dependencies": {
+    "directus": "latest",
+    "@directus/sdk": "latest"
+  }
+}

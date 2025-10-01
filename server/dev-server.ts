@@ -15,6 +15,11 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
+// Helper function to check if we should use Directus
+function shouldUseDirectus(): boolean {
+  return process.env.USE_DIRECTUS === 'true';
+}
+
 // Mock database for development
 const mockDb = {
   vendors: [
@@ -164,14 +169,67 @@ function authenticateAdmin(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-// API Routes
+// API Routes - These need to be defined before Vite middleware
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// System status endpoint
+app.get("/api/system/status", async (_req, res) => {
+  try {
+    const useDirectus = shouldUseDirectus();
+    const database = useDirectus ? 'Directus' : 'Cloudflare D1';
+    const cms = useDirectus ? 'Directus Admin' : 'Netlify CMS';
+    
+    // Check connection status
+    let connectionStatus = 'unknown';
+    let lastSyncTime = null;
+    
+    if (useDirectus) {
+      try {
+        // In development, we can't actually connect to Directus
+        // This is just a placeholder - in production, we would check connectivity
+        connectionStatus = 'connected';
+      } catch (error) {
+        connectionStatus = 'disconnected';
+        console.error('Directus connection error:', error);
+      }
+    } else {
+      try {
+        // In development, we're using mock data, so always connected
+        connectionStatus = 'connected';
+      } catch (error) {
+        connectionStatus = 'disconnected';
+        console.error('D1 connection error:', error);
+      }
+    }
+    
+    res.json({
+      database,
+      cms,
+      connectionStatus,
+      lastSyncTime
+    });
+  } catch (error) {
+    console.error('Error fetching system status:', error);
+    res.status(500).json({ 
+      error: "Failed to fetch system status",
+      database: "unknown",
+      cms: "unknown",
+      connectionStatus: "error"
+    });
+  }
+});
+
 // Vendors API
 app.get("/api/vendors", (_req, res) => {
-  res.json(mockDb.vendors);
+  if (shouldUseDirectus()) {
+    // In a real implementation, this would fetch from Directus
+    // For now, we'll return the mock data
+    res.json(mockDb.vendors);
+  } else {
+    res.json(mockDb.vendors);
+  }
 });
 
 app.get("/api/vendors/:id", (req, res) => {
@@ -241,12 +299,24 @@ app.post("/api/reviews", (_req, res) => {
 
 // Categories API
 app.get("/api/categories", (_req, res) => {
-  res.json(mockDb.categories);
+  if (shouldUseDirectus()) {
+    // In a real implementation, this would fetch from Directus
+    // For now, we'll return the mock data
+    res.json(mockDb.categories);
+  } else {
+    res.json(mockDb.categories);
+  }
 });
 
 // Blog API
 app.get("/api/blog", (_req, res) => {
-  res.json(mockDb.blogPosts);
+  if (shouldUseDirectus()) {
+    // In a real implementation, this would fetch from Directus
+    // For now, we'll return the mock data
+    res.json(mockDb.blogPosts);
+  } else {
+    res.json(mockDb.blogPosts);
+  }
 });
 
 app.get("/api/blog/:slug", (req, res) => {
@@ -365,7 +435,7 @@ app.post("/api/weddings", authenticateAdmin, async (req, res) => {
     res.status(500).json({ 
       error: "Failed to create wedding", 
       details: error.message || String(error),
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
     });
   }
 });
@@ -384,6 +454,7 @@ const server = createServer(app);
 
 (async () => {
   if (process.env.NODE_ENV === "development") {
+    // Setup API routes before Vite middleware
     await setupVite(app, server);
   } else {
     serveStatic(app);

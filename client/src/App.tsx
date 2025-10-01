@@ -24,6 +24,13 @@ import NotFound from "@/pages/not-found";
 import FavoritesPage from "@/pages/Favorites";
 import HomeDebug from "@/pages/HomeDebug"; // Debug component
 
+// Import the new page components
+import InvitationsPage from "@/pages/Invitations";
+import EnhancedSearchPage from "@/pages/EnhancedSearchPage";
+import VendorAvailabilityPage from "@/pages/VendorAvailabilityPage";
+import TestImportsPage from "@/pages/TestImportsPage";
+import TestAllFeatures from "@/pages/TestAllFeatures";
+
 console.log("App module loaded");
 
 function Router() {
@@ -54,6 +61,12 @@ function Router() {
           <Route path="/admin" component={() => <div className="p-8"><h1 className="text-2xl">Admin Dashboard</h1><p>Token: admin-secret-2024</p></div>} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/favorites" component={FavoritesPage} />
+          // Add routes for the new components
+          <Route path="/invitations" component={InvitationsPage} />
+          <Route path="/enhanced-search" component={EnhancedSearchPage} />
+          <Route path="/vendor-availability" component={VendorAvailabilityPage} />
+          <Route path="/test-imports" component={TestImportsPage} />
+          <Route path="/test-all-features" component={TestAllFeatures} />
           <Route component={NotFound} />
         </Switch>
       </Layout>

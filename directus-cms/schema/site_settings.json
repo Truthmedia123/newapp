@@ -1,0 +1,201 @@
+{
+  "collection": "site_settings",
+  "meta": {
+    "icon": "settings",
+    "color": "gray",
+    "note": "Global site settings and configuration",
+    "singleton": true
+  },
+  "schema": {
+    "name": "site_settings",
+    "comment": "Site Settings"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": ["uuid"]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "site_name",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "title"
+        },
+        "width": "full"
+      }
+    },
+    {
+      "field": "logo",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      }
+    },
+    {
+      "field": "favicon",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      }
+    },
+    {
+      "field": "contact_info",
+      "type": "json",
+      "meta": {
+        "interface": "group-detail",
+        "options": {
+          "fields": [
+            "email",
+            "phone",
+            "address"
+          ]
+        },
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "{}"
+      },
+      "children": [
+        {
+          "field": "email",
+          "type": "string",
+          "meta": {
+            "interface": "input",
+            "options": {
+              "iconLeft": "email"
+            },
+            "width": "full"
+          }
+        },
+        {
+          "field": "phone",
+          "type": "string",
+          "meta": {
+            "interface": "input",
+            "options": {
+              "iconLeft": "phone"
+            },
+            "width": "half"
+          }
+        },
+        {
+          "field": "address",
+          "type": "text",
+          "meta": {
+            "interface": "input-multiline",
+            "width": "full"
+          }
+        }
+      ]
+    },
+    {
+      "field": "social_links",
+      "type": "json",
+      "meta": {
+        "interface": "group-detail",
+        "options": {
+          "fields": [
+            "facebook",
+            "instagram",
+            "twitter",
+            "linkedin"
+          ]
+        },
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "{}"
+      },
+      "children": [
+        {
+          "field": "facebook",
+          "type": "string",
+          "meta": {
+            "interface": "input",
+            "options": {
+              "iconLeft": "facebook"
+            },
+            "width": "half"
+          }
+        },
+        {
+          "field": "instagram",
+          "type": "string",
+          "meta": {
+            "interface": "input",
+            "options": {
+              "iconLeft": "instagram"
+            },
+            "width": "half"
+          }
+        },
+        {
+          "field": "twitter",
+          "type": "string",
+          "meta": {
+            "interface": "input",
+            "options": {
+              "iconLeft": "twitter"
+            },
+            "width": "half"
+          }
+        },
+        {
+          "field": "linkedin",
+          "type": "string",
+          "meta": {
+            "interface": "input",
+            "options": {
+              "iconLeft": "linkedin"
+            },
+            "width": "half"
+          }
+        }
+      ]
+    },
+    {
+      "field": "google_analytics_id",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "half"
+      }
+    },
+    {
+      "field": "google_ads_id",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "half"
+      }
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": ["date-updated"]
+      },
+      "schema": {
+        "is_nullable": true
+      }
+    }
+  ]
+}

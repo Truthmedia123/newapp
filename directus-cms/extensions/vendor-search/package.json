@@ -1,0 +1,30 @@
+{
+  "name": "directus-extension-vendor-search",
+  "version": "1.0.0",
+  "description": "Custom API endpoint for advanced wedding vendor search",
+  "icon": "search",
+  "type": "module",
+  "directus:extension": {
+    "type": "endpoint",
+    "path": "endpoint.js",
+    "source": "endpoint.js",
+    "host": "^9.0.0"
+  },
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "endpoint",
+    "wedding",
+    "vendors",
+    "search"
+  ],
+  "author": "TheGoanWedding Team",
+  "license": "MIT",
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "latest"
+  }
+}

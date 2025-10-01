@@ -1,0 +1,46 @@
+# Directus CMS - Git Ignore File
+
+# Database files
+data.db
+data.db.*
+*.db
+*.db.*
+
+# Uploads directory
+uploads/
+
+# Environment variables (keep .env.example but not .env)
+.env
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Node modules
+node_modules/
+
+# Directus cache
+.cache/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Directus extensions (if installed locally)
+extensions/*/node_modules/

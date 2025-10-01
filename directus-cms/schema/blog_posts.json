@@ -1,0 +1,189 @@
+{
+  "collection": "blog_posts",
+  "meta": {
+    "icon": "article",
+    "color": "green",
+    "note": "Wedding blog posts and articles",
+    "sort_field": "published_date",
+    "archive_field": "status",
+    "archive_value": "archived",
+    "unarchive_value": "published",
+    "archive_app_filter": true
+  },
+  "schema": {
+    "name": "blog_posts",
+    "comment": "Blog Posts"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "integer",
+      "meta": {
+        "hidden": true,
+        "readonly": true,
+        "interface": "input",
+        "special": ["uuid"]
+      },
+      "schema": {
+        "is_primary_key": true,
+        "has_auto_increment": true,
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "title",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "title"
+        },
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "slug",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "options": {
+          "iconLeft": "link"
+        },
+        "width": "half",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false,
+        "is_unique": true
+      }
+    },
+    {
+      "field": "content",
+      "type": "text",
+      "meta": {
+        "interface": "input-rich-text-html",
+        "width": "full",
+        "required": true
+      },
+      "schema": {
+        "is_nullable": false
+      }
+    },
+    {
+      "field": "excerpt",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full"
+      }
+    },
+    {
+      "field": "featured_image",
+      "type": "uuid",
+      "meta": {
+        "interface": "file-image",
+        "width": "half"
+      }
+    },
+    {
+      "field": "author",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "half"
+      }
+    },
+    {
+      "field": "published_date",
+      "type": "date",
+      "meta": {
+        "interface": "datetime",
+        "width": "half"
+      }
+    },
+    {
+      "field": "seo_title",
+      "type": "string",
+      "meta": {
+        "interface": "input",
+        "width": "full"
+      }
+    },
+    {
+      "field": "seo_description",
+      "type": "text",
+      "meta": {
+        "interface": "input-multiline",
+        "width": "full"
+      }
+    },
+    {
+      "field": "tags",
+      "type": "json",
+      "meta": {
+        "interface": "tags",
+        "width": "full"
+      },
+      "schema": {
+        "default_value": "[]"
+      }
+    },
+    {
+      "field": "status",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "options": {
+          "choices": [
+            {
+              "text": "Published",
+              "value": "published"
+            },
+            {
+              "text": "Draft",
+              "value": "draft"
+            },
+            {
+              "text": "Archived",
+              "value": "archived"
+            }
+          ]
+        },
+        "width": "half"
+      },
+      "schema": {
+        "default_value": "draft"
+      }
+    },
+    {
+      "field": "created_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": ["date-created"]
+      },
+      "schema": {
+        "is_nullable": true
+      }
+    },
+    {
+      "field": "updated_at",
+      "type": "timestamp",
+      "meta": {
+        "interface": "datetime",
+        "readonly": true,
+        "width": "half",
+        "special": ["date-updated"]
+      },
+      "schema": {
+        "is_nullable": true
+      }
+    }
+  ]
+}

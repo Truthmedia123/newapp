@@ -1,0 +1,28 @@
+name = "thegoanwedding"
+type = "javascript"
+account_id = "your-account-id"
+workers_dev = false
+route = "thegoanwedding.com/*"
+zone_id = "your-zone-id"
+
+[vars]
+NODE_ENV = "production"
+DIRECTUS_URL = "https://directus.thegoanwedding.com"
+DIRECTUS_TOKEN = "your-directus-token"
+USE_DIRECTUS = "true"
+MEILISEARCH_HOST = "https://meilisearch.thegoanwedding.com"
+MEILISEARCH_API_KEY = "your-meilisearch-key"
+
+[build]
+command = "npm run build:production"
+
+[build.upload]
+format = "service-worker"
+
+[env.production]
+name = "thegoanwedding-production"
+route = "thegoanwedding.com/*"
+
+[env.staging]
+name = "thegoanwedding-staging"
+route = "staging.thegoanwedding.com/*"

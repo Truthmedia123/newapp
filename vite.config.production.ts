@@ -34,7 +34,6 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
           utils: ['lucide-react', 'clsx', 'tailwind-merge'],
-          analytics: ['@google-analytics/gtag'],
         },
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
@@ -69,11 +68,3 @@ export default defineConfig({
     ],
   },
 });
-
-
-
-
-
-
-
-
