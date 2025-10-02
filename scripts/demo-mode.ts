@@ -621,12 +621,17 @@ async function main() {
   console.log('🎉 TheGoanWedding Demo Mode');
   console.log('==========================\n');
   
-  // Check if demo mode is enabled
-  const demoMode = process.env.DEMO_MODE === 'true';
-  if (!demoMode) {
-    console.log('Demo mode is not enabled. Set DEMO_MODE=true in your environment variables to enable demo mode.');
+  // Check if this is a reset operation
+  const isReset = process.argv.includes('--reset');
+  
+  if (isReset) {
+    await resetDemoData();
+    console.log('\n✅ Demo data reset completed!');
     process.exit(0);
   }
+  
+  // Always run demo seeding when script is called directly
+  // This supports both demo:enable (with DEMO_MODE=true) and seed:demo (direct call)
 
   try {
     // Get existing categories
