@@ -14,6 +14,7 @@ import { Calculator, Users, Globe, Search, Sparkles, Smartphone, CreditCard, Mes
 
 export default function WeddingTools() {
   const [activeTab, setActiveTab] = useState('budget');
+  const [rsvpStatus, setRsvpStatus] = useState<'attending' | 'not-attending' | null>(null);
 
   const tools = [
     {
@@ -36,6 +37,17 @@ export default function WeddingTools() {
 
   const currentTool = tools.find(tool => tool.id === activeTab);
 
+  const handleRSVP = (status: 'attending' | 'not-attending') => {
+    setRsvpStatus(status);
+    // Add Umami tracking for RSVP click
+    if (typeof window !== 'undefined' && (window as any).umami) {
+      (window as any).umami('rsvp_click', { 
+        status: status,
+        wedding_id: 'goan_wedding_2024' // This would be dynamic in a real implementation
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-7xl mx-auto">
@@ -49,6 +61,50 @@ export default function WeddingTools() {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Comprehensive suite of tools to plan your perfect Goan wedding
           </p>
+        </div>
+
+        {/* RSVP Section */}
+        <div className="px-6 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center">Wedding RSVP</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              {rsvpStatus ? (
+                <div>
+                  <p className="text-lg mb-4">
+                    Thank you for your response! You have indicated that you will 
+                    <span className="font-semibold"> {rsvpStatus === 'attending' ? 'attend' : 'not attend'} </span>
+                    the wedding.
+                  </p>
+                  <Button 
+                    onClick={() => setRsvpStatus(null)}
+                    variant="outline"
+                  >
+                    Change Response
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-lg mb-4">Will you be attending our wedding?</p>
+                  <div className="flex justify-center gap-4">
+                    <Button 
+                      onClick={() => handleRSVP('attending')}
+                      className="bg-green-500 hover:bg-green-600"
+                    >
+                      Yes, I'll Attend
+                    </Button>
+                    <Button 
+                      onClick={() => handleRSVP('not-attending')}
+                      variant="outline"
+                    >
+                      No, I Can't Make It
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Tool Navigation Cards */}

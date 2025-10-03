@@ -169,14 +169,6 @@
       ]
     },
     {
-      "field": "google_analytics_id",
-      "type": "string",
-      "meta": {
-        "interface": "input",
-        "width": "half"
-      }
-    },
-    {
       "field": "google_ads_id",
       "type": "string",
       "meta": {

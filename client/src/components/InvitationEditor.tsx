@@ -261,6 +261,14 @@ const InvitationEditor: React.FC = () => {
         multiplier: 1
       });
 
+      // Add Umami tracking for invitation sent
+      if (typeof window !== 'undefined' && (window as any).umami) {
+        (window as any).umami('invitation_sent', { 
+          template_id: selectedTemplate?.id,
+          template_name: selectedTemplate?.name
+        });
+      }
+
       // In a real implementation, you would save this to Directus
       alert('Invitation saved successfully!');
       console.log('Canvas data:', canvasData);

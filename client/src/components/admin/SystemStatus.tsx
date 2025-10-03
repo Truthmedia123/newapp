@@ -16,14 +16,42 @@ const SystemStatus: React.FC = () => {
     const fetchSystemStatus = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/system/status');
-        if (!response.ok) {
-          throw new Error('Failed to fetch system status');
+        // Check if we're in a static environment (Cloudflare Pages)
+        // In static environments, API calls won't work, so we show a different status
+        if (typeof window !== 'undefined' && window.location.hostname.includes('localhost') && window.location.port === '8787') {
+          // We're in Cloudflare Pages dev server, API won't be available
+          setStatus({
+            database: 'Static Site (No Database)',
+            cms: 'Directus (External)',
+            connectionStatus: 'static',
+            lastSyncTime: null
+          });
+        } else {
+          // Try to fetch from API
+          const response = await fetch('/api/system/status');
+          if (!response.ok) {
+            throw new Error(`Failed to fetch system status: ${response.status} ${response.statusText}`);
+          }
+          
+          // Check content type to ensure we're getting JSON
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Received non-JSON response from server');
+          }
+          
+          const data = await response.json();
+          setStatus(data);
         }
-        const data = await response.json();
-        setStatus(data);
       } catch (err) {
+        console.error('Error fetching system status:', err);
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        // Set fallback status
+        setStatus({
+          database: 'Unknown (API Unavailable)',
+          cms: 'Directus (External)',
+          connectionStatus: 'disconnected',
+          lastSyncTime: null
+        });
       } finally {
         setLoading(false);
       }
@@ -43,7 +71,7 @@ const SystemStatus: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error && status === null) {
     return (
       <div className="p-4">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
@@ -65,11 +93,11 @@ const SystemStatus: React.FC = () => {
             Database Status
           </h3>
           <div className="flex items-center">
-            <div className={`w-3 h-3 rounded-full mr-2 ${status?.connectionStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <div className={`w-3 h-3 rounded-full mr-2 ${status?.connectionStatus === 'connected' ? 'bg-green-500' : status?.connectionStatus === 'static' ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
             <span>{status?.database}</span>
           </div>
           <div className="mt-2 text-sm text-gray-600">
-            Connection: {status?.connectionStatus}
+            Connection: {status?.connectionStatus === 'static' ? 'Static Site' : status?.connectionStatus}
           </div>
         </div>
         
@@ -83,7 +111,7 @@ const SystemStatus: React.FC = () => {
             <span>{status?.cms}</span>
           </div>
           <div className="mt-2 text-sm text-gray-600">
-            Status: Active
+            Status: {status?.connectionStatus === 'static' ? 'Access via Directus URL' : 'Active'}
           </div>
         </div>
         
@@ -97,7 +125,7 @@ const SystemStatus: React.FC = () => {
             <span>Cloudflare Pages</span>
           </div>
           <div className="mt-2 text-sm text-gray-600">
-            Environment: Production
+            Environment: {status?.connectionStatus === 'static' ? 'Static Preview' : 'Production'}
           </div>
         </div>
       </div>
@@ -123,6 +151,16 @@ const SystemStatus: React.FC = () => {
           </button>
         </div>
       </div>
+      
+      {status?.connectionStatus === 'static' && (
+        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-yellow-800">
+            <i className="fas fa-info-circle mr-2"></i>
+            You are viewing a static preview. API functionality is not available in this mode. 
+            For full functionality, run the development server with <code className="bg-gray-100 px-1 rounded">npm run dev</code>.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

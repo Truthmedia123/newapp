@@ -14,6 +14,7 @@ import { SocialShare } from "@/components/engagement/SocialShare";
 import NewsletterSignup from "@/components/engagement/NewsletterSignup";
 import { vendorJSONLD } from "@/utils/seoStructuredData";
 import { Helmet } from "react-helmet";
+import type { Review } from "@/lib/directus";
 
 // Extend window interface for social media SDKs
 declare global {
@@ -34,10 +35,8 @@ declare global {
 type Service = string;
 type GalleryImage = string;
 
-import type { Vendor, Review } from "@shared/schema";
-
-// Helper function to convert vendor data for JSON-LD
-const convertVendorForJSONLD = (vendor: Vendor): any => {
+// Update the convertVendorForJSONLD function to handle both field naming conventions
+const convertVendorForJSONLD = (vendor: any): any => {
   return {
     id: vendor.id,
     name: vendor.name || "",
@@ -48,10 +47,10 @@ const convertVendorForJSONLD = (vendor: Vendor): any => {
     website: vendor.website || undefined, // Convert null to undefined
     location: vendor.location || "",
     address: vendor.address || undefined, // Convert null to undefined
-    profileImage: vendor.profileImage || undefined, // Convert null to undefined
-    coverImage: vendor.coverImage || undefined, // Convert null to undefined
+    profileImage: vendor.profile_image_url || vendor.profileImage || undefined, // Convert null to undefined
+    coverImage: vendor.cover_image_url || vendor.coverImage || undefined, // Convert null to undefined
     rating: vendor.rating || 0,
-    reviewCount: vendor.reviewCount || 0,
+    reviewCount: vendor.reviewCount || vendor.reviews_count || 0,
     priceRange: vendor.priceRange || undefined, // Convert null to undefined
   };
 };
@@ -68,13 +67,35 @@ export default function VendorProfile() {
     comment: ""
   });
 
-  const { data: vendor, isLoading } = useQuery<Vendor>({
+  const { data: vendor, isLoading } = useQuery<any>({
     queryKey: [`/api/vendors/${id}`],
   });
+
+  // Add Umami tracking for vendor page views
+  useEffect(() => {
+    if (vendor && typeof window !== 'undefined' && (window as any).umami) {
+      (window as any).umami('vendor_page_view', { 
+        vendor_id: vendor.id,
+        vendor_name: vendor.name,
+        vendor_category: vendor.category
+      });
+    }
+  }, [vendor]);
 
   const { data: reviews } = useQuery<Review[]>({
     queryKey: [`/api/vendors/${id}/reviews`],
   });
+
+  // Add Umami tracking for vendor page views
+  useEffect(() => {
+    if (vendor && typeof window !== 'undefined' && (window as any).umami) {
+      (window as any).umami('vendor_page_view', { 
+        vendor_id: vendor.id,
+        vendor_name: vendor.name,
+        vendor_category: vendor.category
+      });
+    }
+  }, [vendor]);
 
   // Initialize social media embeds
   useEffect(() => {
@@ -139,12 +160,28 @@ export default function VendorProfile() {
 
   const handleWhatsApp = () => {
     if (!vendor) return;
+    // Add Umami tracking for contact vendor click
+    if (typeof window !== 'undefined' && (window as any).umami) {
+      (window as any).umami('contact_vendor_click', { 
+        vendor_id: vendor.id,
+        vendor_name: vendor.name,
+        contact_method: 'whatsapp'
+      });
+    }
     const message = encodeURIComponent(`Hi! I found your business ${vendor.name} on TheGoanWedding.com and would like to know more about your services.`);
     window.open(`https://wa.me/${vendor.whatsapp}?text=${message}`, '_blank');
   };
 
   const handleCall = () => {
     if (!vendor) return;
+    // Add Umami tracking for contact vendor click
+    if (typeof window !== 'undefined' && (window as any).umami) {
+      (window as any).umami('contact_vendor_click', { 
+        vendor_id: vendor.id,
+        vendor_name: vendor.name,
+        contact_method: 'phone'
+      });
+    }
     window.location.href = `tel:${vendor.phone}`;
   };
 
@@ -178,6 +215,27 @@ export default function VendorProfile() {
   // Convert vendor for JSON-LD
   const vendorForJSONLD = convertVendorForJSONLD(vendor);
 
+  // Determine image sources based on available fields
+  const coverImage = vendor.cover_image_url || vendor.coverImage || 
+    vendor.profile_image_url || vendor.profileImage ||
+    "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&h=800";
+
+  const profileImage = vendor.profile_image_url || vendor.profileImage || 
+    vendor.cover_image_url || vendor.coverImage ||
+    "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500";
+
+  // Determine gallery images based on available fields
+  let galleryImages: string[] = [];
+  if (vendor.gallery_image_urls && Array.isArray(vendor.gallery_image_urls)) {
+    galleryImages = vendor.gallery_image_urls;
+  } else if (vendor.gallery && typeof vendor.gallery === 'string') {
+    try {
+      galleryImages = JSON.parse(vendor.gallery);
+    } catch (e) {
+      galleryImages = [];
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Helmet>
@@ -191,7 +249,7 @@ export default function VendorProfile() {
       {/* Hero Section */}
       <section className="relative h-96">
         <img 
-          src={vendor.coverImage || vendor.profileImage || "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&h=800"} 
+          src={coverImage} 
           alt={vendor.name || "Vendor"}
           className="w-full h-full object-cover" 
         />
@@ -221,7 +279,7 @@ export default function VendorProfile() {
                       category: vendor.category || "",
                       location: vendor.location || "",
                       rating: vendor.rating || 0,
-                      profileImage: vendor.profileImage || ""
+                      profileImage: profileImage
                     }} 
                   />
                 </div>
@@ -243,7 +301,7 @@ export default function VendorProfile() {
             </Card>
 
             {/* Gallery */}
-            {vendor.gallery && (vendor.gallery as unknown as GalleryImage[]).length > 0 && (
+            {galleryImages.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Gallery</CardTitle>
@@ -251,12 +309,22 @@ export default function VendorProfile() {
                 <CardContent>
                   <Carousel className="w-full">
                     <CarouselContent>
-                      {(vendor.gallery as unknown as GalleryImage[]).map((image: GalleryImage, index: number) => (
+                      {galleryImages.map((image: string, index: number) => (
                         <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                           <img 
                             src={image} 
                             alt={`${vendor.name || "Vendor"} gallery ${index + 1}`}
-                            className="w-full h-64 object-cover rounded-lg" 
+                            className="w-full h-64 object-cover rounded-lg cursor-pointer" 
+                            onClick={() => {
+                              // Add Umami tracking for gallery image open
+                              if (typeof window !== 'undefined' && (window as any).umami) {
+                                (window as any).umami('gallery_image_open', { 
+                                  vendor_id: vendor.id,
+                                  vendor_name: vendor.name,
+                                  image_index: index
+                                });
+                              }
+                            }}
                           />
                         </CarouselItem>
                       ))}
@@ -440,7 +508,7 @@ export default function VendorProfile() {
                     <div key={review.id} className="border-b pb-4 last:border-b-0">
                       <div className="flex items-center justify-between mb-2">
                         <div>
-                          <h4 className="font-semibold">{review.customerName || "Anonymous"}</h4>
+                          <h4 className="font-semibold">{review.customer_name || "Anonymous"}</h4>
                           <div className="flex text-yellow-500">
                             {[...Array(review.rating || 0)].map((_, i) => (
                               <i key={i} className="fas fa-star text-sm"></i>
@@ -448,10 +516,10 @@ export default function VendorProfile() {
                           </div>
                         </div>
                         <span className="text-sm text-gray-500">
-                          {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ""}
+                          {review.created_at ? new Date(review.created_at).toLocaleDateString() : ""}
                         </span>
                       </div>
-                      <p className="text-gray-700">{review.comment || ""}</p>
+                      <p className="text-gray-700">{review.review || ""}</p>
                     </div>
                   ))}
                 </div>

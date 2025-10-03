@@ -8,6 +8,7 @@ This document summarizes the Directus CMS setup created for TheGoanWedding.com w
 directus-cms/
 ├── package.json              # Project dependencies and scripts
 ├── directus.config.js        # Directus configuration
+├── config.production.js      # Production configuration
 ├── .env                      # Environment variables (generated)
 ├── .env.example             # Example environment variables
 ├── .gitignore               # Git ignore rules
@@ -38,18 +39,22 @@ directus-cms/
 The following environment variables are configured in `.env`:
 - `KEY` - 32-character security key (generated)
 - `SECRET` - 32-character security secret (generated)
-- `DB_CLIENT` - Database client (sqlite3)
-- `DB_FILENAME` - Database filename (./data.db)
+- `DB_CLIENT` - Database client (postgresql)
+- `DB_HOST` - Database host
+- `DB_PORT` - Database port (5432)
+- `DB_DATABASE` - Database name
+- `DB_USER` - Database user
+- `DB_PASSWORD` - Database password
 - `ADMIN_EMAIL` - Admin user email (admin@thegoanwedding.com)
 - `ADMIN_PASSWORD` - Admin user password (SecurePassword123!)
-- `PUBLIC_URL` - Public URL (http://localhost:8055)
+- `PUBLIC_URL` - Public URL (https://cms.thegoanwedding.com)
 
 ### Directus Configuration
 The `directus.config.js` file includes:
-- Database configuration for SQLite
+- Database configuration for PostgreSQL
 - Server configuration (port 8055)
-- Storage configuration for local uploads
-- Email configuration (sendmail)
+- Storage configuration for local uploads only (no cloud storage)
+- Email configuration (smtp)
 - Custom collections for wedding vendor management:
   - Vendor Categories
   - Vendors
@@ -57,6 +62,17 @@ The `directus.config.js` file includes:
   - Vendor Reviews
   - Vendor Bookings
   - Wedding Events
+
+### Production Configuration
+The `config.production.js` file includes:
+- Database configuration for PostgreSQL
+- Cache configuration with Redis
+- Storage configuration for local uploads only
+- Security configuration
+- CORS configuration
+- Rate limiting
+- Email configuration
+- Websockets
 
 ## Setup Process
 
@@ -96,11 +112,11 @@ npm run setup
 
 ## Access Points
 
-- **Admin Dashboard**: http://localhost:8055/admin
-- **API Endpoint**: http://localhost:8055/items
-- **GraphQL Endpoint**: http://localhost:8055/graphql
-- **Custom Vendor Search**: http://localhost:8055/vendor-search
-- **Vendor Dashboard**: http://localhost:8055/admin/wedding-vendor-dashboard
+- **Admin Dashboard**: https://cms.thegoanwedding.com/admin
+- **API Endpoint**: https://cms.thegoanwedding.com/items
+- **GraphQL Endpoint**: https://cms.thegoanwedding.com/graphql
+- **Custom Vendor Search**: https://cms.thegoanwedding.com/vendor-search
+- **Vendor Dashboard**: https://cms.thegoanwedding.com/admin/wedding-vendor-dashboard
 
 ## Default Admin Credentials
 
@@ -125,7 +141,7 @@ The CMS includes the following collections optimized for wedding vendor manageme
    - Location
    - Services
    - Pricing
-   - Portfolio images
+   - Portfolio images (static URLs only)
    - Ratings
 
 3. **Vendor Packages**
@@ -199,42 +215,30 @@ Use the provided Dockerfile and docker-compose.yml:
 docker-compose up -d
 ```
 
-### Traditional Deployment
-1. Ensure Node.js v18+ is installed
-2. Set up a production database (PostgreSQL/MySQL recommended)
-3. Configure environment variables for production
-4. Run the application with a process manager (PM2, systemd, etc.)
+### Production Deployment
+For production deployment:
+1. Configure PostgreSQL database
+2. Configure Redis for caching
+3. Set up reverse proxy (Nginx) with SSL
+4. Configure environment variables in `config.production.js`
+5. Deploy using Docker or directly on server
 
 ## Security Considerations
 
-1. **Change default credentials** immediately after first login
-2. **Use strong passwords** for all user accounts
-3. **Configure HTTPS** for production deployments
-4. **Regular backups** of database and uploads
-5. **Update Directus** regularly to latest version
-6. **Restrict API access** using authentication and rate limiting
+1. **Admin Access**: Only administrators should have access to the CMS
+2. **API Keys**: Keep API keys secure and rotate regularly
+3. **Rate Limiting**: Enabled to prevent abuse
+4. **CORS**: Configured to only allow requests from the main website
+5. **HTTPS**: Always use HTTPS in production
+6. **Regular Updates**: Keep Directus updated to the latest version
 
-## Customization
+## Analytics Integration
 
-You can customize the CMS by:
-1. Modifying collections and fields through the admin interface
-2. Adding custom extensions
-3. Updating the directus.config.js file
-4. Creating custom endpoints
-5. Adding validation rules and hooks
+The platform uses Umami Analytics for privacy-focused tracking:
+- Vendor page views
+- Contact vendor clicks
+- Gallery image opens
+- RSVP clicks
+- Invitation sends
 
-## Troubleshooting
-
-Common issues and solutions:
-
-1. **Port already in use**: Change the PORT in .env
-2. **Permission errors**: Ensure proper file permissions for database and uploads
-3. **Database connection issues**: Verify DB_CLIENT and DB_FILENAME settings
-4. **Email not working**: Configure proper email settings for your environment
-5. **Extensions not loading**: Ensure extensions are built and server is restarted
-
-## Support Resources
-
-- [Directus Documentation](https://docs.directus.io)
-- [Directus GitHub Repository](https://github.com/directus/directus)
-- Project documentation in the main repository
+All analytics are self-hosted and no third-party tracking scripts are used.

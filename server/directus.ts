@@ -17,8 +17,9 @@ export interface Vendor {
     linkedin: string;
     twitter: string;
   };
-  images: any[];
-  featured_image: any;
+  profile_image_url: string;
+  cover_image_url: string;
+  gallery_image_urls: string[];
   rating: number;
   reviews_count: number;
   availability_calendar: any;
@@ -100,7 +101,6 @@ export interface SiteSettings {
     twitter: string;
     linkedin: string;
   };
-  google_analytics_id: string;
   google_ads_id: string;
   updated_at: string;
 }

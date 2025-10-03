@@ -110,7 +110,6 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       <link rel="manifest" href="/manifest.json" />
 
       {/* Preconnect to external domains */}
-      <link rel="preconnect" href="https://www.google-analytics.com" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 

@@ -44,6 +44,26 @@ A beautiful, modern wedding vendor directory platform specifically designed for 
 - **Sponsored Listings**: Premium vendor placement
 - **Affiliate Links**: Revenue sharing opportunities
 
+## 📊 Analytics
+
+The platform uses Umami Analytics for privacy-focused tracking of user interactions:
+
+### Tracked Events
+- **Vendor Page Views**: When users view vendor profiles
+- **Contact Vendor Clicks**: When users click to contact vendors via WhatsApp or phone
+- **Gallery Image Opens**: When users view gallery images
+- **RSVP Clicks**: When users respond to wedding invitations
+- **Invitation Sends**: When users create and save wedding invitations
+
+### Dashboard Access
+Admins can view analytics data by:
+1. Accessing the Umami dashboard at `https://umami.yourdomain.com`
+2. Logging in with admin credentials
+3. Viewing real-time data and historical reports
+4. Segmenting data by vendor, event, and action
+
+For detailed setup instructions, see [UMAMI_ANALYTICS_SETUP.md](UMAMI_ANALYTICS_SETUP.md).
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -116,6 +136,7 @@ weddingreplit/
 │   │   ├── utils/          # Utility functions
 │   │   └── App.tsx         # Main app component
 │   └── public/             # Static assets
+│       └── vendors/        # Vendor images (profile, cover, gallery)
 ├── server/                 # Backend server
 │   ├── worker.ts           # Cloudflare Worker
 │   ├── routes.ts           # API routes
@@ -126,6 +147,30 @@ weddingreplit/
 ├── scripts/                # Utility scripts
 └── public/                 # Static files for Pages
 ```
+
+## 🖼️ Vendor Image Management
+
+All vendor images are managed as static assets in the `/client/public/vendors/` directory:
+
+### Directory Structure
+```
+/client/public/vendors/
+├── vendor-slug/
+│   ├── profile.jpg         # Main profile image (800x600px)
+│   ├── cover.jpg           # Cover/banner image (1200x400px)
+│   └── gallery/            # Gallery images (1200x800px each)
+│       ├── image1.jpg
+│       ├── image2.jpg
+│       └── ...
+```
+
+### Image Workflow
+1. **Optimize Images**: Resize and compress images for web use
+2. **Organize**: Place images in vendor-specific directories
+3. **Reference**: Update vendor data in Directus with static image paths
+4. **Deploy**: Images are automatically served via Cloudflare CDN
+
+For detailed instructions, see [VENDOR_IMAGE_WORKFLOW.md](VENDOR_IMAGE_WORKFLOW.md).
 
 ## 🛠️ Available Scripts
 

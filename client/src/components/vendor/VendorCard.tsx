@@ -5,27 +5,47 @@ import { Badge } from "@/components/ui/badge";
 import type { Vendor } from "@shared/schema";
 
 interface VendorCardProps {
-  vendor: Vendor;
+  vendor: any; // Using any for now since we're mixing Directus and local schema
 }
 
 export default function VendorCard({ vendor }: VendorCardProps) {
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.preventDefault();
+    // Add Umami tracking for contact vendor click
+    if (typeof window !== 'undefined' && (window as any).umami) {
+      (window as any).umami('contact_vendor_click', { 
+        vendor_id: vendor.id,
+        vendor_name: vendor.name,
+        contact_method: 'whatsapp'
+      });
+    }
     const message = encodeURIComponent(`Hi! I found your business ${vendor.name} on TheGoanWedding.com and would like to know more about your services.`);
     window.open(`https://wa.me/${vendor.whatsapp}?text=${message}`, '_blank');
   };
 
   const handleCall = (e: React.MouseEvent) => {
     e.preventDefault();
+    // Add Umami tracking for contact vendor click
+    if (typeof window !== 'undefined' && (window as any).umami) {
+      (window as any).umami('contact_vendor_click', { 
+        vendor_id: vendor.id,
+        vendor_name: vendor.name,
+        contact_method: 'phone'
+      });
+    }
     window.location.href = `tel:${vendor.phone}`;
   };
+
+  // Determine the image source based on available fields
+  const profileImage = vendor.profile_image_url || vendor.profileImage || 
+    "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500";
 
   return (
     <Card className="group cursor-pointer hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 overflow-hidden bg-white border-0 rounded-2xl">
       <Link href={`/vendor/${vendor.id}`}>
         <div className="relative overflow-hidden">
           <img 
-            src={vendor.profileImage || "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"} 
+            src={profileImage} 
             alt={vendor.name}
             className="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-700" 
           />
@@ -47,7 +67,7 @@ export default function VendorCard({ vendor }: VendorCardProps) {
             <div className="flex items-center gap-1">
               <i className="fas fa-star text-yellow-500 text-sm"></i>
               <span className="text-sm font-semibold text-slate-800">{vendor.rating}</span>
-              <span className="text-xs text-gray-500">({vendor.reviewCount})</span>
+              <span className="text-xs text-gray-500">({vendor.reviewCount || vendor.reviews_count})</span>
             </div>
           </div>
         </div>
@@ -100,7 +120,19 @@ export default function VendorCard({ vendor }: VendorCardProps) {
         
         {/* View profile link */}
         <Link href={`/vendor/${vendor.id}`}>
-          <div className="mt-4 text-center text-sm text-gray-600 hover:text-red-600 transition-colors cursor-pointer">
+          <div 
+            className="mt-4 text-center text-sm text-gray-600 hover:text-red-600 transition-colors cursor-pointer"
+            onClick={() => {
+              // Add Umami tracking for vendor profile view
+              if (typeof window !== 'undefined' && (window as any).umami) {
+                (window as any).umami('vendor_page_view', { 
+                  vendor_id: vendor.id,
+                  vendor_name: vendor.name,
+                  vendor_category: vendor.category
+                });
+              }
+            }}
+          >
             View Full Profile <i className="fas fa-arrow-right ml-1"></i>
           </div>
         </Link>

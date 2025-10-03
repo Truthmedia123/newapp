@@ -100,7 +100,6 @@ export interface SiteSettings {
     twitter: string;
     linkedin: string;
   };
-  google_analytics_id: string;
   google_ads_id: string;
   updated_at: string;
 }

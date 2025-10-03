@@ -59,10 +59,20 @@ export default function Home() {
   useEffect(() => {
     if (vendorsError) {
       console.error("Vendors query error:", vendorsError);
+      console.error("Vendors error details:", {
+        name: vendorsError.name,
+        message: vendorsError.message,
+        stack: vendorsError.stack
+      });
     }
     
     if (blogError) {
       console.error("Blog query error:", blogError);
+      console.error("Blog error details:", {
+        name: blogError.name,
+        message: blogError.message,
+        stack: blogError.stack
+      });
     }
     
     console.log("Home component state:", { 
@@ -86,15 +96,37 @@ export default function Home() {
         <div className="text-center p-8 bg-white rounded-lg shadow-lg">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Data Loading Error</h1>
           <p className="text-gray-700 mb-4">There was an error loading the homepage data.</p>
-          {vendorsError && <p className="text-sm text-red-500 mb-2">Vendors Error: {vendorsError.message}</p>}
-          {blogError && <p className="text-sm text-red-500">Blog Error: {blogError.message}</p>
-}
-          <button 
-            className="mt-4 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
-            onClick={() => window.location.reload()}
-          >
-            Reload Page
-          </button>
+          {vendorsError && (
+            <div className="mb-2">
+              <p className="text-sm text-red-500 mb-1">Vendors Error: {vendorsError.message}</p>
+              <p className="text-xs text-gray-500">Check browser console for detailed error information</p>
+            </div>
+          )}
+          {blogError && (
+            <div>
+              <p className="text-sm text-red-500 mb-1">Blog Error: {blogError.message}</p>
+              <p className="text-xs text-gray-500">Check browser console for detailed error information</p>
+            </div>
+          )}
+          <div className="mt-4 flex flex-col gap-2">
+            <button 
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
+              onClick={() => window.location.reload()}
+            >
+              Reload Page
+            </button>
+            <button
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+              onClick={() => {
+                // Clear any cached data and retry
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.reload();
+              }}
+            >
+              Clear Cache and Reload
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -280,7 +312,7 @@ export default function Home() {
               <Link key={post.id} href={`/blog/${post.slug}`}>
                 <Card className="group cursor-pointer hover:shadow-2xl transition-all transform hover:-translate-y-2 overflow-hidden">
                   <img
-                    src={post.featuredImage || "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400"}
+                    src={post.featured_image || "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400"}
                     alt={post.title}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -293,7 +325,7 @@ export default function Home() {
                     </h3>
                     <p className="text-gray-600 mb-4">{post.excerpt}</p>
                     <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>{new Date(post.createdAt!).toLocaleDateString()}</span>
+                      <span>{new Date(post.published_date || post.created_at!).toLocaleDateString()}</span>
                       <span>5 min read</span>
                     </div>
                   </CardContent>

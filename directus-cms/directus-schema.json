@@ -1218,26 +1218,41 @@
       "collection": "vendors"
     },
     {
-      "field": "images",
-      "type": "alias",
+      "field": "profile_image_url",
+      "type": "string",
       "meta": {
-        "interface": "files",
+        "interface": "input",
         "options": {
-          "folder": null
+          "iconLeft": "image"
         },
         "width": "full",
-        "special": [
-          "files"
-        ]
+        "note": "Static URL to vendor profile image (e.g., /vendors/vendor-slug/profile.jpg)"
       },
       "collection": "vendors"
     },
     {
-      "field": "featured_image",
-      "type": "uuid",
+      "field": "cover_image_url",
+      "type": "string",
       "meta": {
-        "interface": "file-image",
-        "width": "half"
+        "interface": "input",
+        "options": {
+          "iconLeft": "image"
+        },
+        "width": "full",
+        "note": "Static URL to vendor cover image (e.g., /vendors/vendor-slug/cover.jpg)"
+      },
+      "collection": "vendors"
+    },
+    {
+      "field": "gallery_image_urls",
+      "type": "json",
+      "meta": {
+        "interface": "tags",
+        "width": "full",
+        "note": "Array of static URLs to vendor gallery images"
+      },
+      "schema": {
+        "default_value": "[]"
       },
       "collection": "vendors"
     },

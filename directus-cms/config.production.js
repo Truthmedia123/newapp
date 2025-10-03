@@ -13,13 +13,10 @@ module.exports = {
   CACHE_REDIS: 'redis://your-redis-host:6379',
   CACHE_AUTO_PURGE: true,
 
-  // Storage configuration
-  STORAGE_LOCATIONS: 's3',
-  STORAGE_S3_DRIVER: 's3',
-  STORAGE_S3_KEY: 'your-s3-key',
-  STORAGE_S3_SECRET: 'your-s3-secret',
-  STORAGE_S3_BUCKET: 'thegoanwedding-assets',
-  STORAGE_S3_REGION: 'ap-south-1',
+  // Storage configuration (using local storage only)
+  STORAGE_LOCATIONS: 'local',
+  STORAGE_LOCAL_DRIVER: 'local',
+  STORAGE_LOCAL_ROOT: './uploads',
 
   // Security configuration
   KEY: 'your-directus-key',

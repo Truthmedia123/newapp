@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface AnalyticsEvent {
   action: string;
@@ -11,69 +11,30 @@ interface AnalyticsProps {
   trackingId?: string;
 }
 
-export const Analytics: React.FC<AnalyticsProps> = ({ trackingId = 'GA_MEASUREMENT_ID' }) => {
-  useEffect(() => {
-    // Initialize Google Analytics
-    if (typeof window !== 'undefined' && trackingId) {
-      // Load Google Analytics script
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${trackingId}`;
-      document.head.appendChild(script);
-
-      // Initialize gtag
-      window.dataLayer = window.dataLayer || [];
-      function gtag(...args: any[]) {
-        window.dataLayer.push(args);
-      }
-      window.gtag = gtag;
-
-      gtag('js', new Date());
-      gtag('config', trackingId, {
-        page_title: document.title,
-        page_location: window.location.href,
-      });
-    }
-  }, [trackingId]);
-
+export const Analytics: React.FC<AnalyticsProps> = () => {
+  // Umami analytics is loaded via script in index.html
   return null;
 };
 
-// Analytics utility functions
-export const trackEvent = (event: AnalyticsEvent) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', event.action, {
-      event_category: event.category,
-      event_label: event.label,
-      value: event.value,
-    });
+// Analytics utility functions for Umami
+export const trackEvent = (eventName: string, data?: Record<string, any>) => {
+  if (typeof window !== 'undefined' && (window as any).umami) {
+    (window as any).umami(eventName, data);
   }
 };
 
-export const trackPageView = (pagePath: string, pageTitle?: string) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', 'GA_MEASUREMENT_ID', {
-      page_path: pagePath,
-      page_title: pageTitle || document.title,
-    });
+export const trackPageView = (url: string, referrer?: string) => {
+  if (typeof window !== 'undefined' && (window as any).umami) {
+    (window as any).umami('pageview', { url, referrer });
   }
 };
 
 export const trackUserInteraction = (element: string, action: string) => {
-  trackEvent({
-    action,
-    category: 'User Interaction',
-    label: element,
-  });
+  trackEvent('user_interaction', { element, action });
 };
 
 export const trackPerformance = (metric: string, value: number) => {
-  trackEvent({
-    action: 'performance_metric',
-    category: 'Performance',
-    label: metric,
-    value,
-  });
+  trackEvent('performance_metric', { metric, value });
 };
 
 // Custom hook for analytics
@@ -87,28 +48,15 @@ export const useAnalytics = () => {
   };
 
   const trackSearch = (query: string, results: number) => {
-    trackEvent({
-      action: 'search',
-      category: 'Search',
-      label: query,
-      value: results,
-    });
+    trackEvent('search', { query, results });
   };
 
   const trackVendorView = (vendorId: string, vendorName: string) => {
-    trackEvent({
-      action: 'vendor_view',
-      category: 'Vendor',
-      label: vendorName,
-    });
+    trackEvent('vendor_view', { vendorId, vendorName });
   };
 
   const trackWishlistAction = (action: 'add' | 'remove', vendorId: string) => {
-    trackEvent({
-      action: `wishlist_${action}`,
-      category: 'Wishlist',
-      label: vendorId,
-    });
+    trackEvent(`wishlist_${action}`, { vendorId });
   };
 
   return {
@@ -120,10 +68,9 @@ export const useAnalytics = () => {
   };
 };
 
-// Extend Window interface for gtag
+// Extend Window interface for umami
 declare global {
   interface Window {
-    dataLayer: any[];
-    gtag: (...args: any[]) => void;
+    umami: (...args: any[]) => void;
   }
 }
