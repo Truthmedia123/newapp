@@ -23,7 +23,7 @@ A beautiful, modern wedding vendor directory platform specifically designed for 
 - **Dark Mode**: Automatic theme switching
 
 ### 🔧 Admin Features
-- **CMS Integration**: Netlify CMS for content management
+- **CMS Integration**: Directus CMS for content management
 - **Vendor Management**: Import/export vendor data with social media fields
 - **Analytics Dashboard**: Performance metrics and user insights
 - **Security Features**: Anti-copy protection, security headers
@@ -121,8 +121,6 @@ weddingreplit/
 │   ├── routes.ts           # API routes
 │   ├── middleware/         # Rate limiting and caching
 │   └── dev-server.ts       # Express dev server
-├── functions/              # Cloudflare Pages Functions
-│   └── api/                # API endpoints
 ├── shared/                 # Shared schemas and types
 ├── migrations/             # Database migrations
 ├── scripts/                # Utility scripts
@@ -141,6 +139,8 @@ npm run pages:dev        # Start Cloudflare Pages dev server (port 8787) - Stati
 ```bash
 cd client && npm run dev  # Start Vite dev server (port 3000) with API proxy to Express server
 ```
+
+### Database
 ```bash
 npm run db:push          # Push schema changes to database
 npm run db:seed          # Seed database with initial data
@@ -181,7 +181,6 @@ For more detailed information about the project, please refer to the following d
 - [Project Improvements Summary](IMPROVEMENTS_SUMMARY.md) - Summary of all improvements made to the project
 - [Quick Start Guide](QUICK_START.md) - Simplified guide for getting started with the project
 - [Cloudflare Deployment Fixes](CLOUDFLARE_DEPLOYMENT_FIXES.md) - Information about fixing Cloudflare deployment issues
-- [Netlify Setup Guide](NETLIFY_SETUP.md) - Instructions for setting up Netlify CMS
 
 ## 🏖️ Goan Wedding Features
 
@@ -206,7 +205,7 @@ The platform uses a Goan wedding color scheme:
 ### Adding New Vendors
 1. Use the admin dashboard: `/admin/dashboard?token=admin-secret-2024`
 2. Import CSV file with vendor data (including social media fields)
-3. Or use Netlify CMS for content management
+3. Or use Directus CMS for content management
 
 ## 🔧 Configuration
 
@@ -231,12 +230,11 @@ The backend API is deployed to Cloudflare Workers using:
 npm run deploy:production
 ```
 
-### Netlify CMS Deployment
-The content management system is configured for Netlify deployment:
-1. Set up a Netlify site connected to your repository
-2. Enable Identity and Git Gateway in the Netlify dashboard
-3. Access the CMS at `/admin` on your deployed site
-4. Refer to [NETLIFY_SETUP.md](NETLIFY_SETUP.md) for detailed instructions
+### Directus CMS Deployment
+The content management system is configured for Directus deployment:
+1. Set up a Directus instance connected to your database
+2. Access the CMS at `/admin` on your deployed site
+3. Configure collections and permissions as needed
 
 ### Custom Domain Setup
 To connect your custom domain:

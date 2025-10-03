@@ -1,9 +1,11 @@
 import { QueryClient } from "@tanstack/react-query";
-import type { QueryFunction } from "@tanstack/react-query";
+import { getVendors, getFeaturedVendors, getCategories, getRecentBlogPosts } from "./directus";
+import type { QueryFunctionContext } from "@tanstack/react-query";
+import type { Vendor, BlogPost } from "@shared/schema";
 
 console.log("queryClient module loaded");
 
-async function throwIfResNotOk(res: Response) {
+export async function throwIfResNotOk(res: Response) {
   console.log("Checking response status:", res.status, res.statusText);
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -13,52 +15,34 @@ async function throwIfResNotOk(res: Response) {
   return res;
 }
 
-export async function apiRequest(
-  method: string,
-  url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
-  console.log("Making API request:", method, url);
-  try {
-    const res = await fetch(url, {
-      method,
-      headers: data ? { "Content-Type": "application/json" } : {},
-      body: data ? JSON.stringify(data) : undefined,
-      credentials: "include",
-    });
-
-    await throwIfResNotOk(res);
-    console.log("API request successful:", method, url);
-    return res;
-  } catch (error) {
-    console.error("API request failed:", method, url, error);
-    throw error;
-  }
-}
-
 type UnauthorizedBehavior = "returnNull" | "throw";
+
+// Updated query function to use Directus SDK
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
-}) => QueryFunction<T> =
-  ({ on401: unauthorizedBehavior }) =>
-  async ({ queryKey }: { queryKey: string[] }) => {
+}) => (context: QueryFunctionContext) => Promise<T> =
+  <T>(options: { on401: UnauthorizedBehavior }) =>
+  async ({ queryKey }: QueryFunctionContext) => {
     try {
       console.log("Fetching data for queryKey:", queryKey);
-      const res = await fetch(queryKey[0] as string, {
-        credentials: "include",
-      });
-
-      console.log(`API request to ${queryKey[0]} returned status:`, res.status);
-
-      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        console.log("Returning null for 401 response");
-        return null as any;
+      
+      // Map query keys to Directus API calls
+      switch (queryKey[0]) {
+        case "/api/vendors/featured":
+          const featuredVendors = await getFeaturedVendors(6);
+          console.log("Directus featured vendors:", featuredVendors);
+          return featuredVendors as unknown as T;
+          
+        case "/api/blog":
+          const blogPosts = await getRecentBlogPosts(5);
+          console.log("Directus blog posts:", blogPosts);
+          return blogPosts as unknown as T;
+          
+        default:
+          // For other endpoints, we'll need to implement specific handlers
+          // For now, we'll throw an error to identify unhandled cases
+          throw new Error(`Unhandled query key: ${queryKey[0]}`);
       }
-
-      await throwIfResNotOk(res);
-      const data = await res.json();
-      console.log(`API request to ${queryKey[0]} returned data:`, data);
-      return data;
     } catch (error) {
       console.error(`Error fetching from ${queryKey[0]}:`, error);
       // Re-throw the error so the UI can handle it properly

@@ -8,6 +8,10 @@
  */
 
 import { createDirectus, rest, staticToken, createItem, createItems } from '@directus/sdk';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: '../.env.development' });
 
 // Define interfaces for Directus collections
 interface Vendor {

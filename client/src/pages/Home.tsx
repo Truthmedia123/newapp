@@ -35,11 +35,11 @@ console.log("Home module loaded");
 export default function Home() {
   console.log("Home component rendering");
   
-  const { data: featuredVendors, error: vendorsError, isLoading: vendorsLoading } = useQuery<Vendor[]>({
+  const { data: featuredVendors, error: vendorsError, isLoading: vendorsLoading, isError: vendorsIsError } = useQuery<Vendor[]>({
     queryKey: ["/api/vendors/featured"],
   });
 
-  const { data: blogPosts, error: blogError, isLoading: blogLoading } = useQuery<BlogPost[]>({
+  const { data: blogPosts, error: blogError, isLoading: blogLoading, isError: blogIsError } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
   });
 
@@ -56,15 +56,49 @@ export default function Home() {
   }, []);
 
   // Log any errors
-  if (vendorsError) {
-    console.error("Vendors query error:", vendorsError);
-  }
-  
-  if (blogError) {
-    console.error("Blog query error:", blogError);
-  }
+  useEffect(() => {
+    if (vendorsError) {
+      console.error("Vendors query error:", vendorsError);
+    }
+    
+    if (blogError) {
+      console.error("Blog query error:", blogError);
+    }
+    
+    console.log("Home component state:", { 
+      featuredVendors, 
+      vendorsLoading, 
+      vendorsIsError,
+      vendorsError,
+      blogPosts, 
+      blogLoading,
+      blogIsError,
+      blogError
+    });
+  }, [featuredVendors, vendorsLoading, vendorsIsError, vendorsError, blogPosts, blogLoading, blogIsError, blogError]);
 
   console.log("Home component rendering with data:", { featuredVendors, blogPosts, vendorsLoading, blogLoading });
+
+  // Show error state
+  if (vendorsIsError || blogIsError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Data Loading Error</h1>
+          <p className="text-gray-700 mb-4">There was an error loading the homepage data.</p>
+          {vendorsError && <p className="text-sm text-red-500 mb-2">Vendors Error: {vendorsError.message}</p>}
+          {blogError && <p className="text-sm text-red-500">Blog Error: {blogError.message}</p>
+}
+          <button 
+            className="mt-4 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
+            onClick={() => window.location.reload()}
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
