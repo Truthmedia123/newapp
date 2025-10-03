@@ -62,9 +62,10 @@ This will start the development server on http://127.0.0.1:8787
 The application uses the following redirect rules to support client-side routing:
 
 ```
-# Netlify Identity routes
-/.netlify/identity/*  /.netlify/identity/:splat  200
-/admin/*              /admin/index.html          200
+# Admin redirect to Directus
+/admin  https://your-directus-instance.railway.app/admin  302
+
+# SPA fallback - must be last
 /*                    /index.html                200
 ```
 

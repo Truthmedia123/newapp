@@ -87,7 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial vendor directory platform
 - Goan wedding-specific features
 - Admin dashboard for vendor management
-- Netlify CMS integration
+- Directus CMS integration
 - PWA support
 - Basic SEO optimization
 - Responsive design

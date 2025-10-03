@@ -1,63 +1,50 @@
-# Complete Cloudflare Setup for TheGoanWedding.com
+# Complete Cloudflare Setup Guide
 
-This document provides a complete overview of your Cloudflare setup for TheGoanWedding.com wedding vendor directory website.
+This document provides a comprehensive guide for setting up the wedding platform on Cloudflare with full Directus CMS integration.
 
-## Architecture Overview
+## Prerequisites
 
-Your application uses a modern architecture with:
+1. Cloudflare account with Workers and Pages enabled
+2. GitHub account for deployment
+3. Node.js 18+ installed locally
+4. Wrangler CLI installed (`npm install -g wrangler`)
 
-1. **Cloudflare Pages** - For hosting the frontend React application
-2. **Cloudflare Workers** - For backend API endpoints
-3. **Cloudflare D1** - As the database layer
-4. **Cloudflare Workers KV** - For caching (if used)
+## Environment Configuration
 
-## Components
+### Development Environment
+Create a `.env.development` file:
+```bash
+DIRECTUS_URL=http://localhost:8055
+DIRECTUS_TOKEN=your_admin_token
+DATABASE_URL=your_local_database_url
+SITE_URL=http://localhost:8787
+```
 
-### 1. Cloudflare Pages (Frontend)
+### Production Environment
+Set the following environment variables in Cloudflare:
+- `DIRECTUS_URL`: Your Directus instance URL
+- `DIRECTUS_TOKEN`: Admin token for Directus API access
+- `SITE_URL`: Your deployed site URL
 
-- **Project Name**: `weddingreplit`
-- **Build Output Directory**: `dist/public`
-- **Production Branch**: `main`
-- **Custom Domain**: `thegoanwedding.com` (when configured)
-- **Deployment URL**: `https://weddingreplit.pages.dev`
+## Database Setup
 
-#### Environment Variables:
-- `NODE_ENV` = `production`
-- `SITE_URL` = `https://weddingreplit.pages.dev`
+### Local Development
+1. Use SQLite for local development
+2. Database file is located at `.db/dev.db`
 
-### 2. Cloudflare D1 Database
+### Production
+1. Use Cloudflare D1 database
+2. Database name: `wedding_platform_db`
+3. Database ID: `eb586981-d322-4e17-a982-6397604e3fc4`
 
-- **Database Name**: `wedding_platform_db`
-- **Database UUID**: `eb586981-d322-4e17-a982-6397604e3fc4`
-- **Binding Name**: `DB`
-
-#### Tables:
-1. `vendors` - Wedding vendor information
-2. `weddings` - Wedding details
-3. `wedding_events` - Wedding event schedules
-4. `rsvp_invitations` - RSVP invitation tracking
-5. `rsvps` - RSVP responses
-6. `rsvp_questions` - Custom RSVP questions
-7. `rsvp_responses` - RSVP question responses
-8. `reviews` - Vendor reviews
-9. `categories` - Vendor categories
-10. `blog_posts` - Blog content
-11. `business_submissions` - Business listing submissions
-12. `contacts` - Contact form submissions
-
-### 3. Cloudflare Worker (Backend API)
-
-- **Worker Name**: `weddingreplit-worker`
-- **Main File**: `dist/worker.js`
-- **Binding**: Uses the same D1 database as Pages
-
-### 4. Redirects
+## Redirect Configuration
 
 Configured in `client/public/_redirects`:
 ```
-# Netlify Identity routes - must come BEFORE the SPA fallback
-/.netlify/identity/*  /.netlify/identity/:splat  200
-/admin/*             /admin/index.html          200
+# Admin redirect to Directus
+/admin  https://your-directus-instance.railway.app/admin  302
+
+# SPA fallback - must be last
 /*                   /index.html                200
 ```
 

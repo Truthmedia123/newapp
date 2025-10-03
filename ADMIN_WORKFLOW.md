@@ -10,19 +10,19 @@ This wedding platform is configured for admin-only vendor management to maintain
 - **Features**: Overview, vendor management, data import, system settings
 - **Security**: Token-based authentication (change the token in production)
 
-### 2. Netlify CMS
-- **URL**: `/admin`
-- **Access**: Git Gateway with editorial workflow
+### 2. Directus CMS
+- **URL**: `/admin` (redirects to Directus instance)
+- **Access**: Admin credentials required
 - **Features**: Content management, vendor profiles, blog posts
 
 ## Vendor Management Workflow
 
-### Option 1: Netlify CMS (Recommended)
-1. Go to `/admin` to access Netlify CMS
+### Option 1: Directus CMS (Recommended)
+1. Go to the Directus admin URL (configured in environment)
 2. Navigate to "Vendors" collection
 3. Create new vendor profiles with all required fields including social media links
 4. Use draft mode to review before publishing
-5. All changes are version controlled in Git
+5. All changes are stored in the database
 
 ### Option 2: CSV Import
 1. Prepare CSV file using the template in `scripts/vendor-template.csv` (now includes social media fields)
@@ -47,14 +47,14 @@ name,category,description,phone,email,whatsapp,location,address,website,instagra
 - All vendor creation APIs are admin-only
 
 ### CMS Configuration
-- `create: false` for vendors collection
-- Editorial workflow enabled
-- Git Gateway for version control
+- Admin-only access to content management
+- Database storage for all content
+- Role-based access control
 
 ### Admin Authentication
 - Token-based access to admin dashboard
-- Netlify Identity for CMS access
-- All changes tracked in Git
+- Directus admin authentication
+- All changes tracked in database
 
 ### API Protection
 - Rate limiting on all endpoints (100 requests per IP per hour)
@@ -84,18 +84,18 @@ wrangler d1 migrations apply wedding_platform_db          # Production
 ## Content Management
 
 ### Adding Vendors
-1. **CMS Method**: Use Netlify CMS interface
+1. **CMS Method**: Use Directus CMS interface
 2. **CSV Method**: Import via admin dashboard (supports social media fields)
 3. **Manual Method**: Use admin dashboard form with social media and embed fields
 4. **Script Method**: Modify seed script and run
 
 ### Updating Vendors
-1. Edit through Netlify CMS
+1. Edit through Directus CMS
 2. Changes go through draft → review → publish workflow
-3. All changes are version controlled
+3. All changes are stored in database
 
 ### Blog Posts
-1. Create through Netlify CMS
+1. Create through Directus CMS
 2. Use markdown for content
 3. Add featured images and metadata
 
@@ -146,7 +146,7 @@ wrangler d1 migrations apply wedding_platform_db          # Production
 ## Troubleshooting
 
 ### Common Issues
-1. **CMS Access**: Check Netlify Identity settings
+1. **CMS Access**: Check Directus admin credentials
 2. **Import Errors**: Verify CSV format matches template (including new social media fields)
 3. **Deployment Issues**: Check Cloudflare Workers logs
 4. **Database Errors**: Verify migration status
@@ -155,7 +155,7 @@ wrangler d1 migrations apply wedding_platform_db          # Production
 
 ### Support
 - Check Cloudflare Workers dashboard for logs
-- Review Git history for content changes
+- Review database for content changes
 - Use admin dashboard for system status
 - Monitor performance metrics
 - Check testing reports for failures

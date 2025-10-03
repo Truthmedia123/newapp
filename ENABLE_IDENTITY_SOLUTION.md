@@ -1,73 +1,60 @@
-# Solution: Enable Identity and Git Gateway for Netlify CMS
+# Solution: Enable Admin Access for Directus CMS
 
-You're being asked for a username and password because the Identity service hasn't been enabled yet. Follow these steps to resolve this issue:
+You're being asked for a username and password because the Directus admin access hasn't been configured yet. Follow these steps to resolve this issue:
 
-## Step 1: Access Your Site Dashboard
+## Step 1: Access Your Directus Instance
 
-1. Go to: https://app.netlify.com/sites/thegoanwedding
-2. Make sure you're logged into your Netlify account
+1. Go to your Directus admin URL (typically https://your-directus-instance.railway.app/admin)
+2. Make sure you're accessing the correct URL for your deployment
 
-## Step 2: Enable Identity Service
+## Step 2: Use Default Admin Credentials
 
-1. In the left sidebar of your site dashboard, look for "Identity"
-2. Click on "Identity" 
-3. Click the "Enable Identity" button
-4. This will set up authentication for your site
+For local development, use the default credentials:
+- Email: admin@example.com
+- Password: d1r3ctu5
 
-## Step 3: Configure Registration Settings
+For production deployments, you should have set up your own admin credentials during the Directus setup process.
 
-1. Under the "Registration" section:
-   - Select "Invite only" (recommended for security)
-   - Or select "Open" if you want anyone to be able to sign up
+## Step 3: Configure Admin Users
 
-2. If you selected "Invite only":
-   - Click "Invite users"
-   - Enter your email address
-   - Click "Send invite"
-   - Check your email for the invitation
+1. After logging in as the initial admin:
+   - Go to the "Users" section in Directus
+   - Create additional admin users as needed
+   - Assign appropriate roles and permissions
 
-## Step 4: Enable Git Gateway
-
-1. Scroll down to the "Services" section
-2. Click "Enable Git Gateway"
-3. You may need to authorize Netlify to access your GitHub account
-
-## Step 5: Access Your CMS
+## Step 4: Access Your CMS
 
 After completing the above steps:
 
-1. Go to: https://thegoanwedding.netlify.app/admin
-2. Click "Login with Netlify Identity"
-3. If you invited yourself, check your email for the invitation
-4. Create a password when prompted
-5. Log in to your CMS
+1. Navigate to your Directus admin URL
+2. Log in with your admin credentials
+3. Start managing your content through the Directus interface
 
 ## Troubleshooting
 
-### If You Still See Username/Password Prompt
+### If You Can't Log In
 
-1. Make sure you clicked "Enable Identity" in the Netlify dashboard
-2. Refresh the admin page
-3. Try accessing in an incognito/private browser window
-4. Clear your browser cache and cookies for the site
+1. Make sure you're using the correct Directus admin URL
+2. Verify your credentials are correct
+3. If using default credentials, ensure Directus is properly configured
+4. Check that the Directus service is running
 
-### If Identity Doesn't Appear in Sidebar
+### If You Forgot Your Password
 
-1. Make sure you're viewing the correct site (thegoanwedding)
-2. Refresh the Netlify dashboard page
-3. Try signing out and back into Netlify
-4. Check that you have proper permissions for this site
+1. Use the "Forgot Password" feature on the login page
+2. If that doesn't work, you may need to reset the admin password through the database
+3. For local development, you can reset to default credentials by clearing the Directus database
 
-### If Git Gateway Won't Enable
+### Database Connection Issues
 
-1. Make sure your GitHub repository is properly connected
-2. Check that you have admin permissions on the GitHub repository
-3. Try disconnecting and reconnecting your GitHub account in Netlify user settings
+1. Verify that your database connection settings are correct
+2. Check that the database service is running
+3. Ensure proper network connectivity to the database
 
 ## Need Help?
 
 If you're still having issues:
 
-1. Check the [Netlify Documentation](https://docs.netlify.com/)
-2. Review the [Netlify CMS Documentation](https://www.netlifycms.org/docs/intro/)
-3. Contact Netlify support through the dashboard
+1. Check the [Directus Documentation](https://docs.directus.io/)
+2. Review the project setup documentation
+3. Check the Directus logs for error messages

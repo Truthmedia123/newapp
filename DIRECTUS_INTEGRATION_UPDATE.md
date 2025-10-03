@@ -18,7 +18,7 @@ Modified all API routes to check the USE_DIRECTUS environment variable:
 ### 3. Added System Status Endpoint
 Created a new health check endpoint at `/api/system/status` that returns:
 - Database: 'Directus' or 'Cloudflare D1'
-- CMS: 'Directus Admin' or 'Netlify CMS'
+- CMS: 'Directus Admin'
 - Connection status and last sync time
 
 ## Implementation Details

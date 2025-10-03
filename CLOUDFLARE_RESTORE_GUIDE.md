@@ -77,9 +77,10 @@ To use your custom domain:
 
 The redirects are already configured in `client/public/_redirects`:
 ```
-# Netlify Identity routes - must come BEFORE the SPA fallback
-/.netlify/identity/*  /.netlify/identity/:splat  200
-/admin/*             /admin/index.html          200
+# Admin redirect to Directus
+/admin  https://your-directus-instance.railway.app/admin  302
+
+# SPA fallback - must be last
 /*                   /index.html                200
 ```
 

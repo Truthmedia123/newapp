@@ -41,8 +41,7 @@
     "test:coverage": "jest --coverage",
     "deploy:verify": "node scripts/deploy-verify.js",
     "rollback": "tsx scripts/rollback-deployment.ts",
-    "test:directus": "node test-directus-connection.js",
-    "migrate:netlify-to-directus": "node scripts/migrate-netlify-to-directus.js"
+    "test:directus": "node test-directus-connection.js"
   },
   "dependencies": {
     "@directus/sdk": "^20.1.0",
