@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Layout from "@/components/layout/Layout";
-import Home from "@/pages/HomeSimple"; // Using simple version
+import Home from "@/pages/Home";
 import VendorCategory from "@/pages/VendorCategory";
 import VendorProfile from "@/pages/VendorProfile";
 import ListBusiness from "@/pages/ListBusiness";
@@ -22,7 +22,7 @@ import GoanWeddingTimeline from "@/pages/GoanWeddingTimeline";
 import MobileAnalytics from "@/pages/MobileAnalytics";
 import NotFound from "@/pages/not-found";
 import FavoritesPage from "@/pages/Favorites";
-import HomeDebug from "@/pages/HomeDebug"; // Debug component
+import HomeDebug from "@/pages/HomeDebug";
 
 // Import the new page components
 import InvitationsPage from "@/pages/Invitations";

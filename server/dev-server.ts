@@ -232,6 +232,11 @@ app.get("/api/vendors", (_req, res) => {
   }
 });
 
+app.get("/api/vendors/featured", (_req, res) => {
+  const featuredVendors = mockDb.vendors.filter(vendor => vendor.featured === 1);
+  res.json(featuredVendors);
+});
+
 app.get("/api/vendors/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const vendor = mockDb.vendors.find(v => v.id === id);
@@ -460,7 +465,7 @@ const server = createServer(app);
     serveStatic(app);
   }
   
-  const port = 8787;
+  const port = 5001;
   const listenOptions: any = {
     port,
     host: "0.0.0.0",

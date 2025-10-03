@@ -133,13 +133,14 @@ weddingreplit/
 
 ### Development
 ```bash
-npm run dev              # Start Express dev server (port 3001)
-npm run pages:dev        # Start Cloudflare Pages dev server (port 8787)
-npm run build            # Build for development
-npm run build:production # Build for production
+npm run dev              # Start Express dev server (port 5001) - Full-stack development
+npm run pages:dev        # Start Cloudflare Pages dev server (port 8787) - Static preview only
 ```
 
-### Database
+### Frontend Development with HMR
+```bash
+cd client && npm run dev  # Start Vite dev server (port 3000) with API proxy to Express server
+```
 ```bash
 npm run db:push          # Push schema changes to database
 npm run db:seed          # Seed database with initial data
