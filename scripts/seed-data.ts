@@ -7,7 +7,7 @@
  * for development and testing purposes.
  */
 
-import { createDirectus, rest, staticToken, createItem, createItems } from '@directus/sdk';
+import { createDirectus, rest, staticToken, createItem, createItems, authentication } from '@directus/sdk';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -97,7 +97,7 @@ const DIRECTUS_URL = process.env.DIRECTUS_URL || 'http://localhost:8055';
 const DIRECTUS_TOKEN = process.env.DIRECTUS_TOKEN || 'dev-token';
 
 const directus = createDirectus<DirectusSchema>(DIRECTUS_URL)
-  .with(staticToken(DIRECTUS_TOKEN))
+  .with(authentication())
   .with(rest());
 
 // Sample Goan wedding vendors
@@ -681,6 +681,11 @@ async function main() {
   console.log('=====================================\n');
   
   try {
+    // Login to Directus
+    console.log('🔐 Logging into Directus...');
+    await directus.login({ email: 'admin@example.com', password: 'd1r3ctu5' });
+    console.log('✅ Successfully logged into Directus!');
+    
     // Seed categories first (vendors reference categories)
     const categoryIds = await seedCategories();
     

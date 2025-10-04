@@ -36,9 +36,11 @@
     "docker:dev": "docker-compose up",
     "docker:build": "docker-compose build",
     "docker:clean": "docker-compose down -v",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "test:coverage": "jest --coverage",
+    "test:smoke": "node scripts/production-smoke-test.js",
     "deploy:verify": "node scripts/deploy-verify.js",
     "rollback": "tsx scripts/rollback-deployment.ts",
     "test:directus": "node test-directus-connection.js"

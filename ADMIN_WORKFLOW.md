@@ -6,7 +6,7 @@ This wedding platform is configured for admin-only vendor management to maintain
 ## Admin Access
 
 ### 1. Admin Dashboard
-- **URL**: `/admin/dashboard?token=admin-secret-2024`
+- **URL**: `/admin/dashboard?token=admin-secret-6501fa0f`
 - **Features**: Overview, vendor management, data import, system settings
 - **Security**: Token-based authentication (change the token in production)
 

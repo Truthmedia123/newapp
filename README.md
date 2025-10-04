@@ -206,6 +206,68 @@ npm run deploy:production # Deploy to production
 npm run deploy:pages      # Deploy static assets to Cloudflare Pages
 ```
 
+## 🧪 Testing
+
+### Unit Testing
+
+Run unit tests with Jest:
+```bash
+npm test                 # Run test suite
+npm test -- --coverage   # Run tests with coverage report
+npm run test:watch       # Run tests in watch mode
+```
+
+### End-to-End Testing
+
+Run Playwright tests:
+```bash
+npm run test:e2e         # Run end-to-end tests
+```
+
+### Performance and Accessibility Testing
+
+Run Lighthouse audits:
+```bash
+npx lhci autorun         # Run Lighthouse CI
+```
+
+## 🛠️ Development
+
+### Development Server
+
+Start the development environment:
+```bash
+npm run dev:all          # Start all services (Directus, Meilisearch, App)
+npm run pages:dev        # Start Cloudflare Pages dev server
+```
+
+### Code Quality
+
+Ensure code quality with linting and formatting:
+```bash
+npm run check            # TypeScript type checking
+npx eslint .             # ESLint code analysis
+npx prettier --check .   # Prettier code formatting
+```
+
+### Database
+
+Manage the database:
+```bash
+npm run db:push          # Push schema changes to database
+npm run db:seed          # Seed database with initial data
+npm run seed             # Add sample data
+npm run seed:reset       # Reset and reseed data
+```
+
+### Security
+
+Run security audits:
+```bash
+npm audit                # Check for vulnerable dependencies
+npm run update-deps      # Update dependencies and check for vulnerabilities
+```
+
 ### Utilities
 ```bash
 npm run import:vendors   # Import vendor data from CSV
@@ -217,6 +279,15 @@ npm run audit            # Run accessibility and performance audits
 ```bash
 npm run update-deps      # Update dependencies and check for vulnerabilities
 ```
+
+### Production Smoke Testing
+
+Run production smoke tests to verify deployment:
+```bash
+npm run test:smoke       # Run production smoke tests
+```
+
+For detailed information about smoke testing, see [PRODUCTION_SMOKE_TEST.md](docs/PRODUCTION_SMOKE_TEST.md).
 
 ## 📚 Documentation
 
